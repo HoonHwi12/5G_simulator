@@ -33,6 +33,25 @@
 
 FlowsManager* FlowsManager::ptr=nullptr;
 
+FlowsManager::FlowsManager()
+{
+  applicationContainer = new std::vector<Application*>;
+}
+
+FlowsManager::~FlowsManager()
+{
+  std::vector<Application*>::iterator iter;
+  for (iter = applicationContainer->begin();iter != applicationContainer->end(); iter++)
+    {
+    // (*iter)->Destroy();
+    delete *iter;
+
+    }
+
+  delete applicationContainer;
+
+}
+
 Application*
 FlowsManager::CreateApplication (int applicationID,
                                  NetworkNode* src, NetworkNode* dst,
@@ -82,7 +101,12 @@ FlowsManager::CreateApplication (int applicationID,
   app->SetStartTime (startTime);
   app->SetStopTime (startTime + duration);
 
+  GetApplicationContainer ()->push_back (app);
+
   return app;
 
 }
 
+std::vector<Application*>* FlowsManager::GetApplicationContainer (void){
+  return applicationContainer;
+}

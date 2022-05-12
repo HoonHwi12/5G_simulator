@@ -65,18 +65,19 @@
 #include <cstring>
 #include <fenv.h>
 
+//by HH
+#include "scenarios/single-cell-with-interference-mixed-apps.h"
+
 std::mt19937 commonGen(time(NULL));
 
 int
 main (int argc, char *argv[])
 {
-
   // Raise a floating point error when some computation gives a NaN as result
 //  feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
 
   if (argc > 1)
     {
-
       /* Help */
       if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "-H") || !strcmp(argv[1],
           "--help") || !strcmp(argv[1], "--Help"))
@@ -86,94 +87,116 @@ main (int argc, char *argv[])
         }
 
       /* Run simple scenario */
-      if (strcmp(argv[1], "Simple")==0)
+      else if (strcmp(argv[1], "Simple")==0)
         {
           Simple ();
         }
 
 
-
       /* Run more complex scenarios */
-      if (strcmp(argv[1], "SingleCell")==0)
+      else if (strcmp(argv[1], "SingleCell")==0)
         {
           SingleCellWithoutInterference (argc, argv);
         }
-      if (strcmp(argv[1], "SingleCellWithI")==0)
+      else if (strcmp(argv[1], "SingleCellWithI")==0)
         {
           SingleCellWithInterference (argc, argv);
         }
-      if (strcmp(argv[1], "MultiCell")==0)
+      else if (strcmp(argv[1], "MultiCell")==0)
         {
           MultiCell (argc, argv);
         }
-      if (strcmp(argv[1], "SingleCellWithFemto")==0)
+      else if (strcmp(argv[1], "SingleCellWithFemto")==0)
         {
           SingleCellWithFemto(argc, argv);
         }
-      if (strcmp(argv[1], "SingleCellWithStreets")==0)
+      else if (strcmp(argv[1], "SingleCellWithStreets")==0)
         {
           SingleCellWithStreets (argc, argv);
         }
-      if (strcmp(argv[1], "MMC1")==0)
+      else if (strcmp(argv[1], "MMC1")==0)
         {
           MMC1 (argc, argv);
         }
-      if (strcmp(argv[1], "nbCell")==0)
+      else if (strcmp(argv[1], "nbCell")==0)
         {
           nbCell (argc, argv);
         }
-      if (strcmp(argv[1], "test-tri-sector")==0)
+      else if (strcmp(argv[1], "test-tri-sector")==0)
         {
           TestTriSector (argc, argv);
         }
-      if (strcmp(argv[1], "test-multi-cell-tri-sector")==0)
+      else if (strcmp(argv[1], "test-multi-cell-tri-sector")==0)
         {
           TestMultiCellTriSector (argc, argv);
         }
-      if (strcmp(argv[1], "itu-calibration")==0)
+      else if (strcmp(argv[1], "itu-calibration")==0)
         {
           ItuCalibration (argc, argv);
         }
-      if (strcmp(argv[1], "urban-macrocell-itu")==0)
+      else if (strcmp(argv[1], "urban-macrocell-itu")==0)
         {
           UrbanMacrocellItu (argc, argv);
         }
-      if (strcmp(argv[1], "rural-macrocell-itu")==0)
+      else if (strcmp(argv[1], "rural-macrocell-itu")==0)
         {
           RuralMacrocellItu (argc, argv);
         }
-      if (strcmp(argv[1], "test-multicast")==0)
+      else if (strcmp(argv[1], "test-multicast")==0)
         {
           TestMulticast (argc, argv);
         }
-      if (strcmp(argv[1], "test-mbsfn")==0)
+      else if (strcmp(argv[1], "test-mbsfn")==0)
         {
           TestMbsfn (argc, argv);
         }
-      if (strcmp(argv[1], "test-unicast")==0)
+      else if (strcmp(argv[1], "test-unicast")==0)
         {
           TestUnicast (argc, argv);
         }
-      if (strcmp(argv[1], "f5g-uc1")==0)
+      else if (strcmp(argv[1], "f5g-uc1")==0)
         {
           f5g_50MbpsEverywhere (argc, argv);
         }
-      if (strcmp(argv[1], "f5g-uc2")==0)
+      else if (strcmp(argv[1], "f5g-uc2")==0)
         {
           f5g_HighSpeedTrain (argc, argv);
         }
-      if (strcmp(argv[1], "f5g-uc6")==0)
+      else if (strcmp(argv[1], "f5g-uc6")==0)
         {
           f5g_BroadcastServices (argc, argv);
         }
-      if (strcmp(argv[1], "f5g-demo1")==0)
+      else if (strcmp(argv[1], "f5g-demo1")==0)
         {
           f5g_demo1 (argc, argv);
         }
-      if (strcmp(argv[1], "nbCellTest")==0)
+      else if (strcmp(argv[1], "nbCellTest")==0)
         {
           nbCellTest (argc, argv);
         }
+      else if (strcmp(argv[1], "SingleCellWithIMixedApps")==0)
+	    {
+        int nbCells = atoi(argv[2]);
+        double radius = atof(argv[3]);
+        int nbUE = atoi(argv[4]);
+        int nbVideo = atoi(argv[5]);
+        int nbCBR = atoi(argv[6]);
+        int nbBE = atoi(argv[7]);
+        int nbVOIP = atoi(argv[8]);
+        int sched_type = atoi(argv[9]);
+        int frame_struct = atoi(argv[10]);
+        int speed = atoi(argv[11]);
+        double maxDelay = atof(argv[12]);
+        int video_bit_rate = atoi(argv[13]);
+        int seed;
+        if (argc==15) seed = atoi(argv[14]);
+        else seed = -1;
+        SingleCellWithInterferenceMixedApps(nbCells, radius, nbUE, nbVideo, nbCBR, nbBE, nbVOIP, sched_type, frame_struct, speed, maxDelay, video_bit_rate, seed);
+	    }
+      else
+      {
+        printf("No test selected: ABORT\n");
+      }
     }
   else
     {

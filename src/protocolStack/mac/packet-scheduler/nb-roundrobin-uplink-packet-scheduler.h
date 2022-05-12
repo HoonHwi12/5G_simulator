@@ -33,7 +33,7 @@ public:
   void printQ();
 
 private:
-  int m_roundRobinId;
+  size_t m_roundRobinId;
   vector< vector<int> > m_RUmap = vector< vector<int> >(5);
   vector<UserToSchedule> m_users;
   vector<UserToSchedule>  m_queue;

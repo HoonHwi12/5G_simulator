@@ -33,7 +33,7 @@ ApplicationEntity::InsertApplicationSource(Application* app)
   m_app_sources.push_back(app);
 }
 
-vector<Application*>*
+std::vector<Application*>*
 ApplicationEntity::GetApplicationSources(void)
 {
   return &m_app_sources;
@@ -45,7 +45,7 @@ ApplicationEntity::InsertApplicationDestinations(Application* app)
   m_app_destinations.push_back(app);
 }
 
-vector<Application*>*
+std::vector<Application*>*
 ApplicationEntity::GetApplicationDestinations(void)
 {
   return &m_app_destinations;

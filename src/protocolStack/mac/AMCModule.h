@@ -62,9 +62,9 @@ public:
   int
   GetModulationOrderFromMCS(int mcs);
   int
-  GetMCSFromSinrVector(const vector<double> &sinr);
+  GetMCSFromSinrVector(const std::vector<double> &sinr);
 
-  vector<int> CreateCqiFeedbacks (vector<double> sinr);
+  std::vector<int> CreateCqiFeedbacks (std::vector<double> sinr);
   bool getUseExtendedCQI (void);
   void setUseExtendedCQI (bool t);
 

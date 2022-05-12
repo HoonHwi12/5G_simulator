@@ -101,6 +101,17 @@ QoSParameters::SetGBR (double gbr)
   m_gbr = gbr;
 }
 
+void
+QoSParameters::SetDropPorbability (double probability)
+{
+  m_dropProbability = probability;
+}
+
+double QoSParameters::GetDropProbability (void) const
+{
+  return m_dropProbability;
+}
+
 double
 QoSParameters::GetGBR (void) const
 {

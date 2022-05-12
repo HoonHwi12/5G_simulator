@@ -97,6 +97,10 @@ public:
   double
   GetMaxDelay (void) const;
 
+	virtual double GetDropProbability(void) const;
+	virtual void SetDropPorbability(double probability);
+	double m_dropProbability;
+
 private:
   int m_qci;
   bool m_arpPreEmptionCapability;

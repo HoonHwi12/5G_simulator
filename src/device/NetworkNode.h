@@ -20,7 +20,6 @@
  */
 
 
-
 #ifndef NETWORKNODE_H_
 #define NETWORKNODE_H_
 
