@@ -39,17 +39,17 @@ public:
   PacketBurst (void) = default;
   virtual ~PacketBurst (void);
 
-  shared_ptr<PacketBurst> Copy (void);
+  std::shared_ptr<PacketBurst> Copy (void);
   void AddPacket (Packet* packet);
-  list<Packet* > GetPackets (void) const;
+  std::list<Packet* > GetPackets (void) const;
   uint32_t GetNPackets (void) const;
   uint32_t GetSize (void) const;
 
-  list<Packet* >::const_iterator Begin (void) const;
-  list<Packet* >::const_iterator End (void) const;
+  std::list<Packet* >::const_iterator Begin (void) const;
+  std::list<Packet* >::const_iterator End (void) const;
 
 private:
-  list<Packet* > m_packets;
+  std::list<Packet* > m_packets;
 };
 
 

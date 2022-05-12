@@ -511,3 +511,59 @@ Application::Print (void)
        endl;
 }
 
+
+QoSParameters* Application::UpdateQoSOnSchedulerChange(GNodeB::DLSchedulerType new_scheduler_type){
+  switch (new_scheduler_type)
+    {
+      case GNodeB::DLScheduler_TYPE_DQN:
+        SetQoSParameters(qosBase);
+        // printf("LTESIM: QoS for Application ID# %d changed to qosBase.\n", GetApplicationID () );
+      break;
+
+      case GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR:
+        SetQoSParameters(qosBase);
+        // printf("LTESIM: QoS for Application ID# %d changed to qosBase.\n", GetApplicationID () );
+      break;
+      case GNodeB::DLScheduler_TYPE_MLWDF:
+        SetQoSParameters(qosMLWDF);
+        // printf("LTESIM: QoS for Application ID# %d changed to qosMLWDF.\n", GetApplicationID () );
+      break;
+      case GNodeB::DLScheduler_TYPE_EXP:
+        SetQoSParameters(qosEXP);
+        // printf("LTESIM: QoS for Application ID# %d changed to qosEXP.\n", GetApplicationID () );
+      break;
+      case GNodeB::DLScheduler_TYPE_FLS:
+        SetQoSParameters(qosFLS);
+        // printf("LTESIM: QoS for Application ID# %d changed to qosFLS.\n", GetApplicationID () );
+      break;
+      case GNodeB::DLScheduler_EXP_RULE:
+        SetQoSParameters(qosBase);
+        // printf("LTESIM: QoS for Application ID# %d changed to qosBase.\n", GetApplicationID () );
+      break;
+      case GNodeB::DLScheduler_LOG_RULE:
+        SetQoSParameters(qosBase);
+        // printf("LTESIM: QoS for Application ID# %d changed to qosBase.\n", GetApplicationID () );
+      break;
+      case GNodeB::DLScheduler_TYPE_ROUND_ROBIN:
+        SetQoSParameters(qosBase);
+        // printf("LTESIM: QoS for Application ID# %d changed to qosBase.\n", GetApplicationID () );
+      break;
+      case GNodeB::DLScheduler_TYPE_MAXIMUM_THROUGHPUT:
+        SetQoSParameters(qosBase);
+        // printf("LTESIM: QoS for Application ID# %d changed to qosBase.\n", GetApplicationID () );
+      break; 
+      default:
+        SetQoSParameters(qosBase);
+        // printf("LTESIM: QoS for Application ID# %d changed to qosBase.\n", GetApplicationID () );
+      break;
+    }
+    return m_qosParameters;
+}
+
+void Application::SetQoSAllTypes(QoSParameters *EXP, QoSParameters *FLS, QoSParameters *MLWDF, QoSParameters *Base){
+  //qosDQN   = DQN;
+  qosEXP   = EXP;
+  qosFLS   = FLS;
+  qosMLWDF = MLWDF;
+  qosBase  = Base;
+}

@@ -1,0 +1,18 @@
+make:
+	if test -f 5G-air-simulator; then rm 5G-air-simulator; fi;
+	clear;
+	cat CONFIG/5G-air-simulator
+	cd TOOLS; make; cd ../;
+	./CONFIG/make_load-parameter-file.sh; 
+	cd Debug; make clean; make; cd ..;
+	ln -sf Debug/5G-air-simulator 5G-air-simulator
+# 	clear;
+	cat CONFIG/5G-air-simulator-end
+clean:
+	rm 5G-air-simulator; cd Debug; make clean
+	cd ..
+	cd TOOLS; make clean;
+	cd ..
+	clear
+	cat CONFIG/5G-air-simulator-end-clear
+	

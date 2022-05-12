@@ -39,11 +39,12 @@ public:
 
 private:
 
-  FlowsManager() = default;
+  FlowsManager();
   static FlowsManager *ptr;
+	std::vector<Application*> *applicationContainer;
 
 public:
-  virtual ~FlowsManager() = default;
+  virtual ~FlowsManager();
 
   static FlowsManager*
   Init (void)
@@ -62,6 +63,8 @@ public:
                                    Application::ApplicationType type,
                                    QoSParameters* qos,
                                    double startTime, double duration);
+  
+  std::vector<Application*>* GetApplicationContainer (void);
 };
 
 #endif /* FLOWSMANAGER_H_ */

@@ -37,6 +37,9 @@
 #include "utility/PrintVector.h"
 #include "utility/Logging.h"
 
+/* path */
+static std::string path ("/home/hoonhwi/net/5G_simulator/");
+
 using std::cout;
 using std::endl;
 using std::vector;

@@ -36,8 +36,8 @@ public:
 
   virtual void DoSetBandwidthManager (void);
 
-  virtual void StartTx (shared_ptr<PacketBurst> p);
-  virtual void StartRx (shared_ptr<PacketBurst> p, TransmittedSignal* txSignal);
+  virtual void StartTx (std::shared_ptr<PacketBurst> p);
+  virtual void StartRx (std::shared_ptr<PacketBurst> p, TransmittedSignal* txSignal);
 
   virtual void SendIdealControlMessage (IdealControlMessage *msg);
   virtual void ReceiveIdealControlMessage (IdealControlMessage *msg);

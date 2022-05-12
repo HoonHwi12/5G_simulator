@@ -31,7 +31,7 @@
 class UserEquipment;
 class Gateway;
 
-class PacketScheduler;
+//class PacketScheduler;
 class DownlinkPacketScheduler;
 class UplinkPacketScheduler;
 
@@ -103,7 +103,8 @@ public:
     DLScheduler_TYPE_EXP,
     DLScheduler_LOG_RULE,
     DLScheduler_EXP_RULE,
-    DLScheduler_TYPE_ROUND_ROBIN
+    DLScheduler_TYPE_ROUND_ROBIN,
+    DLScheduler_TYPE_DQN
   };
   enum ULSchedulerType
   {
@@ -143,8 +144,31 @@ public:
   //Debug
   void Print (void);
 
+  DLSchedulerType my_scheduler;
+
+
+  // by HH: added
+  static void OpenSchedulerFifo(int *fd);
+  static DLSchedulerType FetchScheduler(int *fd);
+  static void UpdateAllScheduler(GNodeB::DLSchedulerType new_scheduler);
+
+  static void ConnectStateFifo(int *fd);
+  static void SendState(int *fd, std::string state);
+  static void SendUESummary(int *fd);
+  static void FormUESummaryMessage(GNodeB *gNB, std::string *target_string);
+
+  static void ConnectCQIFifo(int *fd);
+  static void SendCQISummary(int *fd);
+  static void FormCQIMessage(GNodeB *gNB, std::string *target_string);
+  
+  static void NumberToString(double number, std::string *target);
+	static void NumberToString(int number, std::string *target);
+
+	static bool makeUEsStationary();
+
 private:
   UserEquipmentRecords *m_userEquipmentRecords;
 };
+
 
 #endif /* GNODEB_H_ */

@@ -69,7 +69,7 @@ static double MI_mapping_direct(double sinr, int modulationOrder)
     case 6:
       return MI_64QAM[index];
     default:
-      cout << "Invalid modulation order: " << modulationOrder << endl;
+      std::cout << "Invalid modulation order: " << modulationOrder << std::endl;
       exit(1);
     }
 }
@@ -92,7 +92,7 @@ static double MI_mapping_inverse(double MI, int modulationOrder)
       MI_curve = MI_64QAM;
       break;
     default:
-      cout << "Invalid modulation order: " << modulationOrder << endl;
+      std::cout << "Invalid modulation order: " << modulationOrder << std::endl;
       exit(1);
     }
   while (max_index - min_index > 1)
@@ -111,7 +111,7 @@ static double MI_mapping_inverse(double MI, int modulationOrder)
 }
 
 static double
-GetMiesmEffectiveSinr (const vector <double> &sinr, int modulationOrder)
+GetMiesmEffectiveSinr (const std::vector <double> &sinr, int modulationOrder)
 {
   double eff_sinr;
   long double sum_I_sinr = 0;
@@ -126,7 +126,7 @@ GetMiesmEffectiveSinr (const vector <double> &sinr, int modulationOrder)
 }
 
 static double
-GetMiesmEffectiveSinr (const vector <double> &sinrs)
+GetMiesmEffectiveSinr (const std::vector <double> &sinrs)
 {
   AMCModule* amc = new AMCModule();
   double effectiveSinr = -INFINITY;

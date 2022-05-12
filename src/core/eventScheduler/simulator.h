@@ -28,6 +28,7 @@
 #include "event.h"
 #include "calendar.h"
 #include "make-event.h"
+//#include "../../device/GNodeB.h"
 
 #include <stdint.h>
 #include <string>
@@ -47,7 +48,7 @@ private:
   static Simulator *ptr;
 
   Calendar *m_calendar;
-  bool m_stop;
+
   unsigned long long int m_currentUid;
   unsigned long long int m_lastAssignedUid;
   double m_currentTs;
@@ -57,9 +58,29 @@ private:
 
   void ProcessOneEvent (void);
 
+  // // by HH: added
+	// void OpenSchedulerFifo(int *fd);
+	// GNodeB::DLSchedulerType DLSchedulerType(int *fd);
+	// void UpdateAllScheduler(GNodeB::DLSchedulerType new_scheduler);
+
+	// void ConnectStateFifo(int *fd);
+	// void SendState(int *fd, std::string state);
+	// void SendUESummary(int *fd);
+	// void FormUESummaryMessage(GNodeB *gNB, std::string *target_string);
+
+	// void ConnectCQIFifo(int *fd);
+	// void SendCQISummary(int *fd);
+	// void FormCQIMessage(GNodeB *gNB, std::string *target_string);
+
+	// void NumberToString(double number, std::string *target);
+	// void NumberToString(int number, std::string *target);
+
+	// bool makeUEsStationary();
+
 public:
   virtual ~Simulator ();
 
+  bool m_stop;
   static Simulator*
   Init (void)
   {

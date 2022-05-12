@@ -35,6 +35,8 @@
 #include <iostream>
 #include <stdint.h>
 
+#include "../../device/GNodeB.h"
+
 class NetworkNode;
 class ClassifierParameters;
 class RadioBearer;
@@ -105,6 +107,9 @@ public:
 
   void Trace (Packet* packet);
 
+	QoSParameters* UpdateQoSOnSchedulerChange(GNodeB::DLSchedulerType new_scheduler_type);
+	void SetQoSAllTypes(QoSParameters *EXP, QoSParameters *FLS, QoSParameters *MLWDF, QoSParameters *Base);
+
   //Debug
   void Print (void);
 
@@ -131,6 +136,11 @@ private:
   double m_stopTime;
 
   int m_applicationID;
+
+  QoSParameters *qosEXP;
+	QoSParameters *qosFLS;
+	QoSParameters *qosMLWDF;
+	QoSParameters *qosBase;
 };
 
 #endif /* APPLICATION_H_ */

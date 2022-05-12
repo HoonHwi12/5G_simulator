@@ -205,7 +205,7 @@ DEBUG_LOG_END
                     }
                 }
             }
-          for (int i=0; i<availableRBs.size(); i++)
+          for (size_t i=0; i<availableRBs.size(); i++)
             {
               if (availableRBs.at(i)<round(nbOfRBs*m_maxCCCHUsage))
                 {
