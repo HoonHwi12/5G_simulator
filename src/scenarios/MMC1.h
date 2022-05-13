@@ -124,8 +124,8 @@ static void MMC1 (int argc, char *argv[])
   cout << "Duration: " << duration << " flow: " << flow_duration << endl;
 
   // SET SCHEDULING ALLOCATION SCHEME
-  GNodeB::DLSchedulerType downlink_scheduler_type;
-  downlink_scheduler_type = GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR;
+  Simulator::SchedulerType downlink_scheduler_type;
+  downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
   cout << "Scheduler PF "<< endl;
   
   // SET TYPE BASELINE/ENHANCED

@@ -101,12 +101,12 @@ ClassifierParameters::GetTransportProtocol(void)
 void
 ClassifierParameters::Print()
 {
-  std::cout <<
+  cout <<
             "\t Classifier Parameters:"
             "\n\t\t src = " << m_sourceID <<
             "\n\t\t dst = " << m_destinationID <<
             "\n\t\t srcPort = " << m_sourcePort <<
             "\n\t\t dstPort = " << m_destinationPort <<
             "\n\t\t protocol = " << m_protocolType
-            << std::endl;
+            << endl;
 }

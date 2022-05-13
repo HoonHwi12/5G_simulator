@@ -197,43 +197,43 @@ static void f5g_HighSpeedTrain (int argc, char *argv[])
   double radius = isd / sqrt(3); // define cell radius from inter site distance
 
   // SET SCHEDULING ALLOCATION SCHEME
-  GNodeB::DLSchedulerType downlink_scheduler_type;
+  Simulator::SchedulerType downlink_scheduler_type;
   switch (sched_type)
     {
     case 1:
-      downlink_scheduler_type = GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR;
+      downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
       cout << "Scheduler PF "<< endl;
       break;
     case 2:
-      downlink_scheduler_type = GNodeB::DLScheduler_TYPE_MLWDF;
+      downlink_scheduler_type = Simulator::Scheduler_TYPE_MLWDF;
       cout << "Scheduler MLWDF "<< endl;
       break;
     case 3:
-      downlink_scheduler_type = GNodeB::DLScheduler_TYPE_EXP;
+      downlink_scheduler_type = Simulator::Scheduler_TYPE_EXP;
       cout << "Scheduler EXP "<< endl;
       break;
     case 4:
-      downlink_scheduler_type = GNodeB::DLScheduler_TYPE_FLS;
+      downlink_scheduler_type = Simulator::Scheduler_TYPE_FLS;
       cout << "Scheduler FLS "<< endl;
       break;
     case 5:
-      downlink_scheduler_type = GNodeB::DLScheduler_EXP_RULE;
+      downlink_scheduler_type = Simulator::Scheduler_EXP_RULE;
       cout << "Scheduler EXP_RULE "<< endl;
       break;
     case 6:
-      downlink_scheduler_type = GNodeB::DLScheduler_LOG_RULE;
+      downlink_scheduler_type = Simulator::Scheduler_LOG_RULE;
       cout << "Scheduler LOG RULE "<< endl;
       break;
     case 7:
-      downlink_scheduler_type = GNodeB::DLScheduler_TYPE_MAXIMUM_THROUGHPUT;
+      downlink_scheduler_type = Simulator::Scheduler_TYPE_MAXIMUM_THROUGHPUT;
       cout << "Scheduler MT "<< endl;
       break;
     case 8:
-      downlink_scheduler_type = GNodeB::DLScheduler_TYPE_ROUND_ROBIN;
+      downlink_scheduler_type = Simulator::Scheduler_TYPE_ROUND_ROBIN;
       cout << "Scheduler RR "<< endl;
       break;
     default:
-      downlink_scheduler_type = GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR;
+      downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
       break;
     }
 

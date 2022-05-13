@@ -49,6 +49,7 @@
 
 //HH
 #include "../protocolStack/mac/packet-scheduler/dqn-packet-scheduler.h"
+#include "../core/eventScheduler/simulator.h"
 #include "../componentManagers/FlowsManager.h"
 // cout stream buffer redirect
 #include <sstream>
@@ -438,63 +439,63 @@ GNodeB::UserEquipmentRecord::GetUplinkChannelStatusIndicator (void) const
 }
 
 void
-GNodeB::SetDLScheduler (GNodeB::DLSchedulerType type)
+GNodeB::SetDLScheduler (Simulator::SchedulerType type)
 {
   GnbMacEntity *mac = GetMacEntity ();
   DownlinkPacketScheduler *scheduler;
 
   switch (type)
     {
-    case GNodeB::DLScheduler_TYPE_DQN:
+    case Simulator::Scheduler_TYPE_DQN:
     	scheduler = new  DQN_PacketScheduler ();
     	scheduler->SetMacEntity (mac);
     	mac->SetDownlinkPacketScheduler (scheduler);      
       break;
 
-    case GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR:
+    case Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR:
       printf("SET SCHEDULER TO PF\n");
       scheduler = new  DL_PF_PacketScheduler ();
       scheduler->SetMacEntity (mac);
       mac->SetDownlinkPacketScheduler (scheduler);
       break;
 
-    case GNodeB::DLScheduler_TYPE_FLS:
+    case Simulator::Scheduler_TYPE_FLS:
       scheduler = new  DL_FLS_PacketScheduler ();
       scheduler->SetMacEntity (mac);
       mac->SetDownlinkPacketScheduler (scheduler);
       break;
 
-    case GNodeB::DLScheduler_TYPE_EXP:
+    case Simulator::Scheduler_TYPE_EXP:
       scheduler = new  DL_EXP_PacketScheduler ();
       scheduler->SetMacEntity (mac);
       mac->SetDownlinkPacketScheduler (scheduler);
       break;
 
-    case GNodeB::DLScheduler_TYPE_MLWDF:
+    case Simulator::Scheduler_TYPE_MLWDF:
       scheduler = new  DL_MLWDF_PacketScheduler ();
       scheduler->SetMacEntity (mac);
       mac->SetDownlinkPacketScheduler (scheduler);
       break;
 
-    case GNodeB::DLScheduler_EXP_RULE:
+    case Simulator::Scheduler_EXP_RULE:
       scheduler = new  ExpRuleDownlinkPacketScheduler ();
       scheduler->SetMacEntity (mac);
       mac->SetDownlinkPacketScheduler (scheduler);
       break;
 
-    case GNodeB::DLScheduler_LOG_RULE:
+    case Simulator::Scheduler_LOG_RULE:
       scheduler = new  LogRuleDownlinkPacketScheduler ();
       scheduler->SetMacEntity (mac);
       mac->SetDownlinkPacketScheduler (scheduler);
       break;
 
-    case GNodeB::DLScheduler_TYPE_MAXIMUM_THROUGHPUT:
+    case Simulator::Scheduler_TYPE_MAXIMUM_THROUGHPUT:
       scheduler = new  DL_MT_PacketScheduler ();
       scheduler->SetMacEntity (mac);
       mac->SetDownlinkPacketScheduler (scheduler);
       break;
 
-    case GNodeB::DLScheduler_TYPE_ROUND_ROBIN:
+    case Simulator::Scheduler_TYPE_ROUND_ROBIN:
       scheduler = new  DL_RR_PacketScheduler ();
       scheduler->SetMacEntity (mac);
       mac->SetDownlinkPacketScheduler (scheduler);
@@ -674,11 +675,11 @@ GNodeB::Print (void)
 
 // }
 
-// GNodeB::DLSchedulerType GNodeB::FetchScheduler(int *fd){
+// Simulator::SchedulerType GNodeB::FetchScheduler(int *fd){
 //   char c_readbuf[80];
 //   char *c_read_ptr;
 //   int i_input_bytes;
-//   GNodeB::DLSchedulerType downlink_scheduler_type;
+//   Simulator::SchedulerType downlink_scheduler_type;
 
 //   *fd = open(SCHE_FIFO, O_RDONLY);
 //   i_input_bytes = read(*fd, c_readbuf, sizeof(c_readbuf));
@@ -700,14 +701,14 @@ GNodeB::Print (void)
 //   {
 //     Simulator *sim;
 //     sim->m_stop = true;
-//     downlink_scheduler_type = GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR;
+//     downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
 //     printf("LTESIM: Scheduler is PF_Fair.\n");
 //     return downlink_scheduler_type;
 //   }
 
 //   if(d_dqn_output0 >= 0)
 //   {
-//         downlink_scheduler_type = GNodeB::DLScheduler_TYPE_DQN;
+//         downlink_scheduler_type = Simulator::Scheduler_TYPE_DQN;
 //         printf("LTESIM: Scheduler is DQN\n");
 //   }
 //   else
@@ -715,36 +716,36 @@ GNodeB::Print (void)
 //     switch ((int)d_dqn_output1/10)
 //       {
 //         case 0:
-//           downlink_scheduler_type = GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR;
+//           downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
 //           printf("LTESIM: Scheduler is PF_Fair.\n");
 //           break;
 //         case 1:
-//           downlink_scheduler_type = GNodeB::DLScheduler_TYPE_MLWDF;
+//           downlink_scheduler_type = Simulator::Scheduler_TYPE_MLWDF;
 //           printf("LTESIM: Scheduler is MLWDF.\n");
 //           break;
 //         case 2:
-//           downlink_scheduler_type = GNodeB::DLScheduler_TYPE_EXP;
+//           downlink_scheduler_type = Simulator::Scheduler_TYPE_EXP;
 //           printf("LTESIM: Scheduler is EXP.\n");
 //           break;
 //         case 3:
-//           downlink_scheduler_type = GNodeB::DLScheduler_TYPE_FLS;
+//           downlink_scheduler_type = Simulator::Scheduler_TYPE_FLS;
 //           printf("LTESIM: Scheduler is FLS.\n");
 //           break;
 //         case 4:
-//           downlink_scheduler_type = GNodeB::DLScheduler_EXP_RULE;
+//           downlink_scheduler_type = Simulator::Scheduler_EXP_RULE;
 //           printf("LTESIM: Scheduler is EXP_RULE.\n");
 //           break;
 //         case 5:
-//           downlink_scheduler_type = GNodeB::DLScheduler_LOG_RULE;
+//           downlink_scheduler_type = Simulator::Scheduler_LOG_RULE;
 //           printf("LTESIM: Scheduler is LOG_RULE.\n");
 //           break;
 //         case 11:
-//           downlink_scheduler_type = GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR;
+//           downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
 //           printf("LTESIM: SETTING UEs stationary.\n");
 //           makeUEsStationary();
 //           break;
 //         default:
-//           downlink_scheduler_type = GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR;
+//           downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
 //           break;
 //       }
 //   }
@@ -855,7 +856,7 @@ GNodeB::Print (void)
 //   }
 // }
 
-// void GNodeB::UpdateAllScheduler(GNodeB::DLSchedulerType new_scheduler){
+// void GNodeB::UpdateAllScheduler(Simulator::SchedulerType new_scheduler){
 //   // vector of gNBs
 //   std::vector<GNodeB*> *gNBs = NetworkManager::Init()->GetGNodeBContainer ();
 //   // vector of Apps

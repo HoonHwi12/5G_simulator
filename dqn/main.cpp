@@ -38,8 +38,8 @@ void initWeights(torch::nn::Module& m);
 
 /* HyperParams*/
 const int BATCH_SIZE        = 32;
-int TRAIN_TTI               = 20000; //20000;
-const int TEST_TTI          = 0;//2500;
+int TRAIN_TTI               = 1000; //20000;
+const int TEST_TTI          = 1000;//2500;
 const int MIN_REPLAY_MEM    = 0;// 1000;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
@@ -426,7 +426,7 @@ void ConnectSchedulerFifo(int *fd){
 
 void OpenCQIFifo(int *fd){
   // create the cqi fifo
-  mkfifo(CQI_FIFO, S_IFIFO|0640);
+  mkfifo(CQI_FIFO, S_IFIFO|0777);
   // block for LTESim to connect
   *fd = open(CQI_FIFO, O_RDONLY);
   close(*fd);
@@ -476,7 +476,7 @@ void FetchInitUEs(int *fd, LTENetworkState *network_state){
   *fd = open(STATE_FIFO, O_RDONLY);
 
   h_log("read fd\n");
-  std::string::size_type size;
+  std::string::size_type size = 0;
   read(*fd, &size, sizeof(size));
   h_log("read finish, size:%d\n", size);
   std::string message(size, ' ');

@@ -52,25 +52,25 @@ AmStateVariables::AmStateVariables()
 void
 AmStateVariables::Print (void)
 {
-  std::cout << "AmStateVariables"
+  cout << "AmStateVariables"
             "\t TX STATE: VT(A)=" << m_vt_a << " VT(MS)=" << m_vt_ms << " VT(S)=" << m_vt_s <<
             "\t RX STATE: VR(R)=" << m_vr_r << " VR(MR)=" << m_vr_mr << " VR(H)=" << m_vr_h <<
-            std::endl;
+            endl;
 }
 
 void
 AmStateVariables::PrintTxVariables (void)
 {
-  std::cout << "TX AmStateVariables"
+  cout << "TX AmStateVariables"
             "\t TX STATE: VT(A)=" << m_vt_a << " VT(MS)=" << m_vt_ms << " VT(S)=" << m_vt_s <<
-            std::endl;
+            endl;
 }
 
 void
 AmStateVariables::PrintRxVariables (void)
 {
-  std::cout << "RX AmStateVariables"
+  cout << "RX AmStateVariables"
             "\t RX STATE: VR(R)=" << m_vr_r << " VR(MR)=" << m_vr_mr << " VR(H)=" << m_vr_h <<
-            std::endl;
+            endl;
 }
 

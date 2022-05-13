@@ -100,7 +100,7 @@ static void UrbanMacrocellItu (int argc, char *argv[])
   cout << "Simulation with SEED = " << seed << endl;
 
   // SET SCHEDULING ALLOCATION SCHEME
-  GNodeB::DLSchedulerType downlink_scheduler_type = GNodeB::DLScheduler_TYPE_ROUND_ROBIN;
+  Simulator::SchedulerType downlink_scheduler_type = Simulator::Scheduler_TYPE_ROUND_ROBIN;
   cout << "Scheduler RR "<< endl;
 
   // SET FRAME STRUCTURE

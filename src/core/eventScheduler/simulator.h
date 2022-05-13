@@ -34,15 +34,29 @@
 #include <iostream>
 
 #include "../../load-parameters.h"
-#include "../../device/GNodeB.h"
 
 /*
  * Simulator
  * Control the scheduling of simulation events.
  */
 
+class GNodeB;
+
 class Simulator
 {
+public:
+  enum SchedulerType
+  {
+    Scheduler_TYPE_MAXIMUM_THROUGHPUT,
+    Scheduler_TYPE_PROPORTIONAL_FAIR,
+    Scheduler_TYPE_FLS,
+    Scheduler_TYPE_MLWDF,
+    Scheduler_TYPE_EXP,
+    Scheduler_LOG_RULE,
+    Scheduler_EXP_RULE,
+    Scheduler_TYPE_ROUND_ROBIN,
+    Scheduler_TYPE_DQN
+  };
 private:
   Simulator ();
   static Simulator *ptr;
@@ -60,8 +74,8 @@ private:
 
   // by HH: added
 	void OpenSchedulerFifo(int *fd);
-  GNodeB::DLSchedulerType FetchScheduler(int *fd);
-	void UpdateAllScheduler(GNodeB::DLSchedulerType new_scheduler);
+  SchedulerType FetchScheduler(int *fd);
+	void UpdateAllScheduler(SchedulerType new_scheduler);
 
 	void ConnectStateFifo(int *fd);
 	void SendState(int *fd, std::string state);
@@ -75,7 +89,7 @@ private:
 	void NumberToString(double number, std::string *target);
 	void NumberToString(int number, std::string *target);
 
-	bool makeUEsStationary();
+	//bool makeUEsStationary();
 
 public:
   virtual ~Simulator ();

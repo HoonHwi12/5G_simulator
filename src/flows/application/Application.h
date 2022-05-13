@@ -107,7 +107,7 @@ public:
 
   void Trace (Packet* packet);
 
-	QoSParameters* UpdateQoSOnSchedulerChange(GNodeB::DLSchedulerType new_scheduler_type);
+	QoSParameters* UpdateQoSOnSchedulerChange(Simulator::SchedulerType new_scheduler_type);
 	void SetQoSAllTypes(QoSParameters *EXP, QoSParameters *FLS, QoSParameters *MLWDF, QoSParameters *Base);
 
   //Debug

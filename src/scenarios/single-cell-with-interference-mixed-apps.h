@@ -111,42 +111,42 @@ static void SingleCellWithInterferenceMixedApps (int nbCells, double radius,
   	std::cout << "Simulation with SEED = " << seed << std::endl;
 
   	// SET SCHEDULING ALLOCATION SCHEME
-  	GNodeB::DLSchedulerType downlink_scheduler_type;
+  	Simulator::SchedulerType downlink_scheduler_type;
   	switch (sched_type){
 	  	case 1:
-			downlink_scheduler_type = GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR;
+			downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
 			std::cout << "Scheduler PF "<< std::endl;
 			break;
 	  	case 2:
-			downlink_scheduler_type = GNodeB::DLScheduler_TYPE_MLWDF;
+			downlink_scheduler_type = Simulator::Scheduler_TYPE_MLWDF;
 			std::cout << "Scheduler MLWDF "<< std::endl;
 			break;
 	  	case 3:
-			downlink_scheduler_type = GNodeB::DLScheduler_TYPE_EXP;
+			downlink_scheduler_type = Simulator::Scheduler_TYPE_EXP;
 			std::cout << "Scheduler EXP "<< std::endl;
 			break;
 	  	case 4:
-			downlink_scheduler_type = GNodeB::DLScheduler_TYPE_FLS;
+			downlink_scheduler_type = Simulator::Scheduler_TYPE_FLS;
 			std::cout << "Scheduler FLS "<< std::endl;
 			break;
       	case 5:
-  	    	downlink_scheduler_type = GNodeB::DLScheduler_EXP_RULE;
+  	    	downlink_scheduler_type = Simulator::Scheduler_EXP_RULE;
   	    	std::cout << "Scheduler EXP_RULE "<< std::endl;
 	    	break;
       	case 6:
-  	    	downlink_scheduler_type = GNodeB::DLScheduler_LOG_RULE;
+  	    	downlink_scheduler_type = Simulator::Scheduler_LOG_RULE;
   	    	std::cout << "Scheduler LOG RULE "<< std::endl;
 	    	break;
 		case 7:
-			downlink_scheduler_type = GNodeB::DLScheduler_TYPE_MAXIMUM_THROUGHPUT;
+			downlink_scheduler_type = Simulator::Scheduler_TYPE_MAXIMUM_THROUGHPUT;
 			cout << "Scheduler MT "<< endl;
 			break;
 		case 8:
-			downlink_scheduler_type = GNodeB::DLScheduler_TYPE_ROUND_ROBIN;
+			downlink_scheduler_type = Simulator::Scheduler_TYPE_ROUND_ROBIN;
 			cout << "Scheduler RR "<< endl;
 			break;			
 	  	default:
-			downlink_scheduler_type = GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR;
+			downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
 			break;
 	}
 
@@ -385,11 +385,11 @@ static void SingleCellWithInterferenceMixedApps (int nbCells, double radius,
 		}
 
 		// assign qos parameters
-		if (downlink_scheduler_type == GNodeB::DLScheduler_TYPE_FLS){
+		if (downlink_scheduler_type == Simulator::Scheduler_TYPE_FLS){
 			VideoApplication[videoApplication].SetQoSParameters (qosFLS);
-		} else if (downlink_scheduler_type == GNodeB::DLScheduler_TYPE_EXP) {
+		} else if (downlink_scheduler_type == Simulator::Scheduler_TYPE_EXP) {
 			VideoApplication[videoApplication].SetQoSParameters (qosEXP);
-		} else if (downlink_scheduler_type == GNodeB::DLScheduler_TYPE_MLWDF) {
+		} else if (downlink_scheduler_type == Simulator::Scheduler_TYPE_MLWDF) {
 			VideoApplication[videoApplication].SetQoSParameters (qosMLWDF);
 		} else {
 			VideoApplication[videoApplication].SetQoSParameters (qosBase);
@@ -523,15 +523,15 @@ static void SingleCellWithInterferenceMixedApps (int nbCells, double radius,
 		}
 
 		// assign qos parameters
-		if (downlink_scheduler_type == GNodeB::DLScheduler_TYPE_FLS)
+		if (downlink_scheduler_type == Simulator::Scheduler_TYPE_FLS)
 		{
 			BEApplication[beApplication].SetQoSParameters (qosFLS);
 		}
-		else if (downlink_scheduler_type == GNodeB::DLScheduler_TYPE_EXP)
+		else if (downlink_scheduler_type == Simulator::Scheduler_TYPE_EXP)
 		{
 			BEApplication[beApplication].SetQoSParameters (qosEXP);
 		}
-		else if (downlink_scheduler_type == GNodeB::DLScheduler_TYPE_MLWDF)
+		else if (downlink_scheduler_type == Simulator::Scheduler_TYPE_MLWDF)
 		{
 			BEApplication[beApplication].SetQoSParameters (qosMLWDF);
 		}
@@ -658,15 +658,15 @@ static void SingleCellWithInterferenceMixedApps (int nbCells, double radius,
 		}
 
 		// assign qos parameters
-		if (downlink_scheduler_type == GNodeB::DLScheduler_TYPE_FLS)
+		if (downlink_scheduler_type == Simulator::Scheduler_TYPE_FLS)
 		{
 			VoIPApplication[voipApplication].SetQoSParameters (qosFLS);
 		}
-		else if (downlink_scheduler_type == GNodeB::DLScheduler_TYPE_EXP)
+		else if (downlink_scheduler_type == Simulator::Scheduler_TYPE_EXP)
 		{
 			VoIPApplication[voipApplication].SetQoSParameters (qosEXP);
 		}
-		else if (downlink_scheduler_type == GNodeB::DLScheduler_TYPE_MLWDF)
+		else if (downlink_scheduler_type == Simulator::Scheduler_TYPE_MLWDF)
 		{
 			VoIPApplication[voipApplication].SetQoSParameters (qosMLWDF);
 		}
@@ -802,11 +802,11 @@ static void SingleCellWithInterferenceMixedApps (int nbCells, double radius,
 		}
 
 		// assign qos parameters
-		if (downlink_scheduler_type == GNodeB::DLScheduler_TYPE_FLS){
+		if (downlink_scheduler_type == Simulator::Scheduler_TYPE_FLS){
 			CBRApplication[cbrApplication].SetQoSParameters (qosFLS);
-		} else if (downlink_scheduler_type == GNodeB::DLScheduler_TYPE_EXP) {
+		} else if (downlink_scheduler_type == Simulator::Scheduler_TYPE_EXP) {
 			CBRApplication[cbrApplication].SetQoSParameters (qosEXP);
-		} else if (downlink_scheduler_type == GNodeB::DLScheduler_TYPE_MLWDF) {
+		} else if (downlink_scheduler_type == Simulator::Scheduler_TYPE_MLWDF) {
 			CBRApplication[cbrApplication].SetQoSParameters (qosMLWDF);
 		} else {
 			CBRApplication[cbrApplication].SetQoSParameters (qosBase);

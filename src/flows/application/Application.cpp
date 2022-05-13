@@ -512,43 +512,43 @@ Application::Print (void)
 }
 
 
-QoSParameters* Application::UpdateQoSOnSchedulerChange(GNodeB::DLSchedulerType new_scheduler_type){
+QoSParameters* Application::UpdateQoSOnSchedulerChange(Simulator::SchedulerType new_scheduler_type){
   switch (new_scheduler_type)
     {
-      case GNodeB::DLScheduler_TYPE_DQN:
+      case Simulator::Scheduler_TYPE_DQN:
         SetQoSParameters(qosBase);
         // printf("LTESIM: QoS for Application ID# %d changed to qosBase.\n", GetApplicationID () );
       break;
 
-      case GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR:
+      case Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR:
         SetQoSParameters(qosBase);
         // printf("LTESIM: QoS for Application ID# %d changed to qosBase.\n", GetApplicationID () );
       break;
-      case GNodeB::DLScheduler_TYPE_MLWDF:
+      case Simulator::Scheduler_TYPE_MLWDF:
         SetQoSParameters(qosMLWDF);
         // printf("LTESIM: QoS for Application ID# %d changed to qosMLWDF.\n", GetApplicationID () );
       break;
-      case GNodeB::DLScheduler_TYPE_EXP:
+      case Simulator::Scheduler_TYPE_EXP:
         SetQoSParameters(qosEXP);
         // printf("LTESIM: QoS for Application ID# %d changed to qosEXP.\n", GetApplicationID () );
       break;
-      case GNodeB::DLScheduler_TYPE_FLS:
+      case Simulator::Scheduler_TYPE_FLS:
         SetQoSParameters(qosFLS);
         // printf("LTESIM: QoS for Application ID# %d changed to qosFLS.\n", GetApplicationID () );
       break;
-      case GNodeB::DLScheduler_EXP_RULE:
+      case Simulator::Scheduler_EXP_RULE:
         SetQoSParameters(qosBase);
         // printf("LTESIM: QoS for Application ID# %d changed to qosBase.\n", GetApplicationID () );
       break;
-      case GNodeB::DLScheduler_LOG_RULE:
+      case Simulator::Scheduler_LOG_RULE:
         SetQoSParameters(qosBase);
         // printf("LTESIM: QoS for Application ID# %d changed to qosBase.\n", GetApplicationID () );
       break;
-      case GNodeB::DLScheduler_TYPE_ROUND_ROBIN:
+      case Simulator::Scheduler_TYPE_ROUND_ROBIN:
         SetQoSParameters(qosBase);
         // printf("LTESIM: QoS for Application ID# %d changed to qosBase.\n", GetApplicationID () );
       break;
-      case GNodeB::DLScheduler_TYPE_MAXIMUM_THROUGHPUT:
+      case Simulator::Scheduler_TYPE_MAXIMUM_THROUGHPUT:
         SetQoSParameters(qosBase);
         // printf("LTESIM: QoS for Application ID# %d changed to qosBase.\n", GetApplicationID () );
       break; 
