@@ -56,6 +56,17 @@
         "random": "cpp",
         "string": "cpp",
         "string_view": "cpp",
-        "bit": "cpp"
+        "bit": "cpp",
+        "bitset": "cpp",
+        "csignal": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "future": "cpp",
+        "regex": "cpp",
+        "typeindex": "cpp",
+        "valarray": "cpp",
+        "set": "cpp",
+        "shared_mutex": "cpp",
+        "variant": "cpp"
     }
 }

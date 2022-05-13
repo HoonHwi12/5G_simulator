@@ -49,7 +49,8 @@
 #include <cstdlib>
 
 //by HH
-#include "../../device/GNodeB.h"
+//#include "../../device/GNodeB.h"
+#include "../../componentManagers/FlowsManager.h"
 
 Simulator* Simulator::ptr=nullptr;
 
@@ -85,6 +86,303 @@ Simulator::Now (void)
   return m_currentTs;
 }
 
+//by HH: DQN
+void Simulator::NumberToString(double number, std::string *target){
+  std::stringstream ss;
+  ss << number;
+  *target = ss.str();
+}
+
+void Simulator::NumberToString(int number, std::string *target){
+  std::stringstream ss;
+  ss << number;
+  *target = ss.str();
+}
+
+void Simulator::OpenSchedulerFifo(int *fd){
+  mkfifo(SCHE_FIFO, S_IFIFO|0640);
+  printf("LTESIM: SCHED Pipe Opened! Waiting for DQN..\n");
+  *fd = open(SCHE_FIFO, O_RDONLY);
+  close(*fd);
+  printf("LTESIM: DQN connected to SCHED Pipe.\n");
+}
+
+void Simulator::ConnectCQIFifo(int *fd){
+  printf("LTESIM: Waiting for CQI_FIFO.\n");
+  *fd = open(CQI_FIFO, O_CREAT|O_WRONLY);
+  printf("LTESIM: Connected to CQI_FIFO.\n");
+  close(*fd);
+}
+
+void Simulator::ConnectStateFifo(int *fd){
+  int noUEs = 0;
+  std::vector<GNodeB*> *gNBs = NetworkManager::Init()->GetGNodeBContainer ();
+  for (std::vector<GNodeB*>::iterator it = gNBs->begin(); it != gNBs->end(); ++it){
+    noUEs += (*it)->GetNbOfUserEquipmentRecords();
+    printf("noUES: %d\n", noUEs);
+  }
+  char noUEs_send[256]="\0";
+  printf("INSERTED noUES: %d\n", noUEs);
+  snprintf (noUEs_send, sizeof(noUEs), "%d", noUEs);
+  printf("noUES SEND: %d\n", noUEs_send);
+
+  printf("LTESIM: Waiting for STATE_FIFO.\n");
+  *fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
+  printf("LTESIM: Connected to STATE_FIFO, Sending #UEs\n");
+   // get the total number of UEs;
+   // send size of message
+  write(*fd, noUEs_send, strlen(noUEs_send));
+  close(*fd);
+  printf("LTESIM: Sent #UEs: \"%s\\n", noUEs_send);
+
+}
+
+bool Simulator::makeUEsStationary(){  
+  std::vector<UserEquipment*>* UEs = NetworkManager::Init()->GetUserEquipmentContainer();
+  UserEquipment* this_ue;
+  for (std::vector<UserEquipment*>::iterator it = UEs->begin(); it != UEs->end(); ++it){
+    this_ue = (*it);
+    this_ue->GetMobilityModel()->SetSpeed(0);
+  }
+
+}
+
+GNodeB::DLSchedulerType Simulator::FetchScheduler(int *fd){
+  char c_readbuf[80];
+  char *c_read_ptr;
+  int i_input_bytes;
+  GNodeB::DLSchedulerType downlink_scheduler_type;
+
+  *fd = open(SCHE_FIFO, O_RDONLY);
+  i_input_bytes = read(*fd, c_readbuf, sizeof(c_readbuf));
+  close(*fd);
+
+  c_read_ptr = strtok(c_readbuf, "|");
+  d_dqn_output0 = 10*atoi(c_read_ptr);
+  c_read_ptr = strtok(NULL,"|");  
+  d_dqn_output1 = 10*atoi(c_read_ptr);
+  c_read_ptr = strtok(NULL,"|");  
+  d_dqn_output2 = 10*atoi(c_read_ptr);
+  c_read_ptr = strtok(NULL,"|");  
+  d_dqn_output3 = 10*atoi(c_read_ptr);
+
+  c_readbuf[i_input_bytes] = '\0';
+//  printf("LTESIM: Received scheduler: \"%f / %f / %f / %f\"\n", d_dqn_output0, d_dqn_output1, d_dqn_output2, d_dqn_output3);
+
+  if (strcmp(c_readbuf, "end") == 0)
+  {
+    Simulator *sim;
+    sim->m_stop = true;
+    downlink_scheduler_type = GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR;
+    printf("LTESIM: Scheduler is PF_Fair.\n");
+    return downlink_scheduler_type;
+  }
+
+  if(d_dqn_output0 >= 0)
+  {
+        downlink_scheduler_type = GNodeB::DLScheduler_TYPE_DQN;
+        printf("LTESIM: Scheduler is DQN\n");
+  }
+  else
+  {
+    switch ((int)d_dqn_output1/10)
+      {
+        case 0:
+          downlink_scheduler_type = GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR;
+          printf("LTESIM: Scheduler is PF_Fair.\n");
+          break;
+        case 1:
+          downlink_scheduler_type = GNodeB::DLScheduler_TYPE_MLWDF;
+          printf("LTESIM: Scheduler is MLWDF.\n");
+          break;
+        case 2:
+          downlink_scheduler_type = GNodeB::DLScheduler_TYPE_EXP;
+          printf("LTESIM: Scheduler is EXP.\n");
+          break;
+        case 3:
+          downlink_scheduler_type = GNodeB::DLScheduler_TYPE_FLS;
+          printf("LTESIM: Scheduler is FLS.\n");
+          break;
+        case 4:
+          downlink_scheduler_type = GNodeB::DLScheduler_EXP_RULE;
+          printf("LTESIM: Scheduler is EXP_RULE.\n");
+          break;
+        case 5:
+          downlink_scheduler_type = GNodeB::DLScheduler_LOG_RULE;
+          printf("LTESIM: Scheduler is LOG_RULE.\n");
+          break;
+        case 11:
+          downlink_scheduler_type = GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR;
+          printf("LTESIM: SETTING UEs stationary.\n");
+          makeUEsStationary();
+          break;
+        default:
+          downlink_scheduler_type = GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR;
+          break;
+      }
+  }
+
+    return downlink_scheduler_type;
+}
+
+void Simulator::SendUESummary(int *fd){
+  std::vector<GNodeB*> *gNBs = NetworkManager::Init()->GetGNodeBContainer ();
+  // target message string
+  std::string UEsummaries;
+  for (std::vector<GNodeB*>::iterator it = gNBs->begin(); it != gNBs->end(); ++it){
+    // form UE summary of this eNB
+    FormUESummaryMessage(*it, &UEsummaries);
+  }
+  std::string::size_type size = UEsummaries.size();
+  printf("LTESIM: Size of UEsummaries: %d \n", (int)size);
+  *fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
+  // send the cqi size
+  write(*fd, &size, sizeof(size));
+  // then the whole message
+  write(*fd, UEsummaries.c_str(), UEsummaries.size());
+  printf("LTESIM: Sent UEsummaries.\n");
+  close(*fd);
+}
+
+void  Simulator::SendCQISummary(int *fd){
+  std::vector<GNodeB*> *gNBs = NetworkManager::Init()->GetGNodeBContainer ();
+  // cqi string to send
+  std::string CQIs;
+  for (std::vector<GNodeB*>::iterator it = gNBs->begin(); it != gNBs->end(); ++it){
+    // form cqi message of this eNB
+    FormCQIMessage(*it, &CQIs);
+  }
+
+  std::string::size_type size = CQIs.size();
+  printf("LTESIM: Size of cqis: %d \n", (int)size);
+  *fd = open(CQI_FIFO, O_CREAT|O_WRONLY);
+  // send the cqi size
+  write(*fd, &size, sizeof(size));
+  // then the whole message
+  write(*fd, CQIs.c_str(), CQIs.size());
+  // printf("LTESIM: Sent cqis.\n%s\n", CQIs.c_str());
+  printf("LTESIM: Sent cqis.\n");
+  close(*fd);
+}
+
+void Simulator::SendState(int *fd, std::string state){
+  std::string::size_type size = state.size();
+  printf("LTESIM: Size of state: %d \n", (int)size);
+  *fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
+  // send the size of message
+  write(*fd, &size, sizeof(size));
+  //  then the whole message
+  write(*fd, state.c_str(), state.size());
+  // printf("LTESIM: Sent state.\n%s\n", state.c_str());
+  printf("LTESIM: Sent state.\n");
+  close(*fd);
+}
+
+void Simulator::FormUESummaryMessage(GNodeB *eNB, std::string *target_string){
+  int ideNB;
+  int UEid;
+  std::string UEid_str;
+  // collect all UE information
+  int noUEs = eNB->GetNbOfUserEquipmentRecords();
+  std::vector<GNodeB::UserEquipmentRecord*> *UErecords = eNB->GetUserEquipmentRecords();
+  GNodeB::UserEquipmentRecord* UErecord;
+  // collect all APP information
+  std::vector<Application*> *apps = FlowsManager::Init()->GetApplicationContainer();
+  Application* app;
+  int appID, appDST;
+  std::string appID_str;
+  //all QoS information
+  QoSParameters* appQoS;
+
+  double appGBR, appDelay, appPLR;
+  std::string appGBR_str, appDelay_str, appPLR_str;
+  // message string used for each Application
+  std::string message_string;
+  for (std::vector<GNodeB::UserEquipmentRecord*>::iterator it = UErecords->begin(); it != UErecords->end(); ++it){
+    UErecord = (*it);
+    UEid = UErecord->GetUE()->GetIDNetworkNode();
+    NumberToString(UEid, &UEid_str);
+    // for each app check which app belongs to which UE
+    for (std::vector<Application*>::iterator it = apps->begin(); it != apps->end(); ++it){
+      app = (*it);
+      appDST = app->GetDestination()->GetIDNetworkNode();
+      if(appDST == UEid){ // app belongs to this UE
+        appID = app->GetApplicationID();
+        NumberToString(appID, &appID_str);
+        // QoS Fetch
+        appQoS = app->GetQoSParameters();
+        appGBR = 0; //appQoS->GetGBR(); HH: need to fix
+        appDelay = 0; //appQoS->GetMaxDelay();
+        appPLR = 0; //appQoS->GetDropProbability();
+
+        // QoS to strings
+        NumberToString(appGBR, &appGBR_str);
+        NumberToString(appDelay, &appDelay_str);
+        NumberToString(appPLR, &appPLR_str);
+
+        // add to the message string
+        // {UE id} {APP id} {APP GBR} {APP delay} {APP PLR}
+        *target_string += UEid_str + " " + appID_str + " " + appGBR_str + " " + appDelay_str + " " + appPLR_str + "\n";
+      }
+    }
+  }
+}
+
+void Simulator::UpdateAllScheduler(GNodeB::DLSchedulerType new_scheduler){
+  // vector of gNBs
+  std::vector<GNodeB*> *gNBs = NetworkManager::Init()->GetGNodeBContainer ();
+  // vector of Apps
+  std::vector<Application*> *apps = FlowsManager::Init()->GetApplicationContainer();
+  // vector of rrc bearers
+  std::vector<RadioBearer*> *bearers;
+  // QoS for changing rrc bearers
+  QoSParameters* new_qos;
+  // Update the QoS for each Application AND it's bearer based on scheduler
+  printf("here7\n");
+  for (std::vector<Application*>::iterator it = apps->begin(); it != apps->end(); ++it){
+    new_qos = (*it)->UpdateQoSOnSchedulerChange(new_scheduler);
+  }
+  printf("here8\n");
+  // for each enobeB
+  for (std::vector<GNodeB*>::iterator it = gNBs->begin(); it != gNBs->end(); ++it){
+    printf("here12\n");
+    // Update Scheduler 
+    (*it)->SetDLScheduler(new_scheduler);
+    printf("here13\n");
+    // get the bearer list from this GNodeB's rrc 
+    bearers = (*it)->GetDLScheduler()->GetMacEntity()->GetDevice()->GetProtocolStack()->GetRrcEntity()->GetRadioBearerContainer();
+    // update each bearer in the rrc's list QoS based on scheduler
+    for (std::vector<RadioBearer*>::iterator it = bearers->begin(); it != bearers->end(); ++it){        
+      // (*it)->SetQoSParameters(new_qos); HH: need to fix
+    }
+    printf("here10\n");
+  }
+  printf("here11\n");
+}
+
+void Simulator::FormCQIMessage(GNodeB *eNB, std::string *target_string){
+    std::vector<GNodeB::UserEquipmentRecord*> *UserEquipmentRecords = eNB->GetUserEquipmentRecords();
+    GNodeB::UserEquipmentRecord* UErecord;
+    // cqi vector for each UE
+    std::vector<int> cqi;
+    // cqi string for each UE
+    std::string cqiString;
+    // temp string
+    std::string temp;
+    for (std::vector<GNodeB::UserEquipmentRecord*>::iterator it = UserEquipmentRecords->begin(); it != UserEquipmentRecords->end(); ++it){
+      UErecord = (*it);
+      cqi = UErecord->GetCQI();
+      for (size_t i = 0; i < cqi.size(); ++i){
+        NumberToString(cqi[i], &temp);
+        cqiString += temp + " ";
+      }
+      *target_string += cqiString + "\n";
+      cqiString = "";
+     
+    }
+}
+
+
 void
 Simulator::Run (void)
 {
@@ -102,13 +400,13 @@ Simulator::Run (void)
   GNodeB::DLSchedulerType scheduler;
   // Open, connect to pipes
   int sh_fd, st_fd, cqi_fd;
-  GNodeB::OpenSchedulerFifo(&sh_fd);
+  OpenSchedulerFifo(&sh_fd);
   // open CQI Fifo
-  GNodeB::ConnectCQIFifo(&cqi_fd);
+  ConnectCQIFifo(&cqi_fd);
   // connect and forward #UEs
-  GNodeB::ConnectStateFifo(&st_fd);
+  ConnectStateFifo(&st_fd);
   // form information about each eNB's UE's application QoS and send!
-  GNodeB::SendUESummary(&st_fd);
+  SendUESummary(&st_fd);
 
 
 
@@ -189,16 +487,16 @@ Simulator::Run (void)
     tti_tr2 = FrameManager::Init()->GetTTICounter();
     // after each TTI change
     if(tti_tr1 != tti_tr2){
-      printf("\nLTESIM: TTI Change! Now in TTI # %ld.\n", tti_tr2);
+      printf("\nWaiting for first packets.. LTESIM: TTI Change! Now in TTI # %ld.\n", tti_tr2);
       // append onto big buffer
       bigbuf = bigbuf + buffer.str();
       // if we are past empty TTIs
       if(!bigbuf.empty()){
         printf("bigbuf: %s\n", bigbuf.c_str() );
         // send the update TTI
-        GNodeB::SendState(&st_fd, buffer.str().c_str());
-        GNodeB::SendCQISummary(&cqi_fd);
-        printf("LTESIM: Waiting for new Scheduler. \n");
+        SendState(&st_fd, buffer.str().c_str());
+        SendCQISummary(&cqi_fd);
+        printf("Waiting for first packets..  LTESIM: Waiting for new Scheduler. \n");
         m_stop = true;
         tti_tr1 = tti_tr2;
         buffer.str("");
@@ -239,26 +537,30 @@ Simulator::Run (void)
   m_stop = false;
 
 
-
+printf("here1 m_stop: %d\n", m_stop);
   while (!m_calendar->IsEmpty () && !m_stop){
+    printf("here3\n");
     // fetch the new scheduler
-    scheduler = GNodeB::FetchScheduler(&sh_fd);
-
+    scheduler = FetchScheduler(&sh_fd);
+printf("here4\n");
     // Update everything needed for scheduler changes
-    GNodeB::UpdateAllScheduler(scheduler);
+    UpdateAllScheduler(scheduler);
+    printf("here5\n");
     // execute "action"
     while(tti_tr1 == tti_tr2 && !m_calendar->IsEmpty()){
+        printf("here14\n");
         ProcessOneEvent ();
+        printf("here15\n");
         tti_tr2 = FrameManager::Init()->GetTTICounter();
     }
     tti_tr1 = tti_tr2;
-    
+    printf("here6\n");
     printf("\nLTESIM: TTI Change! Now in TTI # %ld.\n", tti_tr2);
     // append onto big buffer
     bigbuf = bigbuf + buffer.str();
     // send the last TTI
-    GNodeB::SendState(&st_fd, buffer.str().c_str());
-    GNodeB::SendCQISummary(&cqi_fd);
+    SendState(&st_fd, buffer.str().c_str());
+    SendCQISummary(&cqi_fd);
 
     if(use_lstm == 0x89)
     {
@@ -293,9 +595,10 @@ Simulator::Run (void)
     // clear stream and output capture
     buffer.str("");
   }
+  printf("here2\n");
   // close the streams
-  scheduler = GNodeB::FetchScheduler(&sh_fd);
-  GNodeB::SendState(&st_fd, "end");
+  scheduler = FetchScheduler(&sh_fd);
+  SendState(&st_fd, "end");
   close(sh_fd);
   close(st_fd);
   close(cqi_fd);
@@ -313,9 +616,10 @@ Simulator::ProcessOneEvent(void)
 
   if (!next->IsDeleted())
     {
+      printf("run next event\n");
       next->RunEvent();
     }
-
+  printf("remove event\n");
   m_calendar->RemoveEvent();
 }
 
