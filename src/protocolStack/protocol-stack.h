@@ -34,7 +34,7 @@
 #include "rlc/rlc-entity.h"
 #include "mac/mac-entity.h"
 #include "mac/gnb-mac-entity.h"
-#include "mac/henb-mac-entity.h"
+//#include "mac/henb-mac-entity.h"
 #include "mac/ue-mac-entity.h"
 #include "pdcp/pdcp-entity.h"
 #include "application/application-entity.h"

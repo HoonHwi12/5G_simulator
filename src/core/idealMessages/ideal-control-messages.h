@@ -27,6 +27,7 @@
 #include <list>
 #include "../../load-parameters.h"
 
+#include "../../device/NetworkNode.h"
 class NetworkNode;
 
 

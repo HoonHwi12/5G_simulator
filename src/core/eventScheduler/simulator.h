@@ -28,13 +28,13 @@
 #include "event.h"
 #include "calendar.h"
 #include "make-event.h"
-//#include "../../device/GNodeB.h"
 
 #include <stdint.h>
 #include <string>
 #include <iostream>
 
 #include "../../load-parameters.h"
+#include "../../device/GNodeB.h"
 
 /*
  * Simulator
@@ -58,24 +58,24 @@ private:
 
   void ProcessOneEvent (void);
 
-  // // by HH: added
-	// void OpenSchedulerFifo(int *fd);
-	// GNodeB::DLSchedulerType DLSchedulerType(int *fd);
-	// void UpdateAllScheduler(GNodeB::DLSchedulerType new_scheduler);
+  // by HH: added
+	void OpenSchedulerFifo(int *fd);
+  GNodeB::DLSchedulerType FetchScheduler(int *fd);
+	void UpdateAllScheduler(GNodeB::DLSchedulerType new_scheduler);
 
-	// void ConnectStateFifo(int *fd);
-	// void SendState(int *fd, std::string state);
-	// void SendUESummary(int *fd);
-	// void FormUESummaryMessage(GNodeB *gNB, std::string *target_string);
+	void ConnectStateFifo(int *fd);
+	void SendState(int *fd, std::string state);
+	void SendUESummary(int *fd);
+	void FormUESummaryMessage(GNodeB *gNB, std::string *target_string);
 
-	// void ConnectCQIFifo(int *fd);
-	// void SendCQISummary(int *fd);
-	// void FormCQIMessage(GNodeB *gNB, std::string *target_string);
+	void ConnectCQIFifo(int *fd);
+	void SendCQISummary(int *fd);
+	void FormCQIMessage(GNodeB *gNB, std::string *target_string);
 
-	// void NumberToString(double number, std::string *target);
-	// void NumberToString(int number, std::string *target);
+	void NumberToString(double number, std::string *target);
+	void NumberToString(int number, std::string *target);
 
-	// bool makeUEsStationary();
+	bool makeUEsStationary();
 
 public:
   virtual ~Simulator ();
