@@ -207,7 +207,7 @@ DEBUG_LOG_END
   gnb->GetPhy ()->SetUlChannel (ulCh);
   gnb->GetPhy ()->SetBandwidthManager (spectrum);
   ulCh->AddDevice (gnb);
-  gnb->SetDLScheduler (GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR);
+  gnb->SetDLScheduler (Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR);
   gnb->SetULScheduler(uplink_scheduler_type);
 
   networkManager->GetGNodeBContainer ()->push_back (gnb);

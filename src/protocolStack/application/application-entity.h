@@ -33,13 +33,13 @@ public:
   virtual ~ApplicationEntity() = default;
 
   void InsertApplicationSource(Application* app);
-  std::vector<Application*>* GetApplicationSources(void);
+  vector<Application*>* GetApplicationSources(void);
   void InsertApplicationDestinations(Application* app);
-  std::vector<Application*>* GetApplicationDestinations(void);
+  vector<Application*>* GetApplicationDestinations(void);
 
 private:
-  std::vector<Application*> m_app_sources;
-  std::vector<Application*> m_app_destinations;
+  vector<Application*> m_app_sources;
+  vector<Application*> m_app_destinations;
 };
 
 #endif /* APPLICATION_ENTITY_H_ */

@@ -31,9 +31,11 @@
 class UserEquipment;
 class Gateway;
 
-//class PacketScheduler;
+class PacketScheduler;
 class DownlinkPacketScheduler;
 class UplinkPacketScheduler;
+
+class NetworkNode;
 
 class GNodeB : public NetworkNode
 {
@@ -132,7 +134,7 @@ public:
   UserEquipmentRecord* GetUserEquipmentRecord (int idUE);
   GnbMacEntity* GetMacEntity(void) const;
 
-  void SetDLScheduler (DLSchedulerType type);
+  void SetDLScheduler (Simulator::SchedulerType type);
   DownlinkPacketScheduler* GetDLScheduler (void) const;
   void SetULScheduler (ULSchedulerType type);
   UplinkPacketScheduler* GetULScheduler (void) const;
@@ -150,7 +152,7 @@ public:
   // // by HH: added
   // static void OpenSchedulerFifo(int *fd);
   // static DLSchedulerType FetchScheduler(int *fd);
-  // static void UpdateAllScheduler(GNodeB::DLSchedulerType new_scheduler);
+  // static void UpdateAllScheduler(Simulator::SchedulerType new_scheduler);
 
   // static void ConnectStateFifo(int *fd);
   // static void SendState(int *fd, std::string state);

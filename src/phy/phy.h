@@ -44,8 +44,8 @@ public:
 
   void Destroy (void);
 
-  virtual void StartTx (std::shared_ptr<PacketBurst> p) = 0;
-  virtual void StartRx (std::shared_ptr<PacketBurst> p, TransmittedSignal* txSignal) = 0;
+  virtual void StartTx (shared_ptr<PacketBurst> p) = 0;
+  virtual void StartRx (shared_ptr<PacketBurst> p, TransmittedSignal* txSignal) = 0;
 
   void SetDevice (NetworkNode* d);
   NetworkNode* GetDevice (void);

@@ -76,7 +76,7 @@ static void Simple ()
   int GnbTxAntennas = 1;
   int GnbRxAntennas = 1;
   GNodeB* gnb = networkManager->CreateGnodeb (idGnb, cell, posX, posY, GnbTxAntennas, GnbRxAntennas, dlCh, ulCh, spectrum);
-  gnb->SetDLScheduler (GNodeB::DLScheduler_TYPE_PROPORTIONAL_FAIR);
+  gnb->SetDLScheduler (Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR);
 
 
   //Create GW

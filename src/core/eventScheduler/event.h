@@ -54,7 +54,7 @@ private:
 
 class event_compare {
 public:
-  bool operator() (std::shared_ptr<Event> left, std::shared_ptr<Event> right)
+  bool operator() (shared_ptr<Event> left, shared_ptr<Event> right)
     {
       bool result;
       int ts1 = left->GetTimeStamp();

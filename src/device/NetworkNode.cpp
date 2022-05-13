@@ -36,7 +36,7 @@
 #include "GNodeB.h"
 #include "../protocolStack/protocol-stack.h"
 
-class UserEquipment;
+class NetworkNode;
 
 NetworkNode::NetworkNode()
 {

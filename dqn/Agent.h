@@ -36,15 +36,15 @@ class Agent{
 			torch::Tensor explore_action = torch::zeros({2, 4});
 			uint32_t random_action = dist_actions(mt);
 
-			if(random_action > 14641)
-			{
-				explore_action.index_put_({0, 0}, -1);
-				explore_action.index_put_({0, 1}, 3);
-				explore_action.index_put_({0, 2}, (int)random_action);
-				explore_action.index_put_({0, 3}, -1);
-				explore_action.index_put_({1}, 1);
-			}
-			else
+			// if(random_action > 14641)
+			// {
+			// 	explore_action.index_put_({0, 0}, -1);
+			// 	explore_action.index_put_({0, 1}, 3);
+			// 	explore_action.index_put_({0, 2}, (int)random_action);
+			// 	explore_action.index_put_({0, 3}, -1);
+			// 	explore_action.index_put_({1}, 1);
+			// }
+			// else
 			{
 				explore_action.index_put_({0, 0}, (int)(random_action/1331));
 				explore_action.index_put_({0, 1}, (int)((random_action%1331)/121));
@@ -74,15 +74,15 @@ class Agent{
 			h_log("debug402\n");
 			if(timeLog) printf("InferenceTime %0.7f ms/ Exploit! \n", (float)(clock()-infstart)/CLOCKS_PER_SEC);
 
-			if(arg_action > 14641)
-			{
-				exploit_action.index_put_({0, 0}, -1);
-				exploit_action.index_put_({0, 1}, 3);
-				exploit_action.index_put_({0, 2}, (int)arg_action);
-				exploit_action.index_put_({0, 3}, -1);
-				exploit_action.index_put_({1}, 1);
-			}
-			else
+			// if(arg_action > 14641)
+			// {
+			// 	exploit_action.index_put_({0, 0}, -1);
+			// 	exploit_action.index_put_({0, 1}, 3);
+			// 	exploit_action.index_put_({0, 2}, (int)arg_action);
+			// 	exploit_action.index_put_({0, 3}, -1);
+			// 	exploit_action.index_put_({1}, 1);
+			// }
+			// else
 			{
 				exploit_action.index_put_({0, 0}, (int)(arg_action/1331));
 				exploit_action.index_put_({0, 1}, (int)((arg_action%1331)/121));

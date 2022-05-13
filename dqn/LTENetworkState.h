@@ -359,7 +359,7 @@ h_log("debug302\n");
 					this_UE->SatPLRRate = (this_UE->SatPLRCount)/((this_UE->TXCount)+(this_UE->RXCount));
 					this_app->appSatPLRRate = (this_app->appSatPLRCount)/(TTIcounter);
 		    	// RX case
-				} else {
+				} else if(txrx_field == "RX"){
 					h_log("debug305\n");
 		    		s_line >> app_field;
 					s_line >> ID_field;

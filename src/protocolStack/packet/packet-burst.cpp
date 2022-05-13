@@ -34,10 +34,10 @@ PacketBurst::~PacketBurst (void)
   m_packets.clear();
 }
 
-std::shared_ptr<PacketBurst>
+shared_ptr<PacketBurst>
 PacketBurst::Copy (void)
 {
-  std::shared_ptr<PacketBurst> pb = make_shared<PacketBurst> ();
+  shared_ptr<PacketBurst> pb = make_shared<PacketBurst> ();
   for ( auto packet : GetPackets ())
     {
       pb->AddPacket (packet->Copy());
@@ -54,7 +54,7 @@ PacketBurst::AddPacket (Packet* packet)
     }
 }
 
-std::list<Packet*>
+list<Packet*>
 PacketBurst::GetPackets (void) const
 {
   return m_packets;
@@ -77,13 +77,13 @@ PacketBurst::GetSize (void) const
   return size;
 }
 
-std::list<Packet* >::const_iterator
+list<Packet* >::const_iterator
 PacketBurst::Begin (void) const
 {
   return m_packets.begin ();
 }
 
-std::list<Packet* >::const_iterator
+list<Packet* >::const_iterator
 PacketBurst::End (void) const
 {
   return m_packets.end ();

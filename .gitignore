@@ -41,9 +41,12 @@
 
 # Project executables
 5G-air-simulator
+cqi_fifo
+sched_fifo
+state_fifo
 
 #Fast Fading Traces
 src/channel/propagation-model/FastFadingRealization/*
 
 dqn/libtorch/*
-dqn/build/main
+dqn/build/
