@@ -52,5 +52,6 @@ dqn/libtorch/*
 dqn/build/
 <<<<<<< HEAD
 LSTM/build/
+LSTM/libtorch/*
 =======
 >>>>>>> ac1ab140fac334cdd7c58cfdae79d79b3bc9be5f
