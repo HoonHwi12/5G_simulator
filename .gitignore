@@ -48,7 +48,7 @@ state_fifo
 #Fast Fading Traces
 src/channel/propagation-model/FastFadingRealization/*
 
-dqn/libtorch/
-dqn/build/
-LSTM/build/
-LSTM/libtorch/
+dqn/libtorch/*
+dqn/build/*
+LSTM/build/*
+LSTM/libtorch/*
