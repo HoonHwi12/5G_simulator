@@ -37,6 +37,8 @@
 #include "../../../src/shared-memory.h"
 #include "../../protocolStack/mac/packet-scheduler/downlink-packet-scheduler.h"
 #include "../../device/UserEquipment.h"
+#include "../../flows/QoS/QoSParameters.h"
+#include "../../flows/radio-bearer.h"
 
 // cout stream buffer redirect
 #include <sstream>
@@ -311,7 +313,7 @@ void Simulator::FormUESummaryMessage(GNodeB *eNB, std::string *target_string){
         NumberToString(appID, &appID_str);
         // QoS Fetch
         appQoS = app->GetQoSParameters();
-        appGBR = 0; //appQoS->GetGBR(); HH: need to fix
+        appGBR = appQoS->GetGBR(); // HH: need fix 2
         appDelay = 0; //appQoS->GetMaxDelay();
         appPLR = 0; //appQoS->GetDropProbability();
 
@@ -350,7 +352,7 @@ void Simulator::UpdateAllScheduler(Simulator::SchedulerType new_scheduler){
     bearers = (*it)->GetDLScheduler()->GetMacEntity()->GetDevice()->GetProtocolStack()->GetRrcEntity()->GetRadioBearerContainer();
     // update each bearer in the rrc's list QoS based on scheduler
     for (std::vector<RadioBearer*>::iterator it = bearers->begin(); it != bearers->end(); ++it){        
-      // (*it)->SetQoSParameters(new_qos); HH: need to fix
+      (*it)->SetQoSParameters(new_qos); // HH: need fix 1
     }
   }
 }
