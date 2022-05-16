@@ -50,6 +50,9 @@ struct Application
 	float realgbr;
 	float realdelay;
 	float realplr;
+
+	float fairness;
+
 	float reward;
 	int noRX;
 	int noTX;
@@ -71,6 +74,7 @@ struct Application
 		realplr          = 0;
 		realdelay        = 0;
 		realgbr          = 0;
+		fairness		 = 0;
 	}
 };
 
@@ -240,7 +244,7 @@ class LTENetworkState{
 			
 			UESummary* this_UE;
 			Application* this_app;
-			float gbr_indicator, plr_indicator, delay_indicator, reward_indicator;
+			float gbr_indicator, plr_indicator, delay_indicator, fairness_indicator, reward_indicator;
 			int packet_indicator;
 			std::vector<int> *this_UE_cqis;
 			state = torch::ones({1, state_size});
@@ -276,6 +280,9 @@ class LTENetworkState{
 					plr_indicator = this_app->QoSplr - this_app->realplr; // -realplr ~ qosplr
 					state.index_put_({0,index}, plr_indicator);
 					index++;
+					fairness_indicator = this_app->fairness; // -realplr ~ qosplr
+					state.index_put_({0,index}, fairness_indicator);
+					index++;					
 
 					// by HH, if use lstm
 					if(use_lstm)
@@ -486,15 +493,24 @@ h_log("debug303\n");
          	float plrReward = 0;
          	float delayReward = 0;
          	float sum_reward = 0;
+			float fairness_reward = 0;
 
-         	float gbr_coef = 0.3;
-         	float plr_coef = 0.3;
-         	float dly_coef = 0.3;
+         	float gbr_coef = 0.25;
+         	float plr_coef = 0.25;
+         	float dly_coef = 0.25;
+			float fairness_coef = 0.25;
+			float fairness_normalize = 0.001;
 
 			int num_counter=0;
 			float sumgbr=0;
 			float sumdelay=0;
 			float sumplr=0;
+
+			float fairness_sum=0;
+			float fairness_avg=0;
+			float fairness_variance_sum=0;
+			float fairness_variance=0;
+			float fairness_deviation=0;
 
          	RealReward = torch::zeros(1);
 	      	for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
@@ -510,6 +526,12 @@ h_log("debug303\n");
 					   gbrReward = (*(*itt)).realgbr/(*(*itt)).QoSgbr;
 					   if(gbrReward<0) gbrReward=0;
 		            }   
+
+					// fairness
+					if ((*(*itt)).realgbr > 0) {
+						nb_packet[(*(*itt)).id] = (*(*itt)).realgbr;
+						printf("%d nb packet: %d\n", (*(*itt)).id, nb_packet[(*(*itt)).id] );
+					}
 
 		            // there has been a TX
 		            if((*(*itt)).appTXCount > 0){
@@ -539,7 +561,7 @@ h_log("debug303\n");
 			        } else {
 			        	delayReward = 0;
 						(*(*itt)).noRX++;
-			        }
+			        }					
 
 	            	(*(*itt)).reward = gbr_coef*gbrReward + plr_coef*plrReward + dly_coef*delayReward;
 					sum_reward += (*(*itt)).reward; 
@@ -554,7 +576,26 @@ h_log("debug303\n");
 
 	         	}
 	      	}
-			sum_reward = sum_reward / (float) noUEs ;
+
+			for(size_t fairness_temp=0; fairness_temp<noUEs; fairness_temp++)
+			{
+				if(nb_packet[fairness_temp] > 0) fairness_sum += nb_packet[fairness_temp];
+			}
+			fairness_avg = fairness_sum / noUEs;
+
+			for(size_t fairness_temp=0; fairness_temp<noUEs; fairness_temp++)
+			{
+				if(nb_packet[fairness_temp] > 0) fairness_variance_sum += pow(nb_packet[fairness_temp] - fairness_avg, 2);
+			}
+			fairness_variance = fairness_variance_sum / noUEs;
+			fairness_deviation = sqrt(fairness_variance);
+
+			printf("fairness_deviation: %f\n", fairness_deviation);
+			fairness_reward = 1 - (fairness_deviation * fairness_normalize) * fairness_coef;
+			if(fairness_reward<0) fairness_reward=0;
+			printf("fairness reward: %f\n", fairness_reward);
+
+			sum_reward = (sum_reward / (float) noUEs) + fairness_reward;
 			Accum_Reward += sum_reward;
 			printf("\tAt %d TTI, TTI Reward= %f, \tAccum_reward= %f, #UEs %d \n", (int)TTIcounter, sum_reward, Accum_Reward, noUEs);
 			//printf("AVgbr/AVdelay/AVplr %f %f %f\n", sumgbr/num_counter,sumdelay/num_counter, sumplr/num_counter);
@@ -664,5 +705,6 @@ h_log("debug303\n");
 		float TTIcounter;
 		int noAPPs;
 		int noUEs;
+		int nb_packet[1000] = {0};
 };
 #endif
