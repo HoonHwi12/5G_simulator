@@ -591,7 +591,7 @@ h_log("debug303\n");
 			fairness_deviation = sqrt(fairness_variance);
 
 			printf("fairness_deviation: %f\n", fairness_deviation);
-			fairness_reward = 1 - (fairness_deviation * fairness_normalize) * fairness_coef;
+			fairness_reward = (1 - (fairness_deviation * fairness_normalize)) * fairness_coef;
 			if(fairness_reward<0) fairness_reward=0;
 			printf("fairness reward: %f\n", fairness_reward);
 
