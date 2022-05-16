@@ -206,9 +206,9 @@ class LTENetworkState{
 			}
 			// form the state size
 			// 1(#ues) + Each UE's(App QoS + cqi)
-		    //state_size = 1+noUEs*(3*noAPPs + cqi_size) + packet;
-			if(use_lstm) state_size = 1+noUEs*(3*noAPPs + cqi_size) +1; //HH
-			else state_size = 1+noUEs*(3*noAPPs + cqi_size);
+		    //state_size = 1+noUEs*(3*noAPPs + cqi_size) + packet + FAIRNESS;
+			if(use_lstm) state_size = 1+noUEs*(3*noAPPs + cqi_size) +2; //HH
+			else state_size = 1+noUEs*(3*noAPPs + cqi_size) + 1;
 		    reset_state = torch::ones({1, state_size});
 		}
 
