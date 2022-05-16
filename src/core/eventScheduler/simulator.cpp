@@ -393,6 +393,7 @@ Simulator::Run (void)
   //     ProcessOneEvent ();
   //   }
  
+  remove(CQI_FIFO);
   // scheduler type object
   Simulator::SchedulerType scheduler;
   // Open, connect to pipes
