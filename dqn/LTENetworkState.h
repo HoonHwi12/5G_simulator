@@ -528,8 +528,9 @@ h_log("debug303\n");
 		            }   
 
 					// fairness
-					if ((*(*itt)).realgbr > 0) {
-						nb_packet[(*(*itt)).id] = (*(*itt)).realgbr;
+					if ((*(*itt)).appTXCount > 0) {
+						//nb_packet[(*(*itt)).id] = (*(*itt)).realgbr;
+						nb_packet[(*(*itt)).id]++;
 						printf("%d nb packet: %d\n", (*(*itt)).id, nb_packet[(*(*itt)).id] );
 					}
 
