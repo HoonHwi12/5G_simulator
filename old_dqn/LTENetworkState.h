@@ -48,6 +48,7 @@ struct Application
 	float realgbr;
 	float realdelay;
 	float realplr;
+	float fairness;
 	float reward;
 	Application(int id_ ,float gbr, float delay, float plr){
 		id = id_;
@@ -67,6 +68,7 @@ struct Application
 		realplr          = 0;
 		realdelay        = 0;
 		realgbr          = 0;
+		fairness		 = 0;
 	}
 };
 
@@ -258,7 +260,7 @@ class LTENetworkState{
 					index++;
 					plr_indicator = this_app->QoSplr - this_app->realplr;
 					state.index_put_({0,index}, plr_indicator);
-					index++;
+					index++;					
 
 					gbr_sum += this_app->realgbr;
 					plr_sum += this_app->realplr;
@@ -444,15 +446,24 @@ class LTENetworkState{
          	float plrReward = 0;
          	float delayReward = 0;
          	float sum_reward = 0;
+			float fairness_reward = 0;
 
          	float gbr_coef = 0.3;
          	float plr_coef = 0.3;
          	float dly_coef = 0.3;
+			float fairness_coef = 0.25;
+			float fairness_normalize = 0.001;
 
 			int num_counter=0;
 			float sumgbr=0;
 			float sumdelay=0;
 			float sumplr=0;
+
+			float fairness_sum=0;
+			float fairness_avg=0;
+			float fairness_variance_sum=0;
+			float fairness_variance=0;
+			float fairness_deviation=0;
 
          	RealReward = torch::zeros(1);
 	      	for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
@@ -466,6 +477,13 @@ class LTENetworkState{
 		               //gbrReward = 0;
 					   gbrReward = (*(*itt)).realgbr/(*(*itt)).QoSgbr;
 		            }   
+
+					// fairness
+					if ((*(*itt)).appTXCount > 0) {
+						//nb_packet[(*(*itt)).id] = (*(*itt)).realgbr;
+						nb_packet[(*(*itt)).id]++;
+						//printf("%d nb packet: %d\n", (*(*itt)).id, nb_packet[(*(*itt)).id] );
+					}
 
 		            // there has been a TX
 		            if((*(*itt)).appTXCount > 0){
@@ -504,7 +522,26 @@ class LTENetworkState{
 					num_counter++;
 	         	}
 	      	}
-			sum_reward = sum_reward / (float) noUEs ;
+
+			for(size_t fairness_temp=0; fairness_temp<noUEs; fairness_temp++)
+			{
+				if(nb_packet[fairness_temp] > 0) fairness_sum += nb_packet[fairness_temp];
+			}
+			fairness_avg = fairness_sum / noUEs;
+
+			for(size_t fairness_temp=0; fairness_temp<noUEs; fairness_temp++)
+			{
+				if(nb_packet[fairness_temp] > 0) fairness_variance_sum += pow(nb_packet[fairness_temp] - fairness_avg, 2);
+			}
+			fairness_variance = fairness_variance_sum / noUEs;
+			fairness_deviation = sqrt(fairness_variance);
+
+			//printf("fairness_deviation: %f\n", fairness_deviation);
+			fairness_reward = (1 - (fairness_deviation * fairness_normalize)) * fairness_coef;
+			if(fairness_reward<0) fairness_reward=0;
+			printf("fairness reward %f\n", fairness_reward);
+
+			sum_reward = sum_reward / (float) noUEs + fairness_reward;
 			Accum_Reward += sum_reward;
 			printf("\tAt %d TTI, TTI Reward= %f, \tAccum_reward= %f, #UEs %d\n", (int)TTIcounter, sum_reward, Accum_Reward, noUEs);
 			
@@ -582,19 +619,22 @@ class LTENetworkState{
 				file_name = "test_results/" + sched + "_" + std::to_string(noUEs) + "_train_satis.txt";
 			}
   			
+			printf("Satisfy Log\n");
   			std::ofstream output_file(file_name);
+			output_file << "App_id, SatPLRCount, SatDelayCount, SatGBRCount" << std::endl;
+
 			for (std::vector<UESummary*>::iterator it = UESummaries->begin(); it != UESummaries->end(); ++it){
 				UESummary* this_UE = *it;
 				std::vector<Application*> *appcontainer = this_UE->GetApplicationContainer();
 				for(std::vector<Application*>::iterator itt = appcontainer->begin(); itt != appcontainer->end(); ++itt){
 					Application* this_app = *itt;
-					output_file << this_app->id << ", " << this_app->appSatPLRCount << std::endl;
-					output_file << this_app->id << ", " << this_app->appSatDelayCount << std::endl;
-					output_file << this_app->id << ", " << this_app->appSatGBRCount << std::endl;
+					output_file << this_app->id << ", " << this_app->appSatPLRCount
+								<< ", " << this_app->appSatDelayCount
+								<< ", " << this_app->appSatGBRCount << std::endl;
+					printf("ID %d SatisPLR %f, SatisDelay %f, SatisGBR %f\n", this_app->id, this_app->appSatPLRCount, this_app->appSatDelayCount, this_app->appSatGBRCount);
 				}
 			} 
 			output_file.close();
-
 		}
 
 	private:
@@ -612,5 +652,6 @@ class LTENetworkState{
 		float TTIcounter;
 		int noAPPs;
 		int noUEs;
+		int nb_packet[1000] = {0};
 };
 #endif

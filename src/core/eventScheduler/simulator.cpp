@@ -264,27 +264,27 @@ void  Simulator::SendCQISummary(int *fd){
   }
 
   std::string::size_type size = CQIs.size();
-  printf("LTESIM: Size of cqis: %d \n", (int)size);
+  //printf("LTESIM: Size of cqis: %d \n", (int)size);
   *fd = open(CQI_FIFO, O_CREAT|O_WRONLY);
   // send the cqi size
   write(*fd, &size, sizeof(size));
   // then the whole message
   write(*fd, CQIs.c_str(), CQIs.size());
   // printf("LTESIM: Sent cqis.\n%s\n", CQIs.c_str());
-  printf("LTESIM: Sent cqis.\n");
+  //printf("LTESIM: Sent cqis.\n");
   close(*fd);
 }
 
 void Simulator::SendState(int *fd, std::string state){
   std::string::size_type size = state.size();
-  printf("LTESIM: Size of state: %d \n", (int)size);
+  //printf("LTESIM: Size of state: %d \n", (int)size);
   *fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
   // send the size of message
   write(*fd, &size, sizeof(size));
   //  then the whole message
   write(*fd, state.c_str(), state.size());
   // printf("LTESIM: Sent state.\n%s\n", state.c_str());
-  printf("LTESIM: Sent state.\n");
+  //printf("LTESIM: Sent state.\n");
   close(*fd);
 }
 
@@ -502,7 +502,7 @@ Simulator::Run (void)
         // send the update TTI
         SendState(&st_fd, buffer.str().c_str());
         SendCQISummary(&cqi_fd);
-        printf("Waiting for first packets..  LTESIM: Waiting for new Scheduler. \n");
+        //printf("Waiting for first packets..  LTESIM: Waiting for new Scheduler. \n");
         m_stop = true;
         tti_tr1 = tti_tr2;
         buffer.str("");
@@ -589,7 +589,7 @@ Simulator::Run (void)
       }
     }
 
-    printf("LTESIM: Waiting for new Scheduler. \n");
+    //printf("LTESIM: Waiting for new Scheduler. \n");
     // clear stream and output capture
     buffer.str("");
   }

@@ -83,7 +83,9 @@ static void SingleCellWithInterferenceMixedApps (int nbCells, double radius,
 		                                double maxDelay, int videoBitRate,
                                         int seed)
 {
-	printf("test start\n");
+	printf("Test Start\n");
+	printf("nbCells(%d),Radius(%d),nbVideo(%d),nbCBR(%d),nbBE(%d),nbVOIP(%d),sched_type(%d),frame(%d),speed(%d),maxDelay(%d),VBR(%d)\n");
+	
 	// define simulation times
 	double duration = 46;
 	double flow_duration = 40;
