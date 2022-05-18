@@ -206,9 +206,9 @@ class LTENetworkState{
 			}
 			// form the state size
 			// 1(#ues) + Each UE's(App QoS + cqi)
-		    //state_size = 1+noUEs*(3*noAPPs + cqi_size) + packet + FAIRNESS;
-			if(use_lstm) state_size = 1+noUEs*(3*noAPPs + cqi_size) +2; //HH
-			else state_size = 1+noUEs*(3*noAPPs + cqi_size) + 1;
+		    //state_size = 1+noUEs*{(3+LSTMpacket)*noAPPs + cqi_size};
+			if(use_lstm) state_size = 1+noUEs*(4*noAPPs + cqi_size); //HH
+			else state_size = 1+noUEs*(4*noAPPs + cqi_size) + 1;
 		    reset_state = torch::ones({1, state_size});
 		}
 
@@ -244,7 +244,7 @@ class LTENetworkState{
 			
 			UESummary* this_UE;
 			Application* this_app;
-			float gbr_indicator, plr_indicator, delay_indicator, fairness_indicator, reward_indicator;
+			float gbr_indicator, plr_indicator, delay_indicator, reward_indicator;
 			int packet_indicator;
 			std::vector<int> *this_UE_cqis;
 			state = torch::ones({1, state_size});
@@ -265,7 +265,8 @@ class LTENetworkState{
 			for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
 				this_UE = (*it);
 				// app QoS
-				for (std::vector<Application*>::iterator itt = this_UE->GetApplicationContainer()->begin(); itt != this_UE->GetApplicationContainer()->end(); ++itt){
+				for (std::vector<Application*>::iterator itt = this_UE->GetApplicationContainer()->begin(); itt != this_UE->GetApplicationContainer()->end(); ++itt)
+				{
 					this_app = (*itt);
 					
 					//indicator = requirement - measured
@@ -279,10 +280,7 @@ class LTENetworkState{
 					index++;
 					plr_indicator = this_app->QoSplr - this_app->realplr; // -realplr ~ qosplr
 					state.index_put_({0,index}, plr_indicator);
-					index++;
-					fairness_indicator = this_app->fairness; // -realplr ~ qosplr
-					state.index_put_({0,index}, fairness_indicator);
-					index++;					
+					index++;				
 
 					// by HH, if use lstm
 					if(use_lstm)
@@ -531,7 +529,7 @@ h_log("debug303\n");
 					if ((*(*itt)).appTXCount > 0) {
 						//nb_packet[(*(*itt)).id] = (*(*itt)).realgbr;
 						nb_packet[(*(*itt)).id]++;
-						printf("%d nb packet: %d\n", (*(*itt)).id, nb_packet[(*(*itt)).id] );
+						//printf("%d nb packet: %d\n", (*(*itt)).id, nb_packet[(*(*itt)).id] );
 					}
 
 		            // there has been a TX
@@ -591,14 +589,15 @@ h_log("debug303\n");
 			fairness_variance = fairness_variance_sum / noUEs;
 			fairness_deviation = sqrt(fairness_variance);
 
-			printf("fairness_deviation: %f\n", fairness_deviation);
+			//printf("fairness_deviation: %f\n", fairness_deviation);
 			fairness_reward = (1 - (fairness_deviation * fairness_normalize)) * fairness_coef;
 			if(fairness_reward<0) fairness_reward=0;
-			printf("fairness reward: %f\n", fairness_reward);
+			printf("fairness reward %f\n", fairness_reward);
 
 			sum_reward = (sum_reward / (float) noUEs) + fairness_reward;
 			Accum_Reward += sum_reward;
-			printf("\tAt %d TTI, TTI Reward= %f, \tAccum_reward= %f, #UEs %d \n", (int)TTIcounter, sum_reward, Accum_Reward, noUEs);
+			//printf("\tAt %d TTI, TTI Reward= %f, \tAccum_reward= %f, #UEs %d \n", (int)TTIcounter, sum_reward, Accum_Reward, noUEs);
+			printf("\tAt %d TTI, TTI Reward= %f, fairness= %f\n", (int)TTIcounter, sum_reward, fairness_reward);
 			//printf("AVgbr/AVdelay/AVplr %f %f %f\n", sumgbr/num_counter,sumdelay/num_counter, sumplr/num_counter);
 		
 			RealReward.index_put_({0}, sum_reward);
@@ -672,6 +671,7 @@ h_log("debug303\n");
 				file_name = "test_results/" + sched + "_" + std::to_string(noUEs) + "_train_satis.txt";
 			}
   			
+			printf("Satisfy Log\n");
   			std::ofstream output_file(file_name);
 			output_file << "App_id, SatPLRCount, SatDelayCount, SatGBRCount" << std::endl;
 
@@ -680,11 +680,10 @@ h_log("debug303\n");
 				std::vector<Application*> *appcontainer = this_UE->GetApplicationContainer();
 				for(std::vector<Application*>::iterator itt = appcontainer->begin(); itt != appcontainer->end(); ++itt){
 					Application* this_app = *itt;
-					printf("ID(%d)/SatGBR/SatDelay/SatPLR %f %f %f\n",
-        				this_app->id, this_app->appSatGBRCount, this_app->appSatDelayCount, this_app->appSatPLRCount);
 					output_file << this_app->id << ", " << this_app->appSatPLRCount
-									<< ", " << this_app->appSatDelayCount
-										<< ", " << this_app->appSatGBRCount << std::endl;
+								<< ", " << this_app->appSatDelayCount
+								<< ", " << this_app->appSatGBRCount << std::endl;
+					printf("ID %d SatisPLR %f, SatisDelay %f, SatisGBR %f\n", this_app->id, this_app->appSatPLRCount, this_app->appSatDelayCount, this_app->appSatGBRCount);
 				}
 			} 
 			output_file.close();

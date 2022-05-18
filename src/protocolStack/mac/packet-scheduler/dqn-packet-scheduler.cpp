@@ -57,7 +57,7 @@ DQN_PacketScheduler::~DQN_PacketScheduler()
 void
 DQN_PacketScheduler::DoSchedule ()
 {
-	printf("Start DQN packet scheduler for node %d\n", GetMacEntity ()->GetDevice ()->GetIDNetworkNode());
+	//printf("Start DQN packet scheduler\n", GetMacEntity ()->GetDevice ()->GetIDNetworkNode());
 #ifdef SCHEDULER_DEBUG
 	std::cout << "Start EXP packet scheduler for node "
 			<< GetMacEntity ()->GetDevice ()->GetIDNetworkNode()<< std::endl;
