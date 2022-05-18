@@ -159,16 +159,24 @@ Simulator::SchedulerType Simulator::FetchScheduler(int *fd){
   i_input_bytes = read(*fd, c_readbuf, sizeof(c_readbuf));
   close(*fd);
 
-  c_read_ptr = strtok(c_readbuf, "|");
-  d_dqn_output0 = 10*atoi(c_read_ptr);
-  c_read_ptr = strtok(NULL,"|");  
-  d_dqn_output1 = 10*atoi(c_read_ptr);
-  c_read_ptr = strtok(NULL,"|");  
-  d_dqn_output2 = 10*atoi(c_read_ptr);
-  c_read_ptr = strtok(NULL,"|");  
-  d_dqn_output3 = 10*atoi(c_read_ptr);
-
-  c_readbuf[i_input_bytes] = '\0';
+  if ( strchr(c_readbuf, '|') != NULL) // DIRECT DQN
+  {
+    c_read_ptr = strtok(c_readbuf, "|");
+    d_dqn_output0 = 10*atoi(c_read_ptr);
+    c_read_ptr = strtok(NULL,"|");  
+    d_dqn_output1 = 10*atoi(c_read_ptr);
+    c_read_ptr = strtok(NULL,"|");  
+    d_dqn_output2 = 10*atoi(c_read_ptr);
+    c_read_ptr = strtok(NULL,"|");  
+    d_dqn_output3 = 10*atoi(c_read_ptr);
+    c_readbuf[i_input_bytes] = '\0';
+  }
+  else
+  {
+    printf("creadbuf: %d\n", atoi(c_readbuf));
+    d_dqn_output0 = -1;
+    d_dqn_output1 = 10*atoi(c_readbuf);
+  }
 //  printf("LTESIM: Received scheduler: \"%f / %f / %f / %f\"\n", d_dqn_output0, d_dqn_output1, d_dqn_output2, d_dqn_output3);
 
   if (strcmp(c_readbuf, "end") == 0)

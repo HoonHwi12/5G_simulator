@@ -50,5 +50,7 @@ src/channel/propagation-model/FastFadingRealization/*
 
 dqn/libtorch/*
 dqn/build/*
+old_dqn/libtorch/*
+old_dqn/build/*
 LSTM/build/*
 LSTM/libtorch/*
