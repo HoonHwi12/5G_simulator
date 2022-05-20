@@ -312,7 +312,7 @@ int main(int argc, char** argv) {
           target_q_values = (next_q_values.multiply(GAMMA)) +  std::get<3>(batch);
           // loss and backprop
           torch::Tensor loss = (torch::mse_loss(current_q_values.to(device), target_q_values.to(device))).to(device);
-          printf("loss %f\n", loss.item().toFloat());
+          //printf("loss %f\n", loss.item().toFloat());
 
           loss.set_requires_grad(true);
           optimizer.zero_grad();
