@@ -31,14 +31,15 @@ std::string FetchCQIs(int *fd);
 void FetchInitUEs(int *fd, LTENetworkState *network_state);
 LTENetworkState* initConnections(int* _sh_fd, int* _st_fd, int* _cqi_fd);
 void SendScheduler(int *fd, int scheduler);
+void SendFinalScheduler(int *fd);
 experience processSamples(std::vector<experience> _samples);
 void loadStateDict(DQN model, DQN target_model);
 
 
 /* HyperParams*/
 const int BATCH_SIZE        = 32;
-int TRAIN_TTI               = 1000;
-const int TEST_TTI          = 1000;
+int TRAIN_TTI               = 10000;
+const int TEST_TTI          = 10000;
 const int MIN_REPLAY_MEM    = 1000;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
@@ -64,7 +65,6 @@ std::chrono::nanoseconds duration;
 int main(int argc, char** argv) {
 	int constant_scheduler = 0;
   bool use_dqn = true;
-
   // file naming
   std::string scheduler_string;
 	if(argc > 1){
@@ -116,6 +116,10 @@ int main(int argc, char** argv) {
   // pipe 
   int sh_fd, st_fd, cqi_fd;
 
+  // remove(SCHED_FIFO);
+  // remove(STATE_FIFO);
+  // remove(CQI_FIFO);
+
   // initial connections
   LTENetworkState* networkEnv = initConnections(&sh_fd, &st_fd, &cqi_fd);
   h_log("init connection end\n");
@@ -154,8 +158,11 @@ int main(int argc, char** argv) {
   torch::optim::SGD optimizer(policyNet->parameters(), torch::optim::SGDOptions(LR_START).momentum(MOMENTUM));
 
   // get update from first update packets
+  h_log("fetch state\n");
   update     = FetchState(&st_fd); 
+  h_log("fetch cqi\n");
   cqi_update = FetchCQIs(&cqi_fd);
+  h_log("fetch complete\n");
   networkEnv->UpdateNetworkState(update); 
   networkEnv->ProcessCQIs(cqi_update);
   
@@ -342,6 +349,8 @@ int main(int argc, char** argv) {
     networkEnv->log_satisfaction_rates(scheduler_string, noUEs, true);
   } // only dqn should test loop
 
+// send end signal
+  SendFinalScheduler(&sh_fd);
 
   close(sh_fd);
   close(st_fd);
@@ -403,23 +412,30 @@ void ConnectSchedulerFifo(int *fd){
 
 void OpenCQIFifo(int *fd){
   // create the cqi fifo
+  h_log("mk CQI FIFO\n");
   mkfifo(CQI_FIFO, S_IFIFO|0777);
   // block for LTESim to connect
-  *fd = open(CQI_FIFO, O_RDONLY);
+  h_log("OPEN rdonly CQI FIFO\n");
+  *fd = open(CQI_FIFO, O_CREAT|O_RDONLY);
+
+  h_log("close CQI FIFO\n");
   close(*fd);
 }
 
 void OpenStateFifo(int *fd, int *noUEs){
   // create the state fifo
-  mkfifo(STATE_FIFO, S_IFIFO|0770);
+  h_log("mk state FIFO\n");
+  mkfifo(STATE_FIFO, S_IFIFO|0777);
   char noUEs_in[80];
   int input_bytes;
   // block for LTESim to connect
-  *fd = open(STATE_FIFO, O_RDONLY);
+  h_log("open O_RDONLY state FIFO\n");
+  *fd = open(STATE_FIFO, O_CREAT|O_RDONLY);
   // read the number of UEs
   input_bytes = read(*fd, noUEs_in, sizeof(noUEs_in));
   close(*fd);
   *noUEs = atoi(noUEs_in);
+  h_log("close O_RDONLY state FIFO\n");
 }
 
 std::string FetchState(int *fd){
@@ -437,12 +453,15 @@ std::string FetchState(int *fd){
 std::string FetchCQIs(int *fd){
   // read CQI message size
   *fd = open(CQI_FIFO, O_RDONLY);
+  h_log("open cqi complete\n");
   std::string::size_type size;
   read(*fd, &size, sizeof(size));
+  h_log("read cqi complete\n");
   std::string message(size, ' ');
   // read the CQIs
   read(*fd, &message[0], size);
   close(*fd);
+  h_log("close cqi complete\n");
   return message;
 }
 
@@ -464,6 +483,18 @@ void SendScheduler(int *fd, int scheduler){
   // send scheduler
   *fd = open(SCHED_FIFO, O_CREAT|O_WRONLY);
   write(*fd, scheduler_send, strlen(scheduler_send));
+  close(*fd);
+}
+
+void SendFinalScheduler(int *fd)
+{
+  std::string sched = "end";
+
+  char const *scheduler_send = sched.c_str();
+  // send scheduler
+  *fd = open(SCHED_FIFO, O_CREAT|O_WRONLY);
+  write(*fd, scheduler_send, strlen(scheduler_send));
+
   close(*fd);
 }
 

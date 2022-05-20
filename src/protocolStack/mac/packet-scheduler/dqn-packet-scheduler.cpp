@@ -126,10 +126,10 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
               * pow(ComputeEXPrule(bearer), weight3* pow((weight3/avg_weight),2)); //EXP rule
     */
    metric = (spectralEfficiency * 180000.) / bearer->GetAverageTransmissionRate() // PF
-               //* pow(ComputeEXP(bearer), weight0) // EXP
-               * pow(ComputeLOG(bearer), weight1) // LOG
-               * pow(ComputeMLWDF(bearer), weight2); // MLWDF
-               //* pow(ComputeEXPrule(bearer), weight3); //EXP rule
+//               + pow(ComputeEXP(bearer), weight0) // EXP
+               + pow(ComputeLOG(bearer), weight1) // LOG
+               + pow(ComputeMLWDF(bearer), weight2); // MLWDF
+//               + pow(ComputeEXPrule(bearer), weight3); //EXP rule
     }
 
     return metric;

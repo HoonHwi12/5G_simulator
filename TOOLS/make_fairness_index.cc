@@ -38,10 +38,14 @@ int main(int argc, char* argv[])
 	double fi = 0;
 
 	finput=fopen(argv[1],"r");
+
 	while (feof(finput)==0) 
           {
+
 		fscanf(finput,"%lf\n",&goodput);
+
 		sum_goodput += goodput;
+
             	sum_quad_goodput += pow (goodput, 2);
 	    	n+=1;
 	  }
