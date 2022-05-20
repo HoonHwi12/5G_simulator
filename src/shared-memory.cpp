@@ -33,23 +33,23 @@ int SharedMemoryCreate(key_t KEY_NUM)
             //perror("Shared memory resest fail");
             return FAIL;
         }
-        else
-        {
-            // delete shared memory
-            if(shmctl(shmid, IPC_RMID, 0) == -1) 
-            {
-                //perror("Shared memory delete fail");
-                return FAIL;
-            }
+        // else
+        // {
+        //     // delete shared memory
+        //     if(shmctl(shmid, IPC_RMID, 0) == -1) 
+        //     {
+        //         //perror("Shared memory delete fail");
+        //         return FAIL;
+        //     }
 
-            // create shared memory
-            shmid = shmget((key_t)KEY_NUM, SHARED_SIZE, IPC_CREAT| 0666);
-            if(shmid == -1)
-            {
-                //perror("Shared memory create fail");
-                return FAIL;
-            }
-        }
+        //     // create shared memory
+        //     shmid = shmget((key_t)KEY_NUM, SHARED_SIZE, IPC_CREAT| 0666);
+        //     if(shmid == -1)
+        //     {
+        //         //perror("Shared memory create fail");
+        //         return FAIL;
+        //     }
+        // }
     }
     return shmid;
 }

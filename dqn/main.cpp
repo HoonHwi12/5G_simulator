@@ -32,6 +32,7 @@ void FetchInitUEs(int *fd, LTENetworkState *network_state);
 LTENetworkState* initConnections(int* _sh_fd, int* _st_fd, int* _cqi_fd);
 
 void SendScheduler(int *fd, int scheduler0, int scheduler1=0, int scheduler2=0, int scheduler3=0);
+void SendFinalScheduler(int *fd);
 
 experience processSamples(std::vector<experience> _samples);
 void loadStateDict(DQN model, DQN target_model);
@@ -40,8 +41,8 @@ void initWeights(torch::nn::Module& m);
 
 /* HyperParams*/
 const int BATCH_SIZE        = 32;
-int TRAIN_TTI               = 1000; //20000;
-const int TEST_TTI          = 1000;//2500;
+int TRAIN_TTI               = 200; //20000;
+const int TEST_TTI          = 200;//2500;
 const int MIN_REPLAY_MEM    = 1000;// 1000;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
@@ -352,6 +353,9 @@ int main(int argc, char** argv) {
   // log training loop satisfaction rates, false flag signals training
   networkEnv->log_satisfaction_rates(scheduler_string, noUEs, false);
 
+  // send end signal
+  SendFinalScheduler(&sh_fd);
+
   close(sh_fd);
   close(st_fd);
   close(cqi_fd);
@@ -431,9 +435,12 @@ void ConnectSchedulerFifo(int *fd){
 
 void OpenCQIFifo(int *fd){
   // create the cqi fifo
+  printf("mk cqi fifo\n");
   mkfifo(CQI_FIFO, S_IFIFO|0777);
   // block for LTESim to connect
+  printf("open cqi fifo\n");
   *fd = open(CQI_FIFO, O_RDONLY);
+  printf("close cqi fifo\n");
   close(*fd);
 }
 
@@ -498,6 +505,18 @@ void SendScheduler(int *fd, int scheduler0, int scheduler1, int scheduler2, int 
                       std::to_string(scheduler1)+"|"+
                       std::to_string(scheduler2)+"|"+
                       std::to_string(scheduler3);
+
+  char const *scheduler_send = sched.c_str();
+  // send scheduler
+  *fd = open(SCHED_FIFO, O_CREAT|O_WRONLY);
+  write(*fd, scheduler_send, strlen(scheduler_send));
+
+  close(*fd);
+}
+
+void SendFinalScheduler(int *fd)
+{
+  std::string sched = "end";
 
   char const *scheduler_send = sched.c_str();
   // send scheduler

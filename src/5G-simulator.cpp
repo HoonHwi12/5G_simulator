@@ -201,6 +201,7 @@ main (int argc, char *argv[])
   else
     {
       Help ();
-      return 0;
     }
+
+    return 0;
 }

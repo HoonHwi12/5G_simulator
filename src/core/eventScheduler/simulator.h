@@ -55,7 +55,8 @@ public:
     Scheduler_LOG_RULE,
     Scheduler_EXP_RULE,
     Scheduler_TYPE_ROUND_ROBIN,
-    Scheduler_TYPE_DQN
+    Scheduler_TYPE_DQN,
+    Scheduler_TYPE_FINAL_PROPORTIONAL_FAIR
   };
 private:
   Simulator ();

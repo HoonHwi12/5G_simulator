@@ -25,6 +25,7 @@ enum ApplicationType
 	APPLICATION_TYPE_WEB
 };
 
+float fairness;
 struct Application
 {
 	int id;
@@ -195,8 +196,8 @@ class LTENetworkState{
 				noAPPs += (int)(this_UE->applications->size());
 			}
 			// form the state size
-			// 1(#ues) + Each UE's(App QoS + cqi)
-		    state_size = 1+noUEs*(3*noAPPs + cqi_size);
+			// 1(#ues) + Each UE's(App QoS + cqi + fairness)
+		    state_size = 1+noUEs*(3*noAPPs + cqi_size + 1);
 		    reset_state = torch::ones({1, state_size});
 		}
 
@@ -232,7 +233,7 @@ class LTENetworkState{
 			
 			UESummary* this_UE;
 			Application* this_app;
-			float gbr_indicator, plr_indicator, delay_indicator;
+			float gbr_indicator, plr_indicator, delay_indicator, fairness_indicator;
 			std::vector<int> *this_UE_cqis;
 			state = torch::ones({1, state_size});
 			using namespace torch::indexing;
@@ -267,6 +268,12 @@ class LTENetworkState{
 					delay_sum += this_app->realdelay;
 					sum_counter++;
 				}
+
+				//fairness
+				fairness_indicator = fairness;
+				state.index_put_({0,index}, fairness_indicator);
+				index++;
+
 				// UE CQIs
 				this_UE_cqis = this_UE->GetCQIContainer();
 				for (std::vector<int>::iterator ittt = this_UE_cqis->begin(); ittt != this_UE_cqis->end(); ++ittt){
@@ -448,11 +455,10 @@ class LTENetworkState{
          	float sum_reward = 0;
 			float fairness_reward = 0;
 
-         	float gbr_coef = 0.3;
-         	float plr_coef = 0.3;
-         	float dly_coef = 0.3;
+          	float gbr_coef = 0.25;
+         	float plr_coef = 0.25;
+         	float dly_coef = 0.25;
 			float fairness_coef = 0.25;
-			float fairness_normalize = 0.001;
 
 			int num_counter=0;
 			float sumgbr=0;
@@ -460,29 +466,29 @@ class LTENetworkState{
 			float sumplr=0;
 
 			float fairness_sum=0;
+			float fairness_sum_quad=0;
+			float fairness_sum_goodput=0;
 			float fairness_avg=0;
-			float fairness_variance_sum=0;
-			float fairness_variance=0;
-			float fairness_deviation=0;
+			u_int32_t fairness_connection=0;
+			float fi=0;
 
          	RealReward = torch::zeros(1);
 	      	for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
 	         	for (std::vector<Application*>::iterator itt = (*it)->GetApplicationContainer()->begin(); itt != (*it)->GetApplicationContainer()->end(); ++itt){
-
 					if ((*(*itt)).realgbr >= (*(*itt)).QoSgbr) {
-		               //gbrReward = 1;
-					   gbrReward = 1;
+		               gbrReward = 1;
 		            }
 		            else {
 		               //gbrReward = 0;
 					   gbrReward = (*(*itt)).realgbr/(*(*itt)).QoSgbr;
+					   if(gbrReward<0) gbrReward=0;
 		            }   
 
 					// fairness
-					if ((*(*itt)).appTXCount > 0) {
-						//nb_packet[(*(*itt)).id] = (*(*itt)).realgbr;
-						nb_packet[(*(*itt)).id]++;
-						//printf("%d nb packet: %d\n", (*(*itt)).id, nb_packet[(*(*itt)).id] );
+					if ((*(*itt)).realgbr > 0) {
+						fairness_sum += (*(*itt)).realgbr;
+						fairness_sum_quad += pow((*(*itt)).realgbr, 2);
+						fairness_connection += 1;
 					}
 
 		            // there has been a TX
@@ -498,7 +504,7 @@ class LTENetworkState{
 		            } else {
 		            	plrReward = 0;
 		            }
- 					
+
  					//if there has been a RX
 					if((*(*itt)).appRXCount > 0){
 			            if ((*(*itt)).realdelay <= (*(*itt)).QoSdelay) {
@@ -511,45 +517,41 @@ class LTENetworkState{
 			        // there hasnt been an RX
 			        } else {
 			        	delayReward = 0;
-			        }
+			        }					
 
-	            	(*(*itt)).reward = gbr_coef*gbrReward + plr_coef*plrReward + dly_coef*delayReward;  
+	            	(*(*itt)).reward = gbr_coef*gbrReward + plr_coef*plrReward + dly_coef*delayReward;
 					sum_reward += (*(*itt)).reward; 
 
 					sumgbr += (*(*itt)).realgbr;
 					sumdelay += (*(*itt)).realdelay;
 					sumplr += (*(*itt)).realplr;
-					num_counter++;
+
+					//if((int)TTIcounter%1000==0) printf("counter(%d) id(%d) gbr/plr/delay %f %f %f\n",
+					//	num_counter, (*(*itt)).id, gbr_coef*gbrReward, plr_coef*plrReward, dly_coef*delayReward);
+					//num_counter++;
+
 	         	}
 	      	}
 
-			for(size_t fairness_temp=0; fairness_temp<noUEs; fairness_temp++)
-			{
-				if(nb_packet[fairness_temp] > 0) fairness_sum += nb_packet[fairness_temp];
-			}
-			fairness_avg = fairness_sum / noUEs;
+			fairness_sum_goodput = pow(fairness_sum, 2);
+			fairness_avg = fairness_sum / fairness_connection;
+			fi = fairness_sum_goodput / (fairness_connection * fairness_sum_quad);
 
-			for(size_t fairness_temp=0; fairness_temp<noUEs; fairness_temp++)
-			{
-				if(nb_packet[fairness_temp] > 0) fairness_variance_sum += pow(nb_packet[fairness_temp] - fairness_avg, 2);
-			}
-			fairness_variance = fairness_variance_sum / noUEs;
-			fairness_deviation = sqrt(fairness_variance);
+			fairness = fi;
 
-			//printf("fairness_deviation: %f\n", fairness_deviation);
-			fairness_reward = (1 - (fairness_deviation * fairness_normalize)) * fairness_coef;
+			fairness_reward = fi * fairness_coef;
 			if(fairness_reward<0) fairness_reward=0;
-			printf("fairness reward %f\n", fairness_reward);
 
-			sum_reward = sum_reward / (float) noUEs + fairness_reward;
+			printf("fairness total %f avg %f fi %f reward %f\n", fairness_sum, fairness_avg, fi, fairness_reward);
+
+			sum_reward = (sum_reward / (float) noUEs) + fairness_reward;
 			Accum_Reward += sum_reward;
-			printf("\tAt %d TTI, TTI Reward= %f, \tAccum_reward= %f, #UEs %d\n", (int)TTIcounter, sum_reward, Accum_Reward, noUEs);
-			
+			//printf("\tAt %d TTI, TTI Reward= %f, \tAccum_reward= %f, #UEs %d \n", (int)TTIcounter, sum_reward, Accum_Reward, noUEs);
+			printf("\tAt %d TTI, TTI Reward= %f, fairness= %f\n", (int)TTIcounter, sum_reward, fairness_reward);
+			//printf("AVgbr/AVdelay/AVplr %f %f %f\n", sumgbr/num_counter,sumdelay/num_counter, sumplr/num_counter);
+		
 			RealReward.index_put_({0}, sum_reward);
-	      	//return RealReward;  
-			torch::Tensor testReward = torch::zeros(1);
-
-			  return testReward;
+	      	return RealReward;  
       	}  
 
 		void ProcessCQIs(std::string cqis){

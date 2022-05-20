@@ -112,7 +112,8 @@ void Simulator::OpenSchedulerFifo(int *fd){
 
 void Simulator::ConnectCQIFifo(int *fd){
   printf("LTESIM: Waiting for CQI_FIFO.\n");
-  *fd = open(CQI_FIFO, O_CREAT|O_WRONLY);
+  //*fd = open(CQI_FIFO, O_CREAT|O_WRONLY);
+  *fd = open(CQI_FIFO, O_WRONLY);
   printf("LTESIM: Connected to CQI_FIFO.\n");
   close(*fd);
 }
@@ -130,7 +131,8 @@ void Simulator::ConnectStateFifo(int *fd){
   }while( atoi(noUEs_send) > 10000 || atoi(noUEs_send) < 0 );
 
   printf("LTESIM: Waiting for STATE_FIFO.\n");
-  *fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
+  //*fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
+  *fd = open(STATE_FIFO, O_WRONLY);
   printf("LTESIM: Connected to STATE_FIFO, Sending #UEs\n");
    // get the total number of UEs;
    // send size of message
@@ -171,22 +173,19 @@ Simulator::SchedulerType Simulator::FetchScheduler(int *fd){
     d_dqn_output3 = 10*atoi(c_read_ptr);
     c_readbuf[i_input_bytes] = '\0';
   }
+  else if (strchr(c_readbuf, 'e') != NULL)
+  {
+    downlink_scheduler_type = Simulator::Scheduler_TYPE_FINAL_PROPORTIONAL_FAIR;
+    printf("5G_SIM: Final\n");
+    return downlink_scheduler_type;
+  }  
   else
   {
-    printf("creadbuf: %d\n", atoi(c_readbuf));
     d_dqn_output0 = -1;
     d_dqn_output1 = 10*atoi(c_readbuf);
   }
 //  printf("LTESIM: Received scheduler: \"%f / %f / %f / %f\"\n", d_dqn_output0, d_dqn_output1, d_dqn_output2, d_dqn_output3);
 
-  if (strcmp(c_readbuf, "end") == 0)
-  {
-    Simulator *sim;
-    sim->m_stop = true;
-    downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
-    printf("5G_SIM: Scheduler is PF_Fair.\n");
-    return downlink_scheduler_type;
-  }
 
   if(d_dqn_output0 >= 0)
   {
@@ -245,7 +244,8 @@ void Simulator::SendUESummary(int *fd){
   }
   std::string::size_type size = UEsummaries.size();
   printf("LTESIM: Size of UEsummaries: %d \n", (int)size);
-  *fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
+  //*fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
+  *fd = open(STATE_FIFO, O_WRONLY);
   // send the cqi size
   write(*fd, &size, sizeof(size));
   // then the whole message
@@ -265,7 +265,9 @@ void  Simulator::SendCQISummary(int *fd){
 
   std::string::size_type size = CQIs.size();
   //printf("LTESIM: Size of cqis: %d \n", (int)size);
-  *fd = open(CQI_FIFO, O_CREAT|O_WRONLY);
+  printf("send cqi summary\n");
+  //*fd = open(CQI_FIFO, O_CREAT|O_WRONLY);
+  *fd = open(CQI_FIFO, O_WRONLY);
   // send the cqi size
   write(*fd, &size, sizeof(size));
   // then the whole message
@@ -273,12 +275,14 @@ void  Simulator::SendCQISummary(int *fd){
   // printf("LTESIM: Sent cqis.\n%s\n", CQIs.c_str());
   //printf("LTESIM: Sent cqis.\n");
   close(*fd);
+  printf("send cqi summary end\n");
 }
 
 void Simulator::SendState(int *fd, std::string state){
   std::string::size_type size = state.size();
   //printf("LTESIM: Size of state: %d \n", (int)size);
-  *fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
+  //*fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
+  *fd = open(STATE_FIFO, O_WRONLY);
   // send the size of message
   write(*fd, &size, sizeof(size));
   //  then the whole message
@@ -401,7 +405,7 @@ Simulator::Run (void)
   //     ProcessOneEvent ();
   //   }
  
-  remove(CQI_FIFO);
+  //remove(CQI_FIFO);
   // scheduler type object
   Simulator::SchedulerType scheduler;
   // Open, connect to pipes
@@ -545,6 +549,11 @@ Simulator::Run (void)
   while (!m_calendar->IsEmpty () && !m_stop){
     // fetch the new scheduler
     scheduler = FetchScheduler(&sh_fd);
+    if(scheduler == Scheduler_TYPE_FINAL_PROPORTIONAL_FAIR)
+    {
+      break;
+    }
+
     // Update everything needed for scheduler changes
     UpdateAllScheduler(scheduler);
     // execute "action"
@@ -557,8 +566,11 @@ Simulator::Run (void)
     // append onto big buffer
     bigbuf = bigbuf + buffer.str();
     // send the last TTI
+    printf("send state\n");
     SendState(&st_fd, buffer.str().c_str());
+    printf("send cqi\n");
     SendCQISummary(&cqi_fd);
+    printf("send cqi end\n");
 
     if(use_lstm == 0x89)
     {
@@ -595,8 +607,8 @@ Simulator::Run (void)
   }
 
   // close the streams
-  scheduler = FetchScheduler(&sh_fd);
-  SendState(&st_fd, "end");
+  //scheduler = FetchScheduler(&sh_fd);
+  //SendState(&st_fd, "end");
   close(sh_fd);
   close(st_fd);
   close(cqi_fd);
