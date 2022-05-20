@@ -194,7 +194,7 @@ int main(int argc, char** argv) {
     h_log("send scheduler\n");
 
     // execute action
-    printf("send scheduler: %d\n", action[0].item<int>());
+    //printf("send scheduler: %d\n", action[0].item<int>());
   	SendScheduler(&sh_fd, action[0].item<int>());
   	// observe new state
     h_log("fetch state\n");
@@ -238,7 +238,7 @@ int main(int argc, char** argv) {
         target_q_values = (next_q_values.multiply(GAMMA)) +  std::get<3>(batch);
         // loss and backprop
         torch::Tensor loss = (torch::mse_loss(current_q_values.to(device), target_q_values.to(device))).to(device);
-        printf("loss  %f \n", loss.item().toFloat());
+        //printf("loss  %f \n", loss.item().toFloat());
         loss.set_requires_grad(true);
         optimizer.zero_grad();
         loss.backward();
@@ -335,7 +335,7 @@ int main(int argc, char** argv) {
       target_q_values = (next_q_values.multiply(GAMMA)) +  std::get<3>(batch);
       // loss and backprop
       torch::Tensor loss = (torch::mse_loss(current_q_values.to(device), target_q_values.to(device))).to(device);
-      printf("loss  %f \n", loss.item().toFloat());
+      //printf("loss  %f \n", loss.item().toFloat());
       loss.set_requires_grad(true);
       optimizer.zero_grad();
       loss.backward();
