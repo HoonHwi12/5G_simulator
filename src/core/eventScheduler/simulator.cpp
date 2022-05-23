@@ -220,6 +220,10 @@ Simulator::SchedulerType Simulator::FetchScheduler(int *fd){
           downlink_scheduler_type = Simulator::Scheduler_LOG_RULE;
           printf("5G_SIM: Scheduler is LOG_RULE.\n");
           break;
+        case 6:
+          downlink_scheduler_type = Simulator::Scheduler_TYPE_MAXIMUM_THROUGHPUT;
+          printf("5G_SIM: Scheduler is MAX_THROUGHPUT.\n");
+          break;              
         case 11:
           downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
           printf("5G_SIM: SETTING UEs stationary.\n");

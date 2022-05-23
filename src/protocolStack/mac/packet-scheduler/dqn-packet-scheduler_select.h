@@ -20,15 +20,15 @@
  */
 
 
-#ifndef DQN_PACKETSCHEDULER_H_
-#define DQN_PACKETSCHEDULER_H_
+#ifndef DQN_PACKETSCHEDULER_SELECT_H_
+#define DQN_PACKETSCHEDULER_SELECT_H_
 
 #include "downlink-packet-scheduler.h"
 
-class DQN_PacketScheduler : public DownlinkPacketScheduler {
+class DQN_PacketScheduler_SELECT : public DownlinkPacketScheduler {
 public:
-	DQN_PacketScheduler();
-	virtual ~DQN_PacketScheduler();
+	DQN_PacketScheduler_SELECT();
+	virtual ~DQN_PacketScheduler_SELECT();
 	void DoSchedule();
 
 	virtual double ComputeSchedulingMetric (RadioBearer *bearer, double spectralEfficiency, int subChannel);

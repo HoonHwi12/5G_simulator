@@ -1,4 +1,3 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
  * Copyright (c) 2010,2011,2012,2013 TELEMATICS LAB, Politecnico di Bari
  *
@@ -20,22 +19,18 @@
  */
 
 
-#ifndef DQN_PACKETSCHEDULER_H_
-#define DQN_PACKETSCHEDULER_H_
+#ifndef DQN_PACKETSCHEDULER_MLWDF_H_
+#define DQN_PACKETSCHEDULER_MLWDF_H_
 
 #include "downlink-packet-scheduler.h"
 
-class DQN_PacketScheduler : public DownlinkPacketScheduler {
+class DQN_PacketScheduler_MLWDF : public DownlinkPacketScheduler {
 public:
-	DQN_PacketScheduler();
-	virtual ~DQN_PacketScheduler();
+	DQN_PacketScheduler_MLWDF();
+	virtual ~DQN_PacketScheduler_MLWDF();
 	void DoSchedule();
 
 	virtual double ComputeSchedulingMetric (RadioBearer *bearer, double spectralEfficiency, int subChannel);
-	double ComputeEXP(RadioBearer *bearer);
-	double ComputeLOG(RadioBearer *bearer);
-	double ComputeMLWDF(RadioBearer *bearer);
-	double ComputeEXPrule(RadioBearer *bearer);
 
 private:
 
