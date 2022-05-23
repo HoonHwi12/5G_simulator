@@ -91,11 +91,8 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
   double weight2 = d_dqn_output2 / 100; 
   double weight3 = d_dqn_output3 / 100;
 
-  //double avg_weight = (weight0+weight1+weight2+weight3) / 4;
-
   //printf("Compute DQN metric weight0(%f)/weight1(%f)/weight2(%f)\n",
        //weight0, weight1, weight2);
-
   
 
   if (bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_INFINITE_BUFFER ||
@@ -107,129 +104,104 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
   }
   else
   {
-    /*
-    double debug_exp =  ComputeEXP(bearer);
-    double debug_log = ComputeLOG(bearer);
-    double debug_mlwdf = ComputeMLWDF(bearer);
-    printf("HH] debug_exp aft(%f) / debug_log(%f) / debug_mlwdf(%f)\n", debug_exp, debug_log, debug_mlwdf);
-
-    metric = (spectralEfficiency * 180000.) / bearer->GetAverageTransmissionRate()
-              * pow(debug_exp, weight1) // EXP
-              * pow(debug_log, weight2) // LOG
-              * pow(debug_mlwdf, weight3); // MLWDF
-    */
-    /*
-    metric = (spectralEfficiency * 180000.) / bearer->GetAverageTransmissionRate() // PF
-              * pow(ComputeEXP(bearer), weight0* pow((weight0/avg_weight),2)) // EXP
-              * pow(ComputeLOG(bearer), weight1* pow((weight1/avg_weight),2)) // LOG
-              * pow(ComputeMLWDF(bearer), weight2* pow((weight2/avg_weight),2)) // MLWDF
-              * pow(ComputeEXPrule(bearer), weight3* pow((weight3/avg_weight),2)); //EXP rule
-    */
    metric = (spectralEfficiency * 180000.) / bearer->GetAverageTransmissionRate() // PF
-//               + pow(ComputeEXP(bearer), weight0) // EXP
+               + pow(ComputeEXP(bearer), weight0) // EXP
                + pow(ComputeLOG(bearer), weight1) // LOG
                + pow(ComputeMLWDF(bearer), weight2); // MLWDF
-//               + pow(ComputeEXPrule(bearer), weight3); //EXP rule
+               + pow(ComputeEXPrule(bearer), weight3); //EXP rule
     }
 
     return metric;
 }
 
-// double DQN_PacketScheduler::ComputeEXPrule(RadioBearer *bearer)
-// {
-//   double avgHOL = 0.;
-//   int nbFlows = 0;
-//   FlowsToSchedule *flowsToSchedule = GetFlowsToSchedule ();
-//   FlowsToSchedule::iterator iter;
-//   FlowToSchedule *flow;
+double DQN_PacketScheduler::ComputeEXPrule(RadioBearer *bearer)
+{
+  double avgHOL = 0.;
+  int nbFlows = 0;
 
-//   for (iter = flowsToSchedule->begin (); iter != flowsToSchedule->end (); iter++)
-// 	{
-// 	  flow = (*iter);
-// 	  if (flow->GetBearer ()->HasPackets ())
-// 	    {
-// 		  if ((flow->GetBearer ()->GetApplication ()->GetApplicationType ()
-// 				  == Application::APPLICATION_TYPE_TRACE_BASED)
-// 				  ||
-// 				  (flow->GetBearer ()->GetApplication ()->GetApplicationType ()
-// 						  == Application::APPLICATION_TYPE_VOIP))
-// 			{
-// 			  avgHOL += flow->GetBearer ()->GetHeadOfLinePacketDelay ();
-// 			  nbFlows++;
-// 			}
-// 		}
-// 	}
+  // compute average of hol delays
+  for (auto flow : *GetFlowsToSchedule())
+  {
+    if (flow->GetBearer ()->HasPackets ())
+      {
+        if ((flow->GetBearer ()->GetApplication ()->GetApplicationType ()
+              == Application::APPLICATION_TYPE_TRACE_BASED)
+            ||
+            (flow->GetBearer ()->GetApplication ()->GetApplicationType ()
+              == Application::APPLICATION_TYPE_VOIP))
+          {
+            avgHOL += flow->GetBearer ()->GetHeadOfLinePacketDelay ();
+            nbFlows++;
+          }
+      }
+  }
+  double m_avgHOLDelayes = avgHOL/nbFlows;
 
-//   double m_avgHOLDelayes = avgHOL/nbFlows;
+  QoSParameters *qos = bearer->GetQoSParameters ();
+  double HOL = bearer->GetHeadOfLinePacketDelay ();
+  double targetDelay = qos->GetMaxDelay ();
 
-//   QoSParameters *qos = bearer->GetQoSParameters ();
-//   double HOL = bearer->GetHeadOfLinePacketDelay ();
-//   double targetDelay = qos->GetMaxDelay ();
+  //COMPUTE METRIC USING EXP RULE:
+  double numerator = (6/targetDelay) * HOL;
+  double denominator = (1 + sqrt (m_avgHOLDelayes));
 
-//   //COMPUTE METRIC USING EXP RULE:
-//   double numerator = (6/targetDelay) * HOL;
-//   double denominator = (1 + sqrt (m_avgHOLDelayes));
-
-//   return exp(numerator / denominator);
-// }
+  return exp(numerator / denominator);
+}
 
 
 
-// double DQN_PacketScheduler::ComputeEXP(RadioBearer *bearer)
-// {
-//   //compute AW~
-//   FlowsToSchedule *flowsToSchedule = GetFlowsToSchedule ();
-//   FlowsToSchedule::iterator iter;
-//   FlowToSchedule *flow;
+double DQN_PacketScheduler::ComputeEXP(RadioBearer *bearer)
+{
+  //compute AW~
+  FlowsToSchedule *flowsToSchedule = GetFlowsToSchedule ();
+  FlowsToSchedule::iterator iter;
+  FlowToSchedule *flow;
 
-//   double AW_avgAW;
-//   double m_aW = 0;
-//   int nbFlow = 0;
-//   for (iter = flowsToSchedule->begin(); iter != flowsToSchedule->end(); iter++)
-//   {
-// 	  flow = *iter;
-// 	  RadioBearer *bearer = flow->GetBearer ();
+  double AW_avgAW;
+  double m_aW = 0;
+  int nbFlow = 0;
 
-// 	  if (bearer->HasPackets ())
-// 	  {
-// 		  if ((bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_TRACE_BASED)
-// 			  ||
-// 			  (bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_VOIP))
-// 			{
-// 			  QoSForEXP *qos = (QoSForEXP*) bearer->GetQoSParameters ();
-// 			  double aWi =  - (log10 (qos->GetDropProbability())
-// 							  /
-// 							  qos->GetMaxDelay ());
-// 			  double HOL = bearer->GetHeadOfLinePacketDelay ();
-// 			  aWi = aWi * HOL;
-// 			  m_aW += aWi;
-// 			  nbFlow++;
-// 			}
-// 	  }
-//   }
-//   m_aW = m_aW/nbFlow;
+  // compute AW
+  for (auto flow : *GetFlowsToSchedule())
+  {
+    RadioBearer *bearer = flow->GetBearer ();
 
-//   if (m_aW < 0.000001) m_aW=0;
-//   //~compute AW
+    if (bearer->HasPackets ())
+      {
+        if ((bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_TRACE_BASED)
+            ||
+            (bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_VOIP))
+          {
+            QoSForEXP *qos = (QoSForEXP*) bearer->GetQoSParameters ();
+            double aWi =  - (log10 (qos->GetDropProbability())
+                              /
+                              qos->GetMaxDelay ());
+            double HOL = bearer->GetHeadOfLinePacketDelay ();
+            aWi = aWi * HOL;
+            m_aW += aWi;
+            nbFlow++;
+          }
+      }
+  }
+  m_aW = m_aW/nbFlow;
+  if (m_aW < 0.000001) m_aW=0;
+  //~compute AW
 
-//   QoSForEXP *qos = (QoSForEXP*) bearer->GetQoSParameters ();
+  QoSForEXP *qos = (QoSForEXP*) bearer->GetQoSParameters ();
 
-//   double HOL = bearer->GetHeadOfLinePacketDelay ();
-//   double alfa = -log10(qos->GetDropProbability()) / qos->GetMaxDelay ();
+  double HOL = bearer->GetHeadOfLinePacketDelay ();
+  double alfa = -log10(qos->GetDropProbability()) / qos->GetMaxDelay ();
   
-//   double AW = alfa * HOL;
+  double AW = alfa * HOL;
 
-//   if (AW < 0.000001) AW=0;
-//   else
-//   {
-//     AW_avgAW = AW - m_aW;
+  if (AW < 0.000001) AW=0;
 
-//     if (AW_avgAW < 0.000001)
-//     AW_avgAW=0;
-//   }
+  AW_avgAW = AW - m_aW;
 
-//   return exp ( AW_avgAW / (1 + sqrt (m_aW)) );
-// }
+  if (AW_avgAW < 0.000001) AW_avgAW=0;
+
+  return exp ( AW_avgAW / (1 + sqrt (m_aW)) );
+}
 
 
 double DQN_PacketScheduler::ComputeLOG(RadioBearer *bearer)
