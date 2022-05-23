@@ -49,6 +49,9 @@
 
 //HH
 #include "../protocolStack/mac/packet-scheduler/dqn-packet-scheduler.h"
+#include "../protocolStack/mac/packet-scheduler/dqn-packet-scheduler_mlwdf.h"
+#include "../protocolStack/mac/packet-scheduler/dqn-packet-scheduler_select.h"
+
 #include "../core/eventScheduler/simulator.h"
 #include "../componentManagers/FlowsManager.h"
 // cout stream buffer redirect
