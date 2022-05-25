@@ -17,9 +17,9 @@
 #define shlog(fmt, ...) \
     do { fprintf(stderr, "[SHARED LOG] " fmt, ## __VA_ARGS__); } while (0)
 
-const int  LTE_KEY =  0x89;
-const int  LSTM_KEY =  0x44;
-const int  DQN_KEY =  0x29;
+const int  LTE_KEY =  0x892;
+const int  LSTM_KEY =  0x442;
+const int  DQN_KEY =  0x292;
 const int  SHARED_SIZE = 4096;
 
 //char buffer[SHARED_SIZE] = {0,};

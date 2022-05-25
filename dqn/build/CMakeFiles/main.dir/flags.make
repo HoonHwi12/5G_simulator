@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/g++-7
 CXX_DEFINES = -DUSE_C10D_GLOO -DUSE_C10D_NCCL -DUSE_DISTRIBUTED -DUSE_RPC -DUSE_TENSORPIPE
 
-CXX_INCLUDES = -isystem /home/hoonhwi/net/5G_simulator/dqn/libtorch/include -isystem /home/hoonhwi/net/5G_simulator/dqn/libtorch/include/torch/csrc/api/include -isystem /usr/local/cuda-11.6/include
+CXX_INCLUDES = -isystem /home/hyunji/5G_simulator/dqn/libtorch/include -isystem /home/hyunji/5G_simulator/dqn/libtorch/include/torch/csrc/api/include -isystem /usr/local/cuda-11.5/include
 
 CXX_FLAGS = -w -O0 -ggdb -w -O0 -ggdb -D_GLIBCXX_USE_CXX11_ABI=0 -std=gnu++1z
 

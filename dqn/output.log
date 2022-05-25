@@ -1,0 +1,5 @@
+batch(32)/minReplay(1000)/EPS(1.00~0.01/0.0010)/Update(10)
+Redefinition of Shared-Key, reset key
+PYTORCH version 1.12.0
+CUDA DEVICE COUNT: 2
+CUDA available - working on GPU.

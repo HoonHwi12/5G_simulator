@@ -61,7 +61,11 @@ const int NUM_ACTIONS       = 6;    // number of schedulers
 const int CQI_SIZE          = 25;   // number of downlink channels per eNB
 
 //Adaptive DQN
-const int ADA_ACTIONS       = 17569; // 14641 + 2928
+//const int ADA_ACTIONS       = 17569; // 14641 + 2928
+//hyunji
+
+const int ADA_ACTIONS = 11;
+const int ADA_ACTION = 44;
 const int NUM_OUTPUT       = 4;
 
 // training times
@@ -160,9 +164,12 @@ int main(int argc, char** argv) {
   EpsilonGreedy* eps               = new EpsilonGreedy(EPS_START, EPS_END, EPS_DECAY);// start, end, decay
   EpsilonGreedy* lr_rate           = new EpsilonGreedy(LR_START, LR_END, LR_DECAY);
 
+
+  //hyunji
+  //torch::Tensor ada_actions = torch::zeros({NUM_OUTPUT,ADA_ACTIONS});
   Agent<EpsilonGreedy, DQN>* agent = new Agent<EpsilonGreedy, DQN>(eps,ADA_ACTIONS);
-  DQN policyNet(reset_state.size(1), ADA_ACTIONS);
-  DQN targetNet(reset_state.size(1), ADA_ACTIONS);
+  DQN policyNet(reset_state.size(1), ADA_ACTION);
+  DQN targetNet(reset_state.size(1), ADA_ACTION);
 
   // logging files for training 
   //  ~ please make sure that test_results/ is valid folder
@@ -221,7 +228,7 @@ int main(int argc, char** argv) {
 
   	// selecting an action
     torch::Tensor action = torch::zeros({2,4});
-    torch::Tensor action_input = torch::zeros(1);
+    torch::Tensor action_input = torch::zeros(4);
 
     h_log("action ready\n");
 
@@ -237,10 +244,17 @@ int main(int argc, char** argv) {
 
         if(use_dqn && action[0][0].item<int>() >= 0)
         {
+          /*
           action_input.index_put_({0}, action[0][0].item<int>() * 1331
                 + action[0][1].item<int>() * 121
                 + action[0][2].item<int>() * 11
                 + action[0][3].item<int>() );
+                */
+          action_input.index_put_({0}, action[0][0]);
+          action_input.index_put_({1}, action[0][1]);
+          action_input.index_put_({2}, action[0][2]);
+          action_input.index_put_({3}, action[0][3]);
+          
         }
         else
         {
@@ -299,9 +313,13 @@ int main(int argc, char** argv) {
           experience batch = processSamples(samples);
       
           // work out the qs
-          current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch), std::get<1>(batch));
+
+          //HJ
+          current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch));
+          current_q_values = current_q_values.gather(1,std::get<1>(batch));
           h_log("currenQ ready\n");
           next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).to(torch::kCPU);
+          next_q_values = std::get<1>(next_q_values.max(1));
 
           torch::Tensor abs = at::abs(current_q_values);
           torch::Tensor max_q = at::max(abs);

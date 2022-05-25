@@ -38,7 +38,7 @@
 #include "utility/Logging.h"
 
 /* path */
-static std::string path ("/home/hoonhwi/net/5G_simulator/");
+static std::string path ("/home/hyunji/5G_simulator/");
 
 using std::cout;
 using std::endl;

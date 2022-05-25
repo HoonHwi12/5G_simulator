@@ -1,4 +1,4 @@
-# Install script for directory: /home/hoonhwi/net/5G_simulator/dqn
+# Install script for directory: /home/hyunji/5G_simulator/dqn
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/hoonhwi/net/5G_simulator/dqn/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/hyunji/5G_simulator/dqn/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

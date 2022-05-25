@@ -57,10 +57,10 @@ RM = /usr/local/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/hoonhwi/net/5G_simulator/dqn
+CMAKE_SOURCE_DIR = /home/hyunji/5G_simulator/dqn
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/hoonhwi/net/5G_simulator/dqn/build
+CMAKE_BINARY_DIR = /home/hyunji/5G_simulator/dqn/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/hoonhwi/net/5G_simulator/dqn/build/CMakeFiles /home/hoonhwi/net/5G_simulator/dqn/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hyunji/5G_simulator/dqn/build/CMakeFiles /home/hyunji/5G_simulator/dqn/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/hoonhwi/net/5G_simulator/dqn/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hyunji/5G_simulator/dqn/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
