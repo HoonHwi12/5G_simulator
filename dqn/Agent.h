@@ -42,10 +42,12 @@ class Agent{
 				std::uniform_int_distribution<int> dist_actions(0, num_actions);
 				random_action[i] = dist_actions(mt);
 			}
-			printf("random_action: %d, %d, %d, %d",random_action[0][0].item<int>(),
-													random_action[0][1].item<int>(),
-													random_action[0][2].item<int>(),
-													random_action[0][3].item<int>());
+
+			printf("random_action: %d, %d, %d, %d",random_action[0].item<int>(),
+													random_action[1].item<int>(),
+													random_action[2].item<int>(),
+													random_action[3].item<int>());
+													
 
 			//* by HH: FLS dummy code
 			// if(random_action > 14641)

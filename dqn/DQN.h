@@ -3,7 +3,7 @@
 
 #include <torch/torch.h>
 
-//#define HLOG
+#define HLOG
 #ifdef HLOG
 #define h_log(fmt, ...) \
     do { fprintf(stderr, "[hoonhwi] Log: " fmt, ## __VA_ARGS__); } while (0)        

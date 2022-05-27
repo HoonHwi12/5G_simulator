@@ -43,7 +43,7 @@ void initWeights(torch::nn::Module& m);
 const int BATCH_SIZE        = 32;
 int TRAIN_TTI               = 200; //20000;
 const int TEST_TTI          = 200;//2500;
-const int MIN_REPLAY_MEM    = 1000;// 1000;
+const int MIN_REPLAY_MEM    = 10;// 1000;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
 const float EPS_END         = 0.01;
