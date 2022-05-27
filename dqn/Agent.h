@@ -31,11 +31,23 @@ class Agent{
 
 		torch::Tensor explore(torch::Tensor state){
 			h_log("debug 410\n");
-			std::uniform_int_distribution<int> dist_actions(0, num_actions);
+			//std::uniform_int_distribution<int> dist_actions(0, num_actions);
 			//std::uniform_int_distribution<int> dist_actions(0, 4);
 			torch::Tensor explore_action = torch::zeros({2, 4});
-			uint32_t random_action = dist_actions(mt);
+			//uint32_t random_action = dist_actions(mt);
 
+			torch::Tensor random_action = torch::zeros(4);
+
+			for(int i = 0 ; i < 4; i++){
+				std::uniform_int_distribution<int> dist_actions(0, num_actions);
+				random_action[i] = dist_actions(mt);
+			}
+			printf("random_action: %d, %d, %d, %d",random_action[0][0].item<int>(),
+													random_action[0][1].item<int>(),
+													random_action[0][2].item<int>(),
+													random_action[0][3].item<int>());
+
+			//* by HH: FLS dummy code
 			// if(random_action > 14641)
 			// {
 			// 	explore_action.index_put_({0, 0}, -1);
@@ -46,10 +58,10 @@ class Agent{
 			// }
 			// else
 			{
-				explore_action.index_put_({0, 0}, (int)(random_action/1331));
-				explore_action.index_put_({0, 1}, (int)((random_action%1331)/121));
-				explore_action.index_put_({0, 2}, (int)(((random_action%1331)%121)/11));
-				explore_action.index_put_({0, 3}, (int)(((random_action%1331)%121)%11));
+				explore_action.index_put_({0, 0}, random_action[0]);
+				explore_action.index_put_({0, 1}, random_action[1]);
+				explore_action.index_put_({0, 2}, random_action[2]);
+				explore_action.index_put_({0, 3}, random_action[3]);
 				explore_action.index_put_({1}, 1);
 			}
 
@@ -66,14 +78,24 @@ class Agent{
 
 			start = std::chrono::steady_clock::now();
 			clock_t infstart = clock();
-			torch::Tensor output = policy_net->forward(state);			
+			torch::Tensor output = policy_net->forward(state);	
+
+			std::cout <<"output_before:" << output<<std::endl;
+			output = output.reshape({4,11});		
+			std::cout <<"reshape output: " <<output<<std::endl;		
 			h_log("debug401\n");
 			torch::Tensor exploit_action = torch::zeros({2, 4});
-			uint32_t arg_action = at::argmax(output, 1).item<int>();
+			//uint32_t arg_action = at::argmax(output, 1).item<int>();
+			
+			torch::Tensor arg_action =  at::argmax(output,1);
+
+			std::cout <<"arg_action: "<< arg_action <<std::endl;
+			
 			end = std::chrono::steady_clock::now();
 			h_log("debug402\n");
 			if(timeLog) printf("InferenceTime %0.7f ms/ Exploit! \n", (float)(clock()-infstart)/CLOCKS_PER_SEC);
 
+			//* by HH: FLS dummy code
 			// if(arg_action > 14641)
 			// {
 			// 	exploit_action.index_put_({0, 0}, -1);
@@ -84,10 +106,10 @@ class Agent{
 			// }
 			// else
 			{
-				exploit_action.index_put_({0, 0}, (int)(arg_action/1331));
-				exploit_action.index_put_({0, 1}, (int)((arg_action%1331)/121));
-				exploit_action.index_put_({0, 2}, (int)(((arg_action%1331)%121)/11));
-				exploit_action.index_put_({0, 3}, (int)(((arg_action%1331)%121)%11));
+				exploit_action.index_put_({0, 0}, arg_action[0]);
+				exploit_action.index_put_({0, 1}, arg_action[1]);
+				exploit_action.index_put_({0, 2}, arg_action[2]);
+				exploit_action.index_put_({0, 3}, arg_action[3]);
 				exploit_action.index_put_({1}, 0);
 			}
 
@@ -116,7 +138,7 @@ class Agent{
 		}
 
 
-		torch::Tensor CurrentQ(R policy_net, torch::Tensor states, torch::Tensor actions){
+		torch::Tensor CurrentQ(R policy_net, torch::Tensor states){
 			torch::Tensor q_values = policy_net->forward(states.to(device));
 			torch::Tensor max_qs   = std::get<0>(q_values.max(1));
 			return max_qs;

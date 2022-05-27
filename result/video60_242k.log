@@ -1,0 +1,417 @@
+Test Start
+nbCells(-1265998748),Radius(944191680),nbVideo(-1265998738),nbCBR(0),nbBE(0),nbVOIP(40),sched_type(-346000640),frame(1705844305),speed(56),maxDelay(0),VBR(1705834152)
+Simulation with SEED = 1
+Scheduler PF 
+Created Cell, id 0, position: 0 0
+Created Cell, id 1, position: 0 1732.05
+Created Cell, id 2, position: -1500 866.025
+Created Cell, id 3, position: -1500 -866.025
+Created Cell, id 4, position: 0 -1732.05
+SET SCHEDULER TO PF
+Created gnb, id 0, cell id 0, position: 0 0, channels id 00
+BandwidthManager: 0x55bbb6f22700
+	 operative sub band: 1
+	 m_dlBandwidth 5
+	 m_ulBandwidth 5
+	 m_dlOffsetBw 0
+	 m_ulOffsetBw 0
+	 DL channels: 2110 2110.18 2110.36 2110.54 2110.72 2110.9 2111.08 2111.26 2111.44 2111.62 2111.8 2111.98 2112.16 2112.34 2112.52 2112.7 2112.88 2113.06 2113.24 2113.42 2113.6 2113.78 2113.96 2114.14 2114.32 
+	 UL channels: 1920 1920.18 1920.36 1920.54 1920.72 1920.9 1921.08 1921.26 1921.44 1921.62 1921.8 1921.98 1922.16 1922.34 1922.52 1922.7 1922.88 1923.06 1923.24 1923.42 1923.6 1923.78 1923.96 1924.14 1924.32 
+SET SCHEDULER TO PF
+Created gnb, id 1, cell id 1, position: 0 1732.05, channels id 11
+BandwidthManager: 0x55bbb6f22af0
+	 operative sub band: 1
+	 m_dlBandwidth 5
+	 m_ulBandwidth 5
+	 m_dlOffsetBw 25
+	 m_ulOffsetBw 25
+	 DL channels: 2114.5 2114.68 2114.86 2115.04 2115.22 2115.4 2115.58 2115.76 2115.94 2116.12 2116.3 2116.48 2116.66 2116.84 2117.02 2117.2 2117.38 2117.56 2117.74 2117.92 2118.1 2118.28 2118.46 2118.64 2118.82 
+	 UL channels: 1924.5 1924.68 1924.86 1925.04 1925.22 1925.4 1925.58 1925.76 1925.94 1926.12 1926.3 1926.48 1926.66 1926.84 1927.02 1927.2 1927.38 1927.56 1927.74 1927.92 1928.1 1928.28 1928.46 1928.64 1928.82 
+SET SCHEDULER TO PF
+Created gnb, id 2, cell id 2, position: -1500 866.025, channels id 22
+BandwidthManager: 0x55bbb6f22e00
+	 operative sub band: 1
+	 m_dlBandwidth 5
+	 m_ulBandwidth 5
+	 m_dlOffsetBw 50
+	 m_ulOffsetBw 50
+	 DL channels: 2119 2119.18 2119.36 2119.54 2119.72 2119.9 2120.08 2120.26 2120.44 2120.62 2120.8 2120.98 2121.16 2121.34 2121.52 2121.7 2121.88 2122.06 2122.24 2122.42 2122.6 2122.78 2122.96 2123.14 2123.32 
+	 UL channels: 1929 1929.18 1929.36 1929.54 1929.72 1929.9 1930.08 1930.26 1930.44 1930.62 1930.8 1930.98 1931.16 1931.34 1931.52 1931.7 1931.88 1932.06 1932.24 1932.42 1932.6 1932.78 1932.96 1933.14 1933.32 
+SET SCHEDULER TO PF
+Created gnb, id 3, cell id 3, position: -1500 -866.025, channels id 33
+BandwidthManager: 0x55bbb6f23110
+	 operative sub band: 1
+	 m_dlBandwidth 5
+	 m_ulBandwidth 5
+	 m_dlOffsetBw 75
+	 m_ulOffsetBw 75
+	 DL channels: 2123.5 2123.68 2123.86 2124.04 2124.22 2124.4 2124.58 2124.76 2124.94 2125.12 2125.3 2125.48 2125.66 2125.84 2126.02 2126.2 2126.38 2126.56 2126.74 2126.92 2127.1 2127.28 2127.46 2127.64 2127.82 
+	 UL channels: 1933.5 1933.68 1933.86 1934.04 1934.22 1934.4 1934.58 1934.76 1934.94 1935.12 1935.3 1935.48 1935.66 1935.84 1936.02 1936.2 1936.38 1936.56 1936.74 1936.92 1937.1 1937.28 1937.46 1937.64 1937.82 
+SET SCHEDULER TO PF
+Created gnb, id 4, cell id 4, position: 0 -1732.05, channels id 44
+BandwidthManager: 0x55bbb6f23420
+	 operative sub band: 1
+	 m_dlBandwidth 5
+	 m_ulBandwidth 5
+	 m_dlOffsetBw 25
+	 m_ulOffsetBw 25
+	 DL channels: 2114.5 2114.68 2114.86 2115.04 2115.22 2115.4 2115.58 2115.76 2115.94 2116.12 2116.3 2116.48 2116.66 2116.84 2117.02 2117.2 2117.38 2117.56 2117.74 2117.92 2118.1 2118.28 2118.46 2118.64 2118.82 
+	 UL channels: 1924.5 1924.68 1924.86 1925.04 1925.22 1925.4 1925.58 1925.76 1925.94 1926.12 1926.3 1926.48 1926.66 1926.84 1927.02 1927.2 1927.38 1927.56 1927.74 1927.92 1928.1 1928.28 1928.46 1928.64 1928.82 
+Created UE - id 5 position 878.73 579.709 direction 5.57377
+	 CenterCellPosition: x = 878.73, y = 579.709
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 0
+Push back application to container
+Update counter
+Created UE - id 6 position 530.439 -307.826 direction 5.91087
+	 CenterCellPosition: x = 530.439, y = -307.826
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 1
+Push back application to container
+Update counter
+Created UE - id 7 position 328.592 422.182 direction 2.92524
+	 CenterCellPosition: x = 328.592, y = 422.182
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 2
+Push back application to container
+Update counter
+Created UE - id 8 position 379.097 798.937 direction 0.852713
+	 CenterCellPosition: x = 379.097, y = 798.937
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 3
+Push back application to container
+Update counter
+Created UE - id 9 position 641.434 -6.16552 direction 1.33036
+	 CenterCellPosition: x = 641.434, y = -6.16552
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 4
+Push back application to container
+Update counter
+Created UE - id 10 position 793.337 711.677 direction 1.68098
+	 CenterCellPosition: x = 793.337, y = 711.677
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 5
+Push back application to container
+Update counter
+Created UE - id 11 position 616.523 -44.6365 direction 0.95001
+	 CenterCellPosition: x = 616.523, y = -44.6365
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 6
+Push back application to container
+Update counter
+Created UE - id 12 position 818.216 616.666 direction 4.44857
+	 CenterCellPosition: x = 818.216, y = 616.666
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 7
+Push back application to container
+Update counter
+Created UE - id 13 position -109.986 -512.618 direction 1.53847
+	 CenterCellPosition: x = -109.986, y = -512.618
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 8
+Push back application to container
+Update counter
+Created UE - id 14 position 836.524 -882.036 direction 5.49253
+	 CenterCellPosition: x = 836.524, y = -882.036
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 9
+Push back application to container
+Update counter
+Created UE - id 15 position -502.419 564.419 direction 4.43458
+	 CenterCellPosition: x = -502.419, y = 564.419
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 10
+Push back application to container
+Update counter
+Created UE - id 16 position 939.414 -905.846 direction 1.09749
+	 CenterCellPosition: x = 939.414, y = -905.846
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 11
+Push back application to container
+Update counter
+Created UE - id 17 position -80.1478 -520.486 direction 0.0177737
+	 CenterCellPosition: x = -80.1478, y = -520.486
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 12
+Push back application to container
+Update counter
+Created UE - id 18 position -572.222 -41.5912 direction 2.29823
+	 CenterCellPosition: x = -572.222, y = -41.5912
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 13
+Push back application to container
+Update counter
+Created UE - id 19 position -302.581 -328.721 direction 0.0600869
+	 CenterCellPosition: x = -302.581, y = -328.721
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 14
+Push back application to container
+Update counter
+Created UE - id 20 position 397.085 935.892 direction 3.29494
+	 CenterCellPosition: x = 397.085, y = 935.892
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 15
+Push back application to container
+Update counter
+Created UE - id 21 position 922.794 942.172 direction 0.809848
+	 CenterCellPosition: x = 922.794, y = 942.172
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 16
+Push back application to container
+Update counter
+Created UE - id 22 position 344.607 -9.04919 direction 4.11989
+	 CenterCellPosition: x = 344.607, y = -9.04919
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 17
+Push back application to container
+Update counter
+Created UE - id 23 position -540.621 -223.362 direction 0.474984
+	 CenterCellPosition: x = -540.621, y = -223.362
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 18
+Push back application to container
+Update counter
+Created UE - id 24 position -584.144 176.413 direction 4.93337
+	 CenterCellPosition: x = -584.144, y = 176.413
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 19
+Push back application to container
+Update counter
+Created UE - id 25 position -782.707 -808.172 direction 0.0873196
+	 CenterCellPosition: x = -782.707, y = -808.172
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 20
+Push back application to container
+Update counter
+Created UE - id 26 position 40.9142 19.508 direction 1.35313
+	 CenterCellPosition: x = 40.9142, y = 19.508
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 21
+Push back application to container
+Update counter
+Created UE - id 27 position -775.314 -848.772 direction 5.54391
+	 CenterCellPosition: x = -775.314, y = -848.772
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 22
+Push back application to container
+Update counter
+Created UE - id 28 position 670.421 313.508 direction 3.10821
+	 CenterCellPosition: x = 670.421, y = 313.508
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 23
+Push back application to container
+Update counter
+Created UE - id 29 position 748.101 819.295 direction 5.19027
+	 CenterCellPosition: x = 748.101, y = 819.295
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 24
+Push back application to container
+Update counter
+Created UE - id 30 position -637.709 154.044 direction 0.971921
+	 CenterCellPosition: x = -637.709, y = 154.044
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 25
+Push back application to container
+Update counter
+Created UE - id 31 position -583.709 542.64 direction 2.22365
+	 CenterCellPosition: x = -583.709, y = 542.64
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 26
+Push back application to container
+Update counter
+Created UE - id 32 position -900.238 710.549 direction 2.03479
+	 CenterCellPosition: x = -900.238, y = 710.549
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 27
+Push back application to container
+Update counter
+Created UE - id 33 position -844.867 261.114 direction 2.47785
+	 CenterCellPosition: x = -844.867, y = 261.114
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 28
+Push back application to container
+Update counter
+Created UE - id 34 position -215.178 265.471 direction 3.31382
+	 CenterCellPosition: x = -215.178, y = 265.471
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 29
+Push back application to container
+Update counter
+Created UE - id 35 position -173.119 -422.484 direction 5.95014
+	 CenterCellPosition: x = -173.119, y = -422.484
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 30
+Push back application to container
+Update counter
+Created UE - id 36 position 78.2057 546.263 direction 0.636373
+	 CenterCellPosition: x = 78.2057, y = 546.263
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 31
+Push back application to container
+Update counter
+Created UE - id 37 position 781.331 -201.096 direction 3.98731
+	 CenterCellPosition: x = 781.331, y = -201.096
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 32
+Push back application to container
+Update counter
+Created UE - id 38 position 790.024 -512.302 direction 4.80731
+	 CenterCellPosition: x = 790.024, y = -512.302
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 33
+Push back application to container
+Update counter
+Created UE - id 39 position 10.4369 589.86 direction 2.77181
+	 CenterCellPosition: x = 10.4369, y = 589.86
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 34
+Push back application to container
+Update counter
+Created UE - id 40 position 888.14 -745.548 direction 2.40366
+	 CenterCellPosition: x = 888.14, y = -745.548
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 35
+Push back application to container
+Update counter
+Created UE - id 41 position 511.767 818.403 direction 5.18603
+	 CenterCellPosition: x = 511.767, y = 818.403
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 36
+Push back application to container
+Update counter
+Created UE - id 42 position -855.653 -187.516 direction 5.54714
+	 CenterCellPosition: x = -855.653, y = -187.516
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 37
+Push back application to container
+Update counter
+Created UE - id 43 position 131.421 473.765 direction 0.254517
+	 CenterCellPosition: x = 131.421, y = 473.765
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 38
+Push back application to container
+Update counter
+Created UE - id 44 position 680.213 642.955 direction 5.10708
+	 CenterCellPosition: x = 680.213, y = 642.955
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 39
+Push back application to container
+Update counter
+Created UE - id 45 position 374.095 633.455 direction 1.24496
+	 CenterCellPosition: x = 374.095, y = 633.455
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 40
+Push back application to container
+Update counter
+Created UE - id 46 position 192.297 592.651 direction 3.96744
+	 CenterCellPosition: x = 192.297, y = 592.651
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 41
+Push back application to container
+Update counter
+Created UE - id 47 position -626.058 229.344 direction 4.8026
+	 CenterCellPosition: x = -626.058, y = 229.344
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 42
+Push back application to container
+Update counter
+Created UE - id 48 position -249.878 -848.334 direction 2.57469
+	 CenterCellPosition: x = -249.878, y = -848.334
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 43
+Push back application to container
+Update counter
+Created UE - id 49 position 163.934 -852.676 direction 0.920546
+	 CenterCellPosition: x = 163.934, y = -852.676
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 44
+Push back application to container
+Update counter
+Created UE - id 50 position -121.404 -241.552 direction 3.89837
+	 CenterCellPosition: x = -121.404, y = -241.552
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 45
+Push back application to container
+Update counter
+Created UE - id 51 position -569.89 285.405 direction 0.943159
+	 CenterCellPosition: x = -569.89, y = 285.405
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 46
+Push back application to container
+Update counter
+Created UE - id 52 position 673.815 66.3872 direction 3.68336
+	 CenterCellPosition: x = 673.815, y = 66.3872
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 47
+Push back application to container
+Update counter
+Created UE - id 53 position 756.147 -492.262 direction 1.8373
+	 CenterCellPosition: x = 756.147, y = -492.262
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 48
+Push back application to container
+Update counter
+Created UE - id 54 position -303.976 -227.626 direction 1.1419
+	 CenterCellPosition: x = -303.976, y = -227.626
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 49
+Push back application to container
+Update counter
+Created UE - id 55 position -389.903 495.637 direction 4.22839
+	 CenterCellPosition: x = -389.903, y = 495.637
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 50
+Push back application to container
+Update counter
+Created UE - id 56 position 770.407 367.466 direction 2.56103
+	 CenterCellPosition: x = 770.407, y = 367.466
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 51
+Push back application to container
+Update counter
+Created UE - id 57 position 120.878 -827.249 direction 2.63871
+	 CenterCellPosition: x = 120.878, y = -827.249
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 52
+Push back application to container
+Update counter
+Created UE - id 58 position -77.6812 399.602 direction 1.06849
+	 CenterCellPosition: x = -77.6812, y = 399.602
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 53
+Push back application to container
+Update counter
+Created UE - id 59 position 861.361 387.37 direction 5.06171
+	 CenterCellPosition: x = 861.361, y = 387.37
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 54
+Push back application to container
+Update counter
+Created UE - id 60 position 366.409 -418.993 direction 2.41859
+	 CenterCellPosition: x = 366.409, y = -418.993
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 55
+Push back application to container
+Update counter
+Created UE - id 61 position 112.718 57.3608 direction 3.15755
+	 CenterCellPosition: x = 112.718, y = 57.3608
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 56
+Push back application to container
+Update counter
+Created UE - id 62 position -408.183 552.591 direction 3.31758
+	 CenterCellPosition: x = -408.183, y = 552.591
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 57
+Push back application to container
+Update counter
+Created UE - id 63 position -385.491 232.37 direction 0.101404
+	 CenterCellPosition: x = -385.491, y = 232.37
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 58
+Push back application to container
+Update counter
+Created UE - id 64 position -456.68 -394.071 direction 2.26064
+	 CenterCellPosition: x = -456.68, y = -394.071
+		selected video @ 242k
+CREATED VIDEO APPLICATION, ID 59
