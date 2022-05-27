@@ -34,23 +34,24 @@ void SendScheduler(int *fd, int scheduler);
 void SendFinalScheduler(int *fd);
 experience processSamples(std::vector<experience> _samples);
 void loadStateDict(DQN model, DQN target_model);
-
+void initWeights(torch::nn::Module& m);
 
 /* HyperParams*/
 const int BATCH_SIZE        = 32;
 int TRAIN_TTI               = 10000;
 const int TEST_TTI          = 3000;
-const int MIN_REPLAY_MEM    = 1000;
+const int MIN_REPLAY_MEM    = 10;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
 const float EPS_END         = 0.01;
-const float EPS_DECAY       = 0.0001;
+const float EPS_DECAY       = 0.001;
+const int TRAIN_FREQ        = 4;
 const int NET_UPDATE        = 10;     // how many episodes until we update the target DQN 
 const int MEM_SIZE          = 50000; // replay memory size
 //const float LR              = 0.01;  // learning rate
 const float LR_START        = 0.01;
 const float LR_END          = 0.00001;
-const float LR_DECAY        = 0.0001;
+const float LR_DECAY        = 0.001;
 const float MOMENTUM        = 0.05;  // SGD MOMENTUM
  // environment concerns
 const int NUM_ACTIONS       = 6;    // number of schedulers
@@ -65,6 +66,8 @@ std::chrono::nanoseconds duration;
 int main(int argc, char** argv) {
 	int constant_scheduler = 0;
   bool use_dqn = true;
+  bool is_load=false;
+
   // file naming
   std::string scheduler_string;
 	if(argc > 1){
@@ -116,10 +119,6 @@ int main(int argc, char** argv) {
   // pipe 
   int sh_fd, st_fd, cqi_fd;
 
-  // remove(SCHED_FIFO);
-  // remove(STATE_FIFO);
-  // remove(CQI_FIFO);
-
   // initial connections
   LTENetworkState* networkEnv = initConnections(&sh_fd, &st_fd, &cqi_fd);
   h_log("init connection end\n");
@@ -146,6 +145,22 @@ int main(int argc, char** argv) {
   log_file_name      = base + "_training.txt";
   model_name         = base + "_model.pt";
   std::ofstream output_file(log_file_name);
+
+  // by HH LOAD MODEL
+
+  if(is_load)
+  {
+
+    torch::load(policyNet, model_name);
+
+    printf("load model success, waiting for LTE-Sim\n");
+
+  }
+  else{
+
+    policyNet->apply(initWeights);
+
+  }
 
   // copy weights to targetnet
   loadStateDict(policyNet, targetNet); 
@@ -233,11 +248,20 @@ int main(int argc, char** argv) {
         experience batch = processSamples(samples);
         // work out the qs
         //current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch), std::get<1>(batch));
-        current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch));
-        current_q_values = current_q_values.gather(1,std::get<1>(batch));        
 
+        current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch));
+        h_log("debug 10000\n");
+        
+        current_q_values = current_q_values.gather(1,std::get<1>(batch));        
+        h_log("debug 10001\n");
 	      next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).to(torch::kCPU);
         next_q_values = std::get<1>(next_q_values.max(1));
+        h_log("debug 10003\n");
+
+        torch::Tensor abs = at::abs(current_q_values);
+        torch::Tensor max_q = at::max(abs);
+        float m_q = max_q.item<float>();
+
         // bellman equation
         target_q_values = (next_q_values.multiply(GAMMA)) +  std::get<3>(batch);
         // loss and backprop
@@ -329,7 +353,7 @@ int main(int argc, char** argv) {
       reward_copy = reward[0].item<float>();
 
       // by HH: REPLAY, OPTIMIZE
-      exp->push(state.to(torch::kCPU), action.to(torch::kCPU), next_state.to(torch::kCPU), reward.to(torch::kCPU)); 
+      exp->push(state, action.to(torch::kCPU), next_state, reward); 
       samples = exp->sampleMemory(BATCH_SIZE); 
       experience batch = processSamples(samples);
       // work out the qs
@@ -337,6 +361,11 @@ int main(int argc, char** argv) {
       current_q_values = current_q_values.gather(1,std::get<1>(batch));
       next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).to(torch::kCPU);
       next_q_values = std::get<1>(next_q_values.max(1));
+
+      torch::Tensor abs = at::abs(current_q_values);
+      torch::Tensor max_q = at::max(abs);
+      float m_q = max_q.item<float>();      
+      
       // bellman equation
       target_q_values = (next_q_values.multiply(GAMMA)) +  std::get<3>(batch);
       // loss and backprop
@@ -365,6 +394,17 @@ int main(int argc, char** argv) {
   return 0;
 }
 
+void initWeights(torch::nn::Module& m){
+  if ((typeid(m) == typeid(torch::nn::LinearImpl)) || (typeid(m) == typeid(torch::nn::Linear))) {
+    auto p = m.named_parameters(false);
+    auto w = p.find("weight");
+    auto b = p.find("bias");
+
+    if (w != nullptr) torch::nn::init::xavier_uniform_(*w);
+    if (b != nullptr) torch::nn::init::constant_(*b, 0.01);
+  }
+}
+
 void loadStateDict(DQN model, DQN target_model) {
   torch::autograd::GradMode::set_enabled(false);  // make parameters copying possible
   auto new_params = target_model->named_parameters(); // implement this
@@ -382,6 +422,7 @@ void loadStateDict(DQN model, DQN target_model) {
       }
     }
   }
+  torch::autograd::GradMode::set_enabled(true);
 }
 
 experience processSamples(std::vector<experience> _samples){
@@ -398,7 +439,7 @@ experience processSamples(std::vector<experience> _samples){
 
   torch::Tensor states_tensor = torch::zeros(0);
   torch::Tensor new_states_tensor = torch::zeros(0);
-  torch::Tensor actions_tensor = torch::zeros(0);
+  torch::Tensor actions_tensor = torch::zeros({0,1});
   torch::Tensor rewards_tensor = torch::zeros(0);
 
   states_tensor = torch::cat(states, 0);

@@ -49,7 +49,6 @@ struct Application
 	float realgbr;
 	float realdelay;
 	float realplr;
-	float fairness;
 	float reward;
 	Application(int id_ ,float gbr, float delay, float plr){
 		id = id_;
@@ -654,6 +653,5 @@ class LTENetworkState{
 		float TTIcounter;
 		int noAPPs;
 		int noUEs;
-		int nb_packet[1000] = {0};
 };
 #endif

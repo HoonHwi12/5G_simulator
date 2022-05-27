@@ -1,5 +1,5 @@
 Test Start
-nbCells(-1265998748),Radius(944191680),nbVideo(-1265998738),nbCBR(0),nbBE(0),nbVOIP(40),sched_type(-346000640),frame(1705844305),speed(56),maxDelay(0),VBR(1705834152)
+nbCells(-277183388),Radius(-14538560),nbVideo(-277183378),nbCBR(0),nbBE(0),nbVOIP(40),sched_type(1204309760),frame(-488472976),speed(56),maxDelay(0),VBR(-488481288)
 Simulation with SEED = 1
 Scheduler PF 
 Created Cell, id 0, position: 0 0
@@ -9,7 +9,7 @@ Created Cell, id 3, position: -1500 -866.025
 Created Cell, id 4, position: 0 -1732.05
 SET SCHEDULER TO PF
 Created gnb, id 0, cell id 0, position: 0 0, channels id 00
-BandwidthManager: 0x55bbb6f22700
+BandwidthManager: 0x55f0f1585700
 	 operative sub band: 1
 	 m_dlBandwidth 5
 	 m_ulBandwidth 5
@@ -19,7 +19,7 @@ BandwidthManager: 0x55bbb6f22700
 	 UL channels: 1920 1920.18 1920.36 1920.54 1920.72 1920.9 1921.08 1921.26 1921.44 1921.62 1921.8 1921.98 1922.16 1922.34 1922.52 1922.7 1922.88 1923.06 1923.24 1923.42 1923.6 1923.78 1923.96 1924.14 1924.32 
 SET SCHEDULER TO PF
 Created gnb, id 1, cell id 1, position: 0 1732.05, channels id 11
-BandwidthManager: 0x55bbb6f22af0
+BandwidthManager: 0x55f0f1585af0
 	 operative sub band: 1
 	 m_dlBandwidth 5
 	 m_ulBandwidth 5
@@ -29,7 +29,7 @@ BandwidthManager: 0x55bbb6f22af0
 	 UL channels: 1924.5 1924.68 1924.86 1925.04 1925.22 1925.4 1925.58 1925.76 1925.94 1926.12 1926.3 1926.48 1926.66 1926.84 1927.02 1927.2 1927.38 1927.56 1927.74 1927.92 1928.1 1928.28 1928.46 1928.64 1928.82 
 SET SCHEDULER TO PF
 Created gnb, id 2, cell id 2, position: -1500 866.025, channels id 22
-BandwidthManager: 0x55bbb6f22e00
+BandwidthManager: 0x55f0f1585e00
 	 operative sub band: 1
 	 m_dlBandwidth 5
 	 m_ulBandwidth 5
@@ -39,7 +39,7 @@ BandwidthManager: 0x55bbb6f22e00
 	 UL channels: 1929 1929.18 1929.36 1929.54 1929.72 1929.9 1930.08 1930.26 1930.44 1930.62 1930.8 1930.98 1931.16 1931.34 1931.52 1931.7 1931.88 1932.06 1932.24 1932.42 1932.6 1932.78 1932.96 1933.14 1933.32 
 SET SCHEDULER TO PF
 Created gnb, id 3, cell id 3, position: -1500 -866.025, channels id 33
-BandwidthManager: 0x55bbb6f23110
+BandwidthManager: 0x55f0f1586110
 	 operative sub band: 1
 	 m_dlBandwidth 5
 	 m_ulBandwidth 5
@@ -49,7 +49,7 @@ BandwidthManager: 0x55bbb6f23110
 	 UL channels: 1933.5 1933.68 1933.86 1934.04 1934.22 1934.4 1934.58 1934.76 1934.94 1935.12 1935.3 1935.48 1935.66 1935.84 1936.02 1936.2 1936.38 1936.56 1936.74 1936.92 1937.1 1937.28 1937.46 1937.64 1937.82 
 SET SCHEDULER TO PF
 Created gnb, id 4, cell id 4, position: 0 -1732.05, channels id 44
-BandwidthManager: 0x55bbb6f23420
+BandwidthManager: 0x55f0f1586420
 	 operative sub band: 1
 	 m_dlBandwidth 5
 	 m_ulBandwidth 5
@@ -415,3 +415,499 @@ Created UE - id 64 position -456.68 -394.071 direction 2.26064
 	 CenterCellPosition: x = -456.68, y = -394.071
 		selected video @ 242k
 CREATED VIDEO APPLICATION, ID 59
+Push back application to container
+Update counter
+LTESIM: SCHED Pipe Opened! Waiting for DQN..
+LTESIM: DQN connected to SCHED Pipe.
+LTESIM: Waiting for CQI_FIFO.
+LTESIM: Connected to CQI_FIFO.
+LTESIM: Waiting for STATE_FIFO.
+LTESIM: Connected to STATE_FIFO, Sending #UEs
+LTESIM: Sent #UEs: "60\nLTESIM: Size of UEsummaries: 825 
+LTESIM: Sent UEsummaries.
+Redefinition of Shared-Key, reset key
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 1.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 2.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 3.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 4.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 5.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 6.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 7.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 8.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 9.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 10.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 11.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 12.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 13.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 14.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 15.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 16.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 17.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 18.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 19.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 20.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 21.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 22.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 23.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 24.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 25.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 26.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 27.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 28.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 29.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 30.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 31.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 32.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 33.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 34.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 35.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 36.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 37.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 38.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 39.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 40.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 41.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 42.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 43.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 44.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 45.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 46.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 47.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 48.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 49.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 50.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 51.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 52.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 53.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 54.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 55.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 56.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 57.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 58.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 59.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 60.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 61.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 62.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 63.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 64.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 65.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 66.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 67.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 68.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 69.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 70.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 71.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 72.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 73.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 74.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 75.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 76.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 77.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 78.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 79.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 80.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 81.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 82.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 83.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 84.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 85.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 86.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 87.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 88.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 89.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 90.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 91.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 92.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 93.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 94.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 95.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 96.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 97.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 98.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 99.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 100.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 101.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 102.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 103.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 104.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 105.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 106.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 107.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 108.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 109.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 110.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 111.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 112.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 113.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 114.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 115.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 116.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 117.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 118.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 119.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 120.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 121.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 122.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 123.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 124.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 125.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 126.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 127.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 128.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 129.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 130.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 131.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 132.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 133.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 134.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 135.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 136.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 137.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 138.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 139.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 140.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 141.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 142.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 143.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 144.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 145.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 146.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 147.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 148.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 149.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 150.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 151.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 152.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 153.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 154.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 155.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 156.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 157.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 158.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 159.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 160.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 161.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 162.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 163.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 164.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 165.
+
+Waiting for first packets.. LTESIM: TTI Change! Now in TTI # 166.
+bigbuf: TX VIDEO ID 0 B 1 SIZE 1490 SRC -1 DST 6 T 0.165 0
+TX VIDEO ID 1 B 1 SIZE 1490 SRC -1 DST 6 T 0.165 0
+TX VIDEO ID 2 B 1 SIZE 840 SRC -1 DST 6 T 0.165 0
+
+send cqi summary
+send cqi summary end
+5G_SIM: Scheduler is DQN
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+Compute DQN metric weight0(0.500000)/weight1(0.100000)/weight2(0.400000)
+
+LTESIM: TTI Change! Now in TTI # 167.
+send state
+send cqi
+send cqi summary
+send cqi summary end
+send cqi end
+5G_SIM: Scheduler is DQN
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+Compute DQN metric weight0(0.500000)/weight1(0.600000)/weight2(0.700000)
+
+LTESIM: TTI Change! Now in TTI # 168.
+send state
+send cqi
+send cqi summary
+send cqi summary end
+send cqi end
+5G_SIM: Scheduler is DQN
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+Compute DQN metric weight0(0.700000)/weight1(0.100000)/weight2(0.500000)
+
+LTESIM: TTI Change! Now in TTI # 169.
+send state
+send cqi
+send cqi summary
+send cqi summary end
+send cqi end
+5G_SIM: Scheduler is DQN
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+Compute DQN metric weight0(0.700000)/weight1(0.500000)/weight2(1.000000)
+
+LTESIM: TTI Change! Now in TTI # 170.
+send state
+send cqi
+send cqi summary
+send cqi summary end
+send cqi end
+5G_SIM: Scheduler is DQN
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weight2(0.700000)
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weight2(0.700000)
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weight2(0.700000)
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weight2(0.700000)
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weight2(0.700000)
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weight2(0.700000)
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weight2(0.700000)
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weight2(0.700000)
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weight2(0.700000)
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weight2(0.700000)
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weight2(0.700000)
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weight2(0.700000)
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weight2(0.700000)
+Compute DQN metric weight0(0.700000)/weight1(0.900000)/weigh
