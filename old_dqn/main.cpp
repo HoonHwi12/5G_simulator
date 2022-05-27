@@ -232,13 +232,17 @@ int main(int argc, char** argv) {
 	    	samples = exp->sampleMemory(BATCH_SIZE); 
         experience batch = processSamples(samples);
         // work out the qs
-        current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch), std::get<1>(batch));
+        //current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch), std::get<1>(batch));
+        current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch));
+        current_q_values = current_q_values.gather(1,std::get<1>(batch));        
+
 	      next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).to(torch::kCPU);
+        next_q_values = std::get<1>(next_q_values.max(1));
         // bellman equation
         target_q_values = (next_q_values.multiply(GAMMA)) +  std::get<3>(batch);
         // loss and backprop
         torch::Tensor loss = (torch::mse_loss(current_q_values.to(device), target_q_values.to(device))).to(device);
-        //printf("loss  %f \n", loss.item().toFloat());
+        printf("loss  %f \n", loss.item().toFloat());
         loss.set_requires_grad(true);
         optimizer.zero_grad();
         loss.backward();
@@ -329,8 +333,10 @@ int main(int argc, char** argv) {
       samples = exp->sampleMemory(BATCH_SIZE); 
       experience batch = processSamples(samples);
       // work out the qs
-      current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch), std::get<1>(batch));
+      current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch));
+      current_q_values = current_q_values.gather(1,std::get<1>(batch));
       next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).to(torch::kCPU);
+      next_q_values = std::get<1>(next_q_values.max(1));
       // bellman equation
       target_q_values = (next_q_values.multiply(GAMMA)) +  std::get<3>(batch);
       // loss and backprop
@@ -415,7 +421,6 @@ void OpenCQIFifo(int *fd){
   h_log("mk CQI FIFO\n");
   mkfifo(CQI_FIFO, S_IFIFO|0777);
   // block for LTESim to connect
-  h_log("OPEN rdonly CQI FIFO\n");
   *fd = open(CQI_FIFO, O_CREAT|O_RDONLY);
 
   h_log("close CQI FIFO\n");
@@ -429,7 +434,6 @@ void OpenStateFifo(int *fd, int *noUEs){
   char noUEs_in[80];
   int input_bytes;
   // block for LTESim to connect
-  h_log("open O_RDONLY state FIFO\n");
   *fd = open(STATE_FIFO, O_CREAT|O_RDONLY);
   // read the number of UEs
   input_bytes = read(*fd, noUEs_in, sizeof(noUEs_in));
@@ -456,7 +460,6 @@ std::string FetchCQIs(int *fd){
   h_log("open cqi complete\n");
   std::string::size_type size;
   read(*fd, &size, sizeof(size));
-  h_log("read cqi complete\n");
   std::string message(size, ' ');
   // read the CQIs
   read(*fd, &message[0], size);
