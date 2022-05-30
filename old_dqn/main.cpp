@@ -249,10 +249,13 @@ int main(int argc, char** argv) {
         // work out the qs
         //current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch), std::get<1>(batch));
 
-        current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch));
+
+        current_q_values = agent->CurrentQ(policyNet, (int)std::get<0>(batch));
         h_log("debug 10000\n");
+        h_log("current_q_values size: %d\n", current_q_values.sizes().size() );
+        h_log("batch size: %d\n", std::get<1>(batch).sizes().size() );
         
-        current_q_values = current_q_values.gather(1,std::get<1>(batch));        
+        current_q_values = current_q_values.gather(0, std::get<1>(batch) );
         h_log("debug 10001\n");
 	      next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).to(torch::kCPU);
         next_q_values = std::get<1>(next_q_values.max(1));
@@ -439,7 +442,7 @@ experience processSamples(std::vector<experience> _samples){
 
   torch::Tensor states_tensor = torch::zeros(0);
   torch::Tensor new_states_tensor = torch::zeros(0);
-  torch::Tensor actions_tensor = torch::zeros({0,1});
+  torch::Tensor actions_tensor = torch::zeros(0);
   torch::Tensor rewards_tensor = torch::zeros(0);
 
   states_tensor = torch::cat(states, 0);
