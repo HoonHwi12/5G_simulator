@@ -92,8 +92,7 @@ DQN_PacketScheduler_MLWDF::ComputeSchedulingMetric (RadioBearer *bearer, double 
   double weight2 = d_dqn_output2 / 100; 
   double weight3 = d_dqn_output3 / 100;
 
-  printf("Compute DQN metric weight0(%f)/weight1(%f)/weight2(%f)\n",
-       weight0, weight1, weight2);
+  //printf("Compute DQN metric weight0(%f)/weight1(%f)/weight2(%f)\n", weight0, weight1, weight2);
   
 
   if (bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_INFINITE_BUFFER ||

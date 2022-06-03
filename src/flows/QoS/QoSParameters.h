@@ -99,6 +99,7 @@ public:
 
 	virtual double GetDropProbability(void) const;
 	virtual void SetDropPorbability(double probability);
+
 	double m_dropProbability;
 
 private:

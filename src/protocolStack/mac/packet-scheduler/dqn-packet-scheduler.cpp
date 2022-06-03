@@ -92,8 +92,7 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
   double weight2 = d_dqn_output2 / 100; 
   double weight3 = d_dqn_output3 / 100;
 
-  printf("Compute DQN metric weight0(%f)/weight1(%f)/weight2(%f)\n",
-       weight0, weight1, weight2);
+  //printf("Compute DQN metric weight0(%f)/weight1(%f)/weight2(%f)\n", weight0, weight1, weight2);
   
 
   if (bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_INFINITE_BUFFER ||
@@ -105,12 +104,19 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
   }
   else
   {
-   metric = (spectralEfficiency * 180000.) / bearer->GetAverageTransmissionRate() // PF
-               * ( pow(ComputeEXP(bearer), weight0) // EXP
-                    + pow(ComputeLOG(bearer), weight1) // LOG
-                    + pow(ComputeMLWDF(bearer), weight2) // MLWDF
-                    + pow(ComputeEXPrule(bearer), weight3) ); //EXP rule
+    double exp_metric = ComputeEXP(bearer);
+    double log_metric = ComputeLOG(bearer);
+    double mlwdf_metric = ComputeMLWDF(bearer);
+    double exprule_metric = ComputeEXPrule(bearer);
+
+    printf("Metric EXP LOG MLWDF EXP_RULE: %f %f %f %f\n", exp_metric, log_metric, mlwdf_metric, exprule_metric);
+    metric = (spectralEfficiency * 180000.) / bearer->GetAverageTransmissionRate() // PF
+               * ( pow(exp_metric, weight0) // EXP
+                    + pow(log_metric, weight1) // LOG
+                    + pow(mlwdf_metric, weight2) // MLWDF
+                    + pow(exprule_metric, weight3) ); //EXP rule
     }
+
 
     return metric;
 }

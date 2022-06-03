@@ -43,7 +43,7 @@ class Agent{
 				random_action[i] = dist_actions(mt);
 			}
 
-			printf("random_action: %d, %d, %d, %d",random_action[0].item<int>(),
+			printf("Explore action: %d, %d, %d, %d\n",random_action[0].item<int>(),
 													random_action[1].item<int>(),
 													random_action[2].item<int>(),
 													random_action[3].item<int>());
@@ -67,8 +67,6 @@ class Agent{
 				explore_action.index_put_({1}, 1);
 			}
 
-			//printf("explore param %d %d %d %d\n", explore_action[0][0].item<int>(), explore_action[0][1].item<int>(), explore_action[0][2].item<int>(), explore_action[0][3].item<int>());
-			printf("Explore!\n");
 			start, end = std::chrono::steady_clock::now(); // time of zero is explore
 			return explore_action;
 		}
@@ -82,16 +80,16 @@ class Agent{
 			clock_t infstart = clock();
 			torch::Tensor output = policy_net->forward(state);	
 
-			std::cout <<"output_before:" << output<<std::endl;
+			//std::cout <<"output_before:" << output<<std::endl;
 			output = output.reshape({4,11});		
-			std::cout <<"reshape output: " <<output<<std::endl;		
+			//std::cout <<"reshape output: " <<output<<std::endl;		
 			h_log("debug401\n");
 			torch::Tensor exploit_action = torch::zeros({2, 4});
 			//uint32_t arg_action = at::argmax(output, 1).item<int>();
 			
 			torch::Tensor arg_action =  at::argmax(output,1);
 
-			std::cout <<"arg_action: "<< arg_action <<std::endl;
+			//std::cout <<"arg_action: "<< arg_action <<std::endl;
 			
 			end = std::chrono::steady_clock::now();
 			h_log("debug402\n");
@@ -141,15 +139,20 @@ class Agent{
 
 
 		torch::Tensor CurrentQ(R policy_net, torch::Tensor states){
+			states.nan_to_num();
 			torch::Tensor q_values = policy_net->forward(states.to(device));
-			torch::Tensor max_qs   = std::get<0>(q_values.max(1));
-			return max_qs;
+			q_values.nan_to_num(0);
+			//std::cout<<"state:\n"<<states<<std::endl;
+
+			return q_values;
+
+			//torch::Tensor max_qs   = std::get<0>(q_values.max(1));
+			//return max_qs;
 		}
 
 		torch::Tensor NextQ(R target_net, torch::Tensor next_states){
 			torch::Tensor q_values = target_net->forward(next_states.to(device));
-			torch::Tensor max_qs   = std::get<0>(q_values.max(1));
-			return max_qs;
+			return q_values;
 		}
 
 		std::chrono::nanoseconds inferenceTime(){

@@ -95,7 +95,6 @@ FlowsManager::CreateApplication (int applicationID,
 
   app->SetClassifierParameters (cp);
 
-
   app->SetQoSParameters (qos);
 
   app->SetStartTime (startTime);

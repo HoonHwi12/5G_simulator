@@ -41,9 +41,9 @@ void initWeights(torch::nn::Module& m);
 
 /* HyperParams*/
 const int BATCH_SIZE        = 32;
-int TRAIN_TTI               = 200; //20000;
-const int TEST_TTI          = 200;//2500;
-const int MIN_REPLAY_MEM    = 10;// 1000;
+int TRAIN_TTI               = 1000; //20000;
+const int TEST_TTI          = 1000;//2500;
+const int MIN_REPLAY_MEM    = 100;// 1000;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
 const float EPS_END         = 0.01;
@@ -292,13 +292,13 @@ int main(int argc, char** argv) {
     {
       torch::Tensor next_state  = networkEnv->CurrentState(false);
       // store experiece in replay memory
-      exp->push(state, action_input.to(torch::kCPU), next_state, reward); 
 
       start = std::chrono::steady_clock::now(); //training time logging
       clock_t infstart=clock();
 
       if( !use_lstm || (int)networkEnv->TTIcounter %10 ==0)
       {
+        exp->push(state, action_input.to(torch::kCPU), next_state, reward); 
         // if enough samples
         if(exp->canProvideSamples((size_t)MIN_REPLAY_MEM)){ 
           update_counter++;
@@ -313,25 +313,62 @@ int main(int argc, char** argv) {
       
           // work out the qs
           //* HJ
-          current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch));
-          current_q_values = current_q_values.gather(1,std::get<1>(batch));
-          h_log("currenQ ready\n");
-          next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).to(torch::kCPU);
-          next_q_values = std::get<1>(next_q_values.max(1));
+          torch::Tensor current_q_index = torch::zeros(0);
+          current_q_index = std::get<1>(batch); // size: 40 4x32
+          current_q_index = current_q_index.reshape({-1, NUM_OUTPUT}); // size: 32x4
+          current_q_index = current_q_index.unsqueeze(2);
+          current_q_index = current_q_index.toType(torch::kInt64);
+          //current_q_index.print();
+          //std::cout <<"current_q_index ***********************\n" << current_q_index<<std::endl;
 
-          torch::Tensor abs = at::abs(current_q_values);
-          torch::Tensor max_q = at::max(abs);
-          float m_q = max_q.item<float>();
+          current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch)); // size: 440 32x44 -> 32x4
+          current_q_values = current_q_values.reshape({-1,4,11}); // size: 32x4x11
+          //current_q_values.print();
+          //std::cout <<"current Q before gather***********************\n" << current_q_values <<std::endl;
+
+          current_q_index = current_q_index.cuda();
+          current_q_values = current_q_values.cuda();
+          current_q_values = current_q_values.gather(2, current_q_index);
+          //current_q_values.print();
+          //std::cout <<"current Q after gather***********************\n" << current_q_values<<std::endl;
+          current_q_values = current_q_values.reshape({-1, NUM_OUTPUT});
+          //current_q_values.print();
+
+          h_log("currenQ ready\n");
+          torch::Tensor next_q_index = torch::zeros(0);
+          
+          next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).cuda();
+      		next_q_values = next_q_values.reshape({-1, 4,11}); // size: 32x4x11
+          next_q_index = at::argmax(next_q_values,2);
+          next_q_index = next_q_index.unsqueeze(2);
+          h_log("next Q index\n");
+          //next_q_index.print();
+
+          h_log("next q print\n");
+			    next_q_values = next_q_values.gather(2, next_q_index);
+          //next_q_values.print();
+          //std::cout <<"next_q_values ***********************\n" << next_q_values<<std::endl;
 
           // bellman equation
-          target_q_values = (next_q_values.multiply(GAMMA)) +  std::get<3>(batch);
+          h_log("debug 06\n");
+          next_q_values = next_q_values.reshape({NUM_OUTPUT, -1});
+          next_q_values.cuda();
+          target_q_values = (next_q_values.multiply(GAMMA)) +  std::get<3>(batch).cuda();
+          h_log("debug 07\n");
+          target_q_values = target_q_values.reshape({-1, NUM_OUTPUT});
+          //target_q_values.print();
+
+          h_log("debug 0605\n");
           // loss and backprop
           torch::Tensor loss = (torch::mse_loss(current_q_values.to(device), target_q_values.to(device))).to(device);
           printf("loss %f\n", loss.item().toFloat());
 
           loss.set_requires_grad(true);
+          h_log("debug 0608\n");
           optimizer.zero_grad();
+          h_log("debug 0606\n");
           loss.backward();
+          h_log("debug 0607\n");
           optimizer.step();
           h_log("optimizer step complete\n");
 
@@ -421,6 +458,7 @@ experience processSamples(std::vector<experience> _samples){
   std::vector<torch::Tensor> actions;
   std::vector<torch::Tensor> new_states;
   std::vector<torch::Tensor> rewards;
+
   for (auto i : _samples){
     states.push_back(std::get<0>(i));
     actions.push_back(std::get<1>(i));
@@ -430,7 +468,7 @@ experience processSamples(std::vector<experience> _samples){
 
   torch::Tensor states_tensor = torch::zeros(0);
   torch::Tensor new_states_tensor = torch::zeros(0);
-  torch::Tensor actions_tensor = torch::zeros({0,4});
+  torch::Tensor actions_tensor = torch::zeros({4});
   torch::Tensor rewards_tensor = torch::zeros(0);
 
   states_tensor = torch::cat(states, 0);
