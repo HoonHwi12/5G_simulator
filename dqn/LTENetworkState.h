@@ -54,8 +54,9 @@ struct Application
 	float realplr;
 
 	float reward;
+	float QoSpower;
 
-	Application(int id_ ,float gbr, float delay, float plr){
+	Application(int id_ ,float gbr, float delay, float plr, float power){
 		id = id_;
 		QoSgbr           = gbr;
 		QoSdelay         = delay;
@@ -74,6 +75,7 @@ struct Application
 		realdelay        = 0;
 		realgbr          = 0;
 		fairness		 = 0;
+		QoSpower		 = power;
 	}
 };
 
@@ -170,7 +172,7 @@ class LTENetworkState{
 			// {UE id} {APP id} {APP GBR} {APP delay} {APP PLR}
 			std::stringstream s_summary;
 			std::string line;
-			double UEid_field, APPid_field, APPgbr_field, APPdelay_field, APPplr_field;
+			double UEid_field, APPid_field, APPgbr_field, APPdelay_field, APPplr_field, APPpower_field;
 		    //Storing the whole string into string stream
 		    s_summary << UESummaries; 
 		    // get a line
@@ -194,7 +196,8 @@ class LTENetworkState{
 		    	s_line >> APPgbr_field;
 		    	s_line >> APPdelay_field;
 		    	s_line >> APPplr_field;
-		    	Application* this_app = new Application((int)APPid_field, APPgbr_field, APPdelay_field, APPplr_field);
+				s_line >> APPpower_field;
+		    	Application* this_app = new Application((int)APPid_field, APPgbr_field, APPdelay_field, APPplr_field, APPpower_field);
 		    	this_UE->applications->push_back(this_app);
 		    	
 		    }
@@ -584,12 +587,12 @@ h_log("debug303\n");
 			fairness_reward = fi * fairness_coef;
 			if(fairness_reward<0) fairness_reward=0;
 
-			printf("fairness total %f avg %f fi %f reward %f\n", fairness_sum, fairness_avg, fi, fairness_reward);
+			//printf("fairness total %f avg %f fi %f reward %f\n", fairness_sum, fairness_avg, fi, fairness_reward);
 
 			sum_reward = (sum_reward / (float) noUEs) + fairness_reward;
 			Accum_Reward += sum_reward;
 			//printf("\tAt %d TTI, TTI Reward= %f, \tAccum_reward= %f, #UEs %d \n", (int)TTIcounter, sum_reward, Accum_Reward, noUEs);
-			printf("\tAt %d TTI, TTI Reward= %f, fairness= %f\n", (int)TTIcounter, sum_reward, fairness_reward);
+			printf("\tAt %d TTI, TTI Reward= %f, fairness= %f\n", (int)TTIcounter, sum_reward, fi);
 			//printf("AVgbr/AVdelay/AVplr %f %f %f\n", sumgbr/num_counter,sumdelay/num_counter, sumplr/num_counter);
 		
 			RealReward.index_put_({0}, sum_reward);
@@ -624,7 +627,7 @@ h_log("debug303\n");
 			for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
 				printf("UE id#%d\n", (*it)->GetID() );
 				for (std::vector<Application*>::iterator itt = (*it)->GetApplicationContainer()->begin(); itt != (*it)->GetApplicationContainer()->end(); ++itt){
-					printf("appID: %d appGBR: %f appDelay: %f appPLR: %f cqi:\n", (int)(*(*itt)).id,  (*(*itt)).QoSgbr, (*(*itt)).QoSdelay, (*(*itt)).QoSplr );
+					printf("appID: %d appGBR: %f appDelay: %f appPLR: %f appPOWER: %f cqi:\n", (int)(*(*itt)).id,  (*(*itt)).QoSgbr, (*(*itt)).QoSdelay, (*(*itt)).QoSplr, (*(*itt)).QoSpower);
 				}
 				std::vector<int> *thisCQIs = (*it)->GetCQIContainer();		
 				printf("[");

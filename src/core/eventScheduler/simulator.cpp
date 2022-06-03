@@ -253,6 +253,7 @@ void Simulator::SendUESummary(int *fd){
   // send the cqi size
   write(*fd, &size, sizeof(size));
   // then the whole message
+  printf("uesum: %s\n", UEsummaries.c_str());
   write(*fd, UEsummaries.c_str(), UEsummaries.size());
   printf("LTESIM: Sent UEsummaries.\n");
   close(*fd);
@@ -312,15 +313,14 @@ void Simulator::FormUESummaryMessage(GNodeB *eNB, std::string *target_string){
   //all QoS information
   QoSParameters* appQoS;
 
-  double appGBR, appDelay, appPLR;
-  std::string appGBR_str, appDelay_str, appPLR_str;
+  double appGBR, appDelay, appPLR, appPOWER;
+  std::string appGBR_str, appDelay_str, appPLR_str, appPOWER_str;
   // message string used for each Application
   std::string message_string;
   for (std::vector<GNodeB::UserEquipmentRecord*>::iterator it = UErecords->begin(); it != UErecords->end(); ++it){
     UErecord = (*it);
     UEid = (int)UErecord->GetUE()->GetIDNetworkNode();
     NumberToString(UEid, &UEid_str);
-    // for each app check which app belongs to which UE
     for (std::vector<Application*>::iterator it = apps->begin(); it != apps->end(); ++it){
       app = (*it);
       appDST = app->GetDestination()->GetIDNetworkNode();
@@ -330,17 +330,19 @@ void Simulator::FormUESummaryMessage(GNodeB *eNB, std::string *target_string){
         // QoS Fetch
         appQoS = app->GetQoSParameters();
         appGBR = appQoS->GetGBR(); // HH: need fix 2
-        appDelay = 0; //appQoS->GetMaxDelay();
-        appPLR = 0; //appQoS->GetDropProbability();
+        appDelay = appQoS->GetMaxDelay();
+        appPLR = appQoS->GetDropProbability();
+        appPOWER = eNB->GetPhy()->GetTxPower();
 
         // QoS to strings
         NumberToString(appGBR, &appGBR_str);
         NumberToString(appDelay, &appDelay_str);
         NumberToString(appPLR, &appPLR_str);
+        NumberToString(appPOWER, &appPLR_str);
 
         // add to the message string
-        // {UE id} {APP id} {APP GBR} {APP delay} {APP PLR}
-        *target_string += UEid_str + " " + appID_str + " " + appGBR_str + " " + appDelay_str + " " + appPLR_str + "\n";
+        // {UE id} {APP id} {APP GBR} {APP delay} {APP PLR} {APP POWER}
+        *target_string += UEid_str + " " + appID_str + " " + appGBR_str + " " + appDelay_str + " " + appPLR_str + " " + appPOWER_str + "\n";
       }
     }
   }
