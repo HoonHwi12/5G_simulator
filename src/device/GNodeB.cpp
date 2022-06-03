@@ -454,7 +454,16 @@ GNodeB::SetDLScheduler (Simulator::SchedulerType type)
     	scheduler->SetMacEntity (mac);
     	mac->SetDownlinkPacketScheduler (scheduler);      
       break;
-
+    case Simulator::Scheduler_TYPE_DQN_MLWDF:
+    	scheduler = new  DQN_PacketScheduler_MLWDF ();
+    	scheduler->SetMacEntity (mac);
+    	mac->SetDownlinkPacketScheduler (scheduler);      
+      break;
+    case Simulator::Scheduler_TYPE_DQN_MIXED:
+    	scheduler = new  DQN_PacketScheduler_SELECT ();
+    	scheduler->SetMacEntity (mac);
+    	mac->SetDownlinkPacketScheduler (scheduler);      
+      break;      
     case Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR:
       printf("SET SCHEDULER TO PF\n");
       scheduler = new  DL_PF_PacketScheduler ();

@@ -56,6 +56,8 @@ public:
     Scheduler_EXP_RULE,
     Scheduler_TYPE_ROUND_ROBIN,
     Scheduler_TYPE_DQN,
+    Scheduler_TYPE_DQN_MLWDF,
+    Scheduler_TYPE_DQN_MIXED,
     Scheduler_TYPE_FINAL_PROPORTIONAL_FAIR
   };
 private:

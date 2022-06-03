@@ -520,13 +520,16 @@ std::string FetchState(int *fd){
 
 std::string FetchCQIs(int *fd){
   // read CQI message size
+  h_log("open fetch cqi fifo\n");
   *fd = open(CQI_FIFO, O_RDONLY);
   std::string::size_type size;
+  h_log("read fetch cqi fifo\n");
   read(*fd, &size, sizeof(size));
   std::string message(size, ' ');
   // read the CQIs
   read(*fd, &message[0], size);
   close(*fd);
+  h_log("close fetch cqi fifo\n");
   return message;
 }
 
