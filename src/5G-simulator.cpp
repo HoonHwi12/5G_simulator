@@ -71,6 +71,8 @@
 
 std::mt19937 commonGen(time(NULL));
 
+int DQN_TYPE;
+
 int
 main (int argc, char *argv[])
 {

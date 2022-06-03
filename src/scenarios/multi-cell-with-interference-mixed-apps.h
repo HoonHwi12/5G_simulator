@@ -53,6 +53,8 @@
 #include "../phy/gnb-phy.h"
 #include "../phy/ue-phy.h"
 
+extern int DQN_TYPE;
+
 static int commomMultiSeed [9] =
 {
 	805290992,
@@ -112,42 +114,22 @@ static void MultiCellWithInterferenceMixedApps (int nbCells, double radius,
   	std::cout << "Simulation with SEED = " << seed << std::endl;
 
   	// SET SCHEDULING ALLOCATION SCHEME
-  	Simulator::SchedulerType downlink_scheduler_type;
+  	Simulator::SchedulerType downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
   	switch (sched_type){
+	  	case 0:
+			DQN_TYPE = Simulator::Scheduler_TYPE_DQN;
+			std::cout << "Scheduler DQN "<< std::endl;
+			break;
 	  	case 1:
-			downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
-			std::cout << "Scheduler PF "<< std::endl;
+			DQN_TYPE = Simulator::Scheduler_TYPE_DQN_MLWDF;
+			std::cout << "Scheduler DQN MLWDF "<< std::endl;
 			break;
 	  	case 2:
-			downlink_scheduler_type = Simulator::Scheduler_TYPE_MLWDF;
-			std::cout << "Scheduler MLWDF "<< std::endl;
-			break;
-	  	case 3:
-			downlink_scheduler_type = Simulator::Scheduler_TYPE_EXP;
-			std::cout << "Scheduler EXP "<< std::endl;
-			break;
-	  	case 4:
-			downlink_scheduler_type = Simulator::Scheduler_TYPE_FLS;
-			std::cout << "Scheduler FLS "<< std::endl;
-			break;
-      	case 5:
-  	    	downlink_scheduler_type = Simulator::Scheduler_EXP_RULE;
-  	    	std::cout << "Scheduler EXP_RULE "<< std::endl;
-	    	break;
-      	case 6:
-  	    	downlink_scheduler_type = Simulator::Scheduler_LOG_RULE;
-  	    	std::cout << "Scheduler LOG RULE "<< std::endl;
-	    	break;
-		case 7:
-			downlink_scheduler_type = Simulator::Scheduler_TYPE_MAXIMUM_THROUGHPUT;
-			cout << "Scheduler MT "<< endl;
-			break;
-		case 8:
-			downlink_scheduler_type = Simulator::Scheduler_TYPE_ROUND_ROBIN;
-			cout << "Scheduler RR "<< endl;
+			DQN_TYPE = Simulator::Scheduler_TYPE_DQN_MIXED;
+			std::cout << "Scheduler DQN MIXED "<< std::endl;
 			break;			
 	  	default:
-			downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
+			DQN_TYPE = Simulator::Scheduler_TYPE_DQN;
 			break;
 	}
 

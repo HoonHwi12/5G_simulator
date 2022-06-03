@@ -63,6 +63,8 @@ Simulator* Simulator::ptr=nullptr;
 
 double d_dqn_output0, d_dqn_output1, d_dqn_output2, d_dqn_output3; 
 
+extern int DQN_TYPE;
+
 Simulator::Simulator ()
 {
   m_stop = false;
@@ -189,8 +191,21 @@ Simulator::SchedulerType Simulator::FetchScheduler(int *fd){
 
   if(d_dqn_output0 >= 0)
   {
+    if(DQN_TYPE == Simulator::Scheduler_TYPE_DQN)
+    {
         downlink_scheduler_type = Simulator::Scheduler_TYPE_DQN;
         printf("5G_SIM: Scheduler is DQN\n");
+    }
+    else if(DQN_TYPE == Simulator::Scheduler_TYPE_DQN_MLWDF)
+    {
+        downlink_scheduler_type = Simulator::Scheduler_TYPE_DQN_MLWDF;
+        printf("5G_SIM: Scheduler is DQN MLWDF\n");
+    }
+    else if(DQN_TYPE == Simulator::Scheduler_TYPE_DQN_MIXED)
+    {
+        downlink_scheduler_type = Simulator::Scheduler_TYPE_DQN_MIXED;
+        printf("5G_SIM: Scheduler is DQN MIXED\n");
+    }    
   }
   else
   {

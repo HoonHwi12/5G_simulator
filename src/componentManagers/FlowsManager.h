@@ -32,7 +32,6 @@ class ClassifierParameters;
 class QoSParameters;
 class NetworkNode;
 
-
 class FlowsManager
 {
 public:
