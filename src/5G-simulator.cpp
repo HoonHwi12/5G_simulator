@@ -67,6 +67,7 @@
 
 //by HH
 #include "scenarios/single-cell-with-interference-mixed-apps.h"
+#include "scenarios/multi-cell-with-interference-mixed-apps.h"
 
 std::mt19937 commonGen(time(NULL));
 
@@ -77,7 +78,7 @@ main (int argc, char *argv[])
 //  feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
 
   if (argc > 1)
-    {
+  {
       /* Help */
       if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "-H") || !strcmp(argv[1],
           "--help") || !strcmp(argv[1], "--Help"))
@@ -193,15 +194,34 @@ main (int argc, char *argv[])
         else seed = -1;
         SingleCellWithInterferenceMixedApps(nbCells, radius, nbUE, nbVideo, nbCBR, nbBE, nbVOIP, sched_type, frame_struct, speed, maxDelay, video_bit_rate, seed);
 	    }
+      else if (strcmp(argv[1], "MultiCellWithIMixedApps")==0)
+	    {
+        int nbCells = atoi(argv[2]);
+        double radius = atof(argv[3]);
+        int nbUE = atoi(argv[4]);
+        int nbVideo = atoi(argv[5]);
+        int nbCBR = atoi(argv[6]);
+        int nbBE = atoi(argv[7]);
+        int nbVOIP = atoi(argv[8]);
+        int sched_type = atoi(argv[9]);
+        int frame_struct = atoi(argv[10]);
+        int speed = atoi(argv[11]);
+        double maxDelay = atof(argv[12]);
+        int video_bit_rate = atoi(argv[13]);
+        int seed;
+        if (argc==15) seed = atoi(argv[14]);
+        else seed = -1;
+        MultiCellWithInterferenceMixedApps(nbCells, radius, nbUE, nbVideo, nbCBR, nbBE, nbVOIP, sched_type, frame_struct, speed, maxDelay, video_bit_rate, seed);
+	    }      
       else
       {
         printf("No test selected: ABORT\n");
       }
-    }
+  }
   else
-    {
-      Help ();
-    }
+  {
+    Help ();
+  }
 
     return 0;
 }

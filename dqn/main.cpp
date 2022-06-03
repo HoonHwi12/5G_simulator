@@ -41,17 +41,15 @@ void initWeights(torch::nn::Module& m);
 
 /* HyperParams*/
 const int BATCH_SIZE        = 32;
-int TRAIN_TTI               = 1000; //20000;
-const int TEST_TTI          = 1000;//2500;
-const int MIN_REPLAY_MEM    = 100;// 1000;
+int TRAIN_TTI               = 10000; //20000;
+const int TEST_TTI          = 2500;
+const int MIN_REPLAY_MEM    = 1000;// 1000;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
 const float EPS_END         = 0.01;
 const float EPS_DECAY       = 0.001;
+
 const int NET_UPDATE        = 10;     // how many episodes until we update the target DQN 
-
-const int TRAIN_FREQ        = 4;
-
 const int MEM_SIZE          = 50000; // replay memory size
 const float LR_START        = 0.01;
 const float LR_END          = 0.00001;
@@ -66,7 +64,6 @@ const int CQI_SIZE          = 25;   // number of downlink channels per eNB
 //* hyunji
 const int ADA_ACTIONS       = 11;
 const int ADA_ACTION        = 44;
-
 const int NUM_OUTPUT        = 4;
 
 // training times
@@ -311,8 +308,6 @@ int main(int argc, char** argv) {
           samples = exp->sampleMemory(BATCH_SIZE); 
           experience batch = processSamples(samples);
       
-          // work out the qs
-          //* HJ
           torch::Tensor current_q_index = torch::zeros(0);
           current_q_index = std::get<1>(batch); // size: 40 4x32
           current_q_index = current_q_index.reshape({-1, NUM_OUTPUT}); // size: 32x4
@@ -388,7 +383,7 @@ int main(int argc, char** argv) {
       // checks the valid-TTI's explore/exploitation count
       if (action[1][0].item<int>() == 0) valid_TTI_exploit++;
       else if(action[1][0].item<int>() > 0) valid_TTI_explore++;
-      printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC, valid_TTI_exploit, valid_TTI_explore);
+      printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC, valid_TTI_exploit, valid_TTI_explore * 1000);
 
     } // training loop
     
