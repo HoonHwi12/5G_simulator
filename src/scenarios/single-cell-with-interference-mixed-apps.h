@@ -198,7 +198,7 @@ static void SingleCellWithInterferenceMixedApps (int nbCells, double radius,
 	  	ulChannels->push_back (ulCh);
 	}
 
-  	//create eNBs
+  	//create gNBs
   	std::vector <GNodeB*> *gNBs = new std::vector <GNodeB*>;
   	for(int i = 0; i < nbCells; i++){
   		GNodeB* gnb = new GNodeB (i, cells->at (i));

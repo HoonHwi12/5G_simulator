@@ -39,13 +39,13 @@ void initWeights(torch::nn::Module& m);
 /* HyperParams*/
 const int BATCH_SIZE        = 32;
 int TRAIN_TTI               = 10000;
-const int TEST_TTI          = 3000;
-const int MIN_REPLAY_MEM    = 10;
+const int TEST_TTI          = 2500;
+const int MIN_REPLAY_MEM    = 1000;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
 const float EPS_END         = 0.01;
 const float EPS_DECAY       = 0.001;
-const int TRAIN_FREQ        = 4;
+
 const int NET_UPDATE        = 10;     // how many episodes until we update the target DQN 
 const int MEM_SIZE          = 50000; // replay memory size
 //const float LR              = 0.01;  // learning rate
@@ -246,9 +246,6 @@ int main(int argc, char** argv) {
 	    	//sample random batch and process
 	    	samples = exp->sampleMemory(BATCH_SIZE); 
         experience batch = processSamples(samples);
-        // work out the qs
-        //current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch), std::get<1>(batch));
-
 
         current_q_values = agent->CurrentQ(policyNet, (int)std::get<0>(batch));
         h_log("debug 10000\n");
