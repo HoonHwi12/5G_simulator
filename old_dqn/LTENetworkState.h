@@ -49,8 +49,10 @@ struct Application
 	float realgbr;
 	float realdelay;
 	float realplr;
-	float reward;
-	Application(int id_ ,float gbr, float delay, float plr){
+	float reward;	
+	float QoSpower;
+
+	Application(int id_ ,float gbr, float delay, float plr, float power){
 		id = id_;
 		QoSgbr           = gbr;
 		QoSdelay         = delay;
@@ -69,6 +71,7 @@ struct Application
 		realdelay        = 0;
 		realgbr          = 0;
 		fairness		 = 0;
+		QoSpower		 = power;
 	}
 };
 
@@ -275,7 +278,7 @@ class LTENetworkState{
 				index++;
 
 				// UE CQIs
-				this_UE_cqis = this_UE->GetCQIContainer();
+			this_UE_cqis = this_UE->GetCQIContainer();
 				for (std::vector<int>::iterator ittt = this_UE_cqis->begin(); ittt != this_UE_cqis->end(); ++ittt){
 					state.index_put_({0,index}, (*ittt));
 					index++;

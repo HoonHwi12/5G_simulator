@@ -79,8 +79,8 @@ class Agent{
 
 		torch::Tensor CurrentQ(R policy_net, torch::Tensor states){
 			torch::Tensor q_values = policy_net->forward(states.to(device));
-			torch::Tensor max_qs   = std::get<0>(q_values.max(1));
-			return max_qs;
+			//torch::Tensor max_qs   = std::get<0>(q_values.max(1));
+			return q_values;
 		}
 
 		torch::Tensor NextQ(R target_net, torch::Tensor next_states){
