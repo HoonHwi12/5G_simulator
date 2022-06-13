@@ -38,9 +38,9 @@ void initWeights(torch::nn::Module& m);
 
 /* HyperParams*/
 const int BATCH_SIZE        = 32;
-int TRAIN_TTI               = 100;
+int TRAIN_TTI               = 10000;
 const int TEST_TTI          = 2500;
-const int MIN_REPLAY_MEM    = 10;
+const int MIN_REPLAY_MEM    = 1000;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
 const float EPS_END         = 0.01;
@@ -418,6 +418,10 @@ int main(int argc, char** argv) {
   close(st_fd);
   close(cqi_fd);
   delete networkEnv;
+
+   printf("Average GBR: %0.6f, Average delay: %0.6f, Average plr: %0.6f, Average fairness: %0.6f",
+    sum_gbr/networkEnv->TTIcounter, sum_delay/networkEnv->TTIcounter, sum_plr/networkEnv->TTIcounter, sum_fairness/networkEnv->TTIcounter);
+    
   return 0;
 }
 

@@ -216,7 +216,7 @@ int main(int argc, char** argv) {
 
   if(!use_dqn)
   {
-    TRAIN_TTI += TEST_TTI;
+    //TRAIN_TTI += TEST_TTI;
   }
   while(1){ // training loop
     h_log("entering while(1)\n");
@@ -316,7 +316,7 @@ int main(int argc, char** argv) {
           //current_q_index.print();
           //std::cout <<"current_q_index ***********************\n" << current_q_index<<std::endl;
 
-          current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch)); // size: 440 32x44 -> 32x4
+          current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch)); // size: 440 32x44
           current_q_values = current_q_values.reshape({-1,4,11}); // size: 32x4x11
           //current_q_values.print();
           //std::cout <<"current Q before gather***********************\n" << current_q_values <<std::endl;
@@ -408,6 +408,8 @@ int main(int argc, char** argv) {
   close(cqi_fd);
   delete networkEnv;
 
+  printf("Average GBR: %0.6f, Average delay: %0.6f, Average plr: %0.6f, Average fairness: %0.6f",
+    sum_gbr/networkEnv->TTIcounter, sum_delay/networkEnv->TTIcounter, sum_plr/networkEnv->TTIcounter, sum_fairness/networkEnv->TTIcounter);
   printf("TEST END, Test Duration: %0.4f s\n", (float)(clock()-test_start) / CLOCKS_PER_SEC);
 
   return 0;
