@@ -13,6 +13,10 @@
 //by HH
 #include "../src/shared-memory.cpp"
 bool use_lstm=false;
+float sum_delay = 0;
+float sum_gbr = 0;
+float sum_plr = 0;
+float sum_fairness = 0;
 
 typedef std::pair<int, int> id_size_pair;
 
@@ -54,6 +58,7 @@ struct Application
 	float realplr;
 
 	float reward;
+	float fairness;
 	float QoSpower;
 
 	Application(int id_ ,float gbr, float delay, float plr, float power){
@@ -313,6 +318,10 @@ class LTENetworkState{
 					index++;
 				}
 			}
+
+			sum_gbr += gbr_sum/sum_counter;
+			sum_delay += delay_sum/sum_counter;
+			sum_plr += plr_sum/sum_counter;
 
 			if(print_qos) printf("TTI:%f/ AVgbr/AVdelay/AVplr:%f %f %f\n", TTIcounter, gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter);
 
@@ -586,6 +595,8 @@ h_log("debug303\n");
 
 			fairness_reward = fi * fairness_coef;
 			if(fairness_reward<0) fairness_reward=0;
+
+			sum_fairness += fi;
 
 			//printf("fairness total %f avg %f fi %f reward %f\n", fairness_sum, fairness_avg, fi, fairness_reward);
 
