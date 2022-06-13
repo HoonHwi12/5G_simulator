@@ -78,7 +78,7 @@ class Agent{
 
 			start = std::chrono::steady_clock::now();
 			clock_t infstart = clock();
-			torch::Tensor output = policy_net->forward(state);	
+			torch::Tensor output = policy_net->state_forward(state);	
 
 			//std::cout <<"output_before:" << output<<std::endl;
 			output = output.reshape({4,11});		
@@ -139,9 +139,7 @@ class Agent{
 
 
 		torch::Tensor CurrentQ(R policy_net, torch::Tensor states){
-			states.nan_to_num();
-			torch::Tensor q_values = policy_net->forward(states.to(device));
-			q_values.nan_to_num(0);
+			torch::Tensor q_values = policy_net->forward(states.cuda());
 			//std::cout<<"state:\n"<<states<<std::endl;
 
 			return q_values;
@@ -151,7 +149,7 @@ class Agent{
 		}
 
 		torch::Tensor NextQ(R target_net, torch::Tensor next_states){
-			torch::Tensor q_values = target_net->forward(next_states.to(device));
+			torch::Tensor q_values = target_net->forward(next_states.cuda());
 			return q_values;
 		}
 

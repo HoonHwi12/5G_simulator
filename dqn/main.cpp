@@ -40,16 +40,17 @@ void loadStateDict(DQN model, DQN target_model);
 void initWeights(torch::nn::Module& m);
 
 /* HyperParams*/
-const int BATCH_SIZE        = 32;
+int BATCH_SIZE              = 32;
 int TRAIN_TTI               = 10000; //20000;
 const int TEST_TTI          = 2500;
 const int MIN_REPLAY_MEM    = 1000;// 1000;
+const int UPDATE_FREQUENCY  = 4;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
 const float EPS_END         = 0.01;
 const float EPS_DECAY       = 0.001;
 
-const int NET_UPDATE        = 10;     // how many episodes until we update the target DQN 
+const int NET_UPDATE        = 100;     // how many episodes until we update the target DQN 
 const int MEM_SIZE          = 50000; // replay memory size
 const float LR_START        = 0.01;
 const float LR_END          = 0.00001;
@@ -62,9 +63,9 @@ const int CQI_SIZE          = 25;   // number of downlink channels per eNB
 //Adaptive DQN
 //const int ADA_ACTIONS       = 17569; // 14641 + 2928
 //* hyunji
-const int ADA_ACTIONS       = 11;
-const int ADA_ACTION        = 44;
-const int NUM_OUTPUT        = 4;
+int ADA_ACTIONS       = 11;
+int ADA_ACTION        = 44;
+int NUM_OUTPUT        = 4;
 
 // training times
 std::chrono::steady_clock::time_point start;
@@ -293,88 +294,88 @@ int main(int argc, char** argv) {
       start = std::chrono::steady_clock::now(); //training time logging
       clock_t infstart=clock();
 
-      if( !use_lstm || (int)networkEnv->TTIcounter %10 ==0)
-      {
-        exp->push(state, action_input.to(torch::kCPU), next_state, reward); 
-        // if enough samples
-        if(exp->canProvideSamples((size_t)MIN_REPLAY_MEM)){ 
-          update_counter++;
-          // access learning rate
-          auto options = static_cast<torch::optim::AdamOptions&> (optimizer.defaults());
-          options.lr(lr_rate->explorationRate(networkEnv->TTIcounter - MIN_REPLAY_MEM));
-          h_log("lr update\n");
+      exp->push(state, action_input.to(torch::kCPU), next_state, reward); 
+      // if enough samples
+      if(exp->canProvideSamples((size_t)MIN_REPLAY_MEM) && ((int)networkEnv->TTIcounter % UPDATE_FREQUENCY == 0) ){ 
+        update_counter++;
+        // access learning rate
+        auto options = static_cast<torch::optim::AdamOptions&> (optimizer.defaults());
+        options.lr(lr_rate->explorationRate(networkEnv->TTIcounter - MIN_REPLAY_MEM));
+        h_log("lr update\n");
 
-          //sample random batch and process
-          samples = exp->sampleMemory(BATCH_SIZE); 
-          experience batch = processSamples(samples);
-      
-          torch::Tensor current_q_index = torch::zeros(0);
-          current_q_index = std::get<1>(batch); // size: 40 4x32
-          current_q_index = current_q_index.reshape({-1, NUM_OUTPUT}); // size: 32x4
-          current_q_index = current_q_index.unsqueeze(2);
-          current_q_index = current_q_index.toType(torch::kInt64);
-          //current_q_index.print();
-          //std::cout <<"current_q_index ***********************\n" << current_q_index<<std::endl;
+        //sample random batch and process
+        samples = exp->sampleMemory(BATCH_SIZE); 
+        h_log("sample memory\n");
+        experience batch = processSamples(samples);
+        h_log("process samples\n");
+        torch::Tensor current_q_index = torch::zeros(0);
+        current_q_index = std::get<1>(batch); // size: 40 4x32
+        current_q_index = current_q_index.reshape({-1, NUM_OUTPUT}); // size: 32x4
+        current_q_index = current_q_index.unsqueeze(2);
+        current_q_index = current_q_index.toType(torch::kInt64);
+        //current_q_index.print();
+        //std::cout <<"current_q_index ***********************\n" << current_q_index<<std::endl;
 
-          current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch)); // size: 440 32x44
-          current_q_values = current_q_values.reshape({-1,4,11}); // size: 32x4x11
-          //current_q_values.print();
-          //std::cout <<"current Q before gather***********************\n" << current_q_values <<std::endl;
+        h_log("get current q start\n");
+        current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch)); // size: 440 32x44
+        h_log("get current q end\n");
+        current_q_values = current_q_values.reshape({-1,4,11}); // size: 32x4x11
+        //current_q_values.print();
+        //std::cout <<"current Q before gather***********************\n" << current_q_values <<std::endl;
 
-          current_q_index = current_q_index.cuda();
-          current_q_values = current_q_values.cuda();
-          current_q_values = current_q_values.gather(2, current_q_index);
-          //current_q_values.print();
-          //std::cout <<"current Q after gather***********************\n" << current_q_values<<std::endl;
-          current_q_values = current_q_values.reshape({-1, NUM_OUTPUT});
-          //current_q_values.print();
+        current_q_index = current_q_index.cuda();
+        current_q_values = current_q_values.cuda();
+        current_q_values = current_q_values.gather(2, current_q_index);
+        //current_q_values.print();
+        //std::cout <<"current Q after gather***********************\n" << current_q_values<<std::endl;
+        current_q_values = current_q_values.reshape({-1, NUM_OUTPUT});
+        //current_q_values.print();
 
-          h_log("currenQ ready\n");
-          torch::Tensor next_q_index = torch::zeros(0);
-          
-          next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).cuda();
-      		next_q_values = next_q_values.reshape({-1, 4,11}); // size: 32x4x11
-          next_q_index = at::argmax(next_q_values,2);
-          next_q_index = next_q_index.unsqueeze(2);
-          h_log("next Q index\n");
-          //next_q_index.print();
+        h_log("currenQ ready\n");
+        torch::Tensor next_q_index = torch::zeros(0);
+        
+        next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).cuda();
+        next_q_values = next_q_values.reshape({-1, 4,11}); // size: 32x4x11
+        next_q_index = at::argmax(next_q_values,2);
+        next_q_index = next_q_index.unsqueeze(2);
+        h_log("next Q index\n");
+        //next_q_index.print();
 
-          h_log("next q print\n");
-			    next_q_values = next_q_values.gather(2, next_q_index);
-          //next_q_values.print();
-          //std::cout <<"next_q_values ***********************\n" << next_q_values<<std::endl;
+        h_log("next q print\n");
+        next_q_values = next_q_values.gather(2, next_q_index);
+        //next_q_values.print();
+        //std::cout <<"next_q_values ***********************\n" << next_q_values<<std::endl;
 
-          // bellman equation
-          h_log("debug 06\n");
-          next_q_values = next_q_values.reshape({NUM_OUTPUT, -1});
-          next_q_values.cuda();
-          target_q_values = (next_q_values.multiply(GAMMA)) +  std::get<3>(batch).cuda();
-          h_log("debug 07\n");
-          target_q_values = target_q_values.reshape({-1, NUM_OUTPUT});
-          //target_q_values.print();
+        // bellman equation
+        h_log("debug 06\n");
+        next_q_values = next_q_values.reshape({NUM_OUTPUT, -1});
+        next_q_values.cuda();
+        target_q_values = (next_q_values.multiply(GAMMA)) +  std::get<3>(batch).cuda();
+        h_log("debug 07\n");
+        target_q_values = target_q_values.reshape({-1, NUM_OUTPUT});
+        //target_q_values.print();
 
-          h_log("debug 0605\n");
-          // loss and backprop
-          torch::Tensor loss = (torch::mse_loss(current_q_values.to(device), target_q_values.to(device))).to(device);
-          printf("loss %f\n", loss.item().toFloat());
+        h_log("debug 0605\n");
+        // loss and backprop
+        torch::Tensor loss = (torch::mse_loss(current_q_values[0][0].to(device), target_q_values[0][0].to(device))).to(device);
+        printf("loss %f\n", loss.item<float>());
 
-          loss.set_requires_grad(true);
-          h_log("debug 0608\n");
-          optimizer.zero_grad();
-          h_log("debug 0606\n");
-          loss.backward();
-          h_log("debug 0607\n");
-          optimizer.step();
-          h_log("optimizer step complete\n");
+        loss.set_requires_grad(true);
+        h_log("debug 0608\n");
+        optimizer.zero_grad();
+        h_log("debug 0606\n");
+        loss.backward();
+        h_log("debug 0607\n");
+        optimizer.step();
+        h_log("optimizer step complete\n");
 
-          // update targetNet with policyNey parameters
-          if(update_counter > NET_UPDATE){
-            // copy weights to targetnet
-            loadStateDict(policyNet, targetNet);
-            update_counter = 0;
-          }
-        } // enough samples
-      }
+        // update targetNet with policyNey parameters
+        if(update_counter > NET_UPDATE){
+          // copy weights to targetnet
+          loadStateDict(policyNet, targetNet);
+          update_counter = 0;
+        }
+      } // enough samples
 
       // training time logging
       end = std::chrono::steady_clock::now();
@@ -408,7 +409,7 @@ int main(int argc, char** argv) {
   close(cqi_fd);
   delete networkEnv;
 
-  printf("Average GBR: %0.6f, Average delay: %0.6f, Average plr: %0.6f, Average fairness: %0.6f",
+  printf("Average GBR: %0.6f, Average delay: %0.6f, Average plr: %0.6f, Average fairness: %0.6f\n",
     sum_gbr/networkEnv->TTIcounter, sum_delay/networkEnv->TTIcounter, sum_plr/networkEnv->TTIcounter, sum_fairness/networkEnv->TTIcounter);
   printf("TEST END, Test Duration: %0.4f s\n", (float)(clock()-test_start) / CLOCKS_PER_SEC);
 
