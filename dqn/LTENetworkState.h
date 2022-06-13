@@ -596,7 +596,7 @@ h_log("debug303\n");
 			fairness_reward = fi * fairness_coef;
 			if(fairness_reward<0) fairness_reward=0;
 
-			sum_fairness += fi;
+			if(fi>0) sum_fairness += fi;
 
 			//printf("fairness total %f avg %f fi %f reward %f\n", fairness_sum, fairness_avg, fi, fairness_reward);
 
