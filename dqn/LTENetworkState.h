@@ -19,10 +19,10 @@ float sum_gbr = 0;
 float sum_plr = 0;
 float sum_fairness = 0;
 
-float before_delay = 0;
-float before_gbr = 0;
-float before_plr = 0;
-float before_fairness = 0;
+float before_delay;
+float before_gbr;
+float before_plr;
+float before_fairness;
 
 typedef std::pair<int, int> id_size_pair;
 
@@ -569,21 +569,24 @@ h_log("debug303\n");
 					if ((*(*itt)).realgbr > before_gbr ) gbrReward = 1;
 					else
 					{
-						gbrReward = -1 + (*(*itt)).realgbr/before_gbr;
+						if(before_gbr == 0) gbrReward = 0;
+						else gbrReward = -1 + (*(*itt)).realgbr/before_gbr;
 					}
 					before_gbr = (*(*itt)).realgbr;
 
 					if ((*(*itt)).realplr < before_plr ) plrReward = 1;
 					else
 					{
-						plrReward = -1 + ((before_plr) / (*(*itt)).realplr);
+						if( (*(*itt)).realplr == 0) plrReward = -1;
+						else plrReward = -1 + ((before_plr) / (*(*itt)).realplr);
 					}
 					before_plr = (*(*itt)).realplr;
 
 					if ((*(*itt)).realdelay < before_delay ) delayReward = 1;
 					else
 					{
-						-1 + ((before_delay) / (*(*itt)).realdelay);
+						if((*(*itt)).realdelay == 0) delayReward = -1;
+						else delayReward = -1 + ((before_delay) / (*(*itt)).realdelay);
 					}
 					before_delay = (*(*itt)).realdelay;					
 					// if ((*(*itt)).realgbr >= (*(*itt)).QoSgbr) {
@@ -660,8 +663,8 @@ h_log("debug303\n");
 			if(fi>0) sum_fairness += fi;
 
 			//printf("fairness total %f avg %f fi %f reward %f\n", fairness_sum, fairness_avg, fi, fairness_reward);
-
 			sum_reward = (sum_reward / (float) noUEs) + fairness_reward;
+			
 			Accum_Reward += sum_reward;
 			//printf("\tAt %d TTI, TTI Reward= %f, \tAccum_reward= %f, #UEs %d \n", (int)TTIcounter, sum_reward, Accum_Reward, noUEs);
 			printf("\tAt %d TTI, TTI Reward= %f, fairness= %f\n", (int)TTIcounter, sum_reward, fi);

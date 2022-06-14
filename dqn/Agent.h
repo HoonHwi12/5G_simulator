@@ -114,9 +114,10 @@ class Agent{
 				exploit_action.index_put_({1}, 0);
 			}
 
-			//printf("exploit action %d %d %d %d\n", exploit_action[0][0].item<int>(), exploit_action[0][1].item<int>(), exploit_action[0][2].item<int>(), exploit_action[0][3].item<int>());
+			printf("exploit action %d %d %d %d\n", exploit_action[0][0].item<int>(), exploit_action[0][1].item<int>(), exploit_action[0][2].item<int>(), exploit_action[0][3].item<int>());
 		
 			if(!timeLog) printf("Exploit! \n");
+			
 			return exploit_action;
 		}
 
