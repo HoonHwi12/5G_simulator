@@ -294,6 +294,7 @@ int main(int argc, char** argv) {
       torch::Tensor next_state  = networkEnv->CurrentState(false);
       next_state = next_state.unsqueeze(0);
       state = state.unsqueeze(0);
+      action_input = action_input.unsqueeze(0);
       // store experiece in replay memory
 
       start = std::chrono::steady_clock::now(); //training time logging
@@ -313,17 +314,17 @@ int main(int argc, char** argv) {
         experience batch = processSamples(samples);
         h_log("process samples\n");
         torch::Tensor current_q_index = torch::zeros(0);
-        current_q_index = std::get<1>(batch); // size: 40 4x32
-        current_q_index = current_q_index.reshape({-1, NUM_OUTPUT}); // size: 32x4
+        current_q_index = std::get<1>(batch); // size: 40 32x4
+        //current_q_index = current_q_index.reshape({-1, NUM_OUTPUT}); // size: 32x4
         current_q_index = current_q_index.unsqueeze(2);
         current_q_index = current_q_index.toType(torch::kInt64);
         //current_q_index.print();
         //std::cout <<"current_q_index ***********************\n" << current_q_index<<std::endl;
 
         h_log("get current q start\n");
-        current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch)); // size: 440 32x44
+        current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch)); // size: 32x4x11
         h_log("get current q end\n");
-        current_q_values = current_q_values.reshape({-1,4,11}); // size: 32x4x11
+        //current_q_values = current_q_values.reshape({-1,4,11}); // size: 32x4x11
         //current_q_values.print();
         //std::cout <<"current Q before gather***********************\n" << current_q_values <<std::endl;
 
@@ -332,14 +333,13 @@ int main(int argc, char** argv) {
         current_q_values = current_q_values.gather(2, current_q_index);
         //current_q_values.print();
         //std::cout <<"current Q after gather***********************\n" << current_q_values<<std::endl;
-        current_q_values = current_q_values.reshape({-1, NUM_OUTPUT});
-        //current_q_values.print();
+        //current_q_values = current_q_values.reshape({-1, NUM_OUTPUT});
 
         h_log("currenQ ready\n");
         torch::Tensor next_q_index = torch::zeros(0);
 
-        next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).cuda();
-        next_q_values = next_q_values.reshape({-1, 4,11}); // size: 32x4x11
+        next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).to(device);
+        //next_q_values = next_q_values.reshape({-1, 4,11}); // size: 32x4x11
 
         next_q_index = at::argmax(next_q_values,2);
         next_q_index = next_q_index.unsqueeze(2);
@@ -353,11 +353,16 @@ int main(int argc, char** argv) {
 
         // bellman equation
         h_log("debug 06\n");
-        next_q_values = next_q_values.reshape({NUM_OUTPUT, -1});
+        //next_q_values = next_q_values.reshape({NUM_OUTPUT, -1});
         next_q_values.cuda();
-        target_q_values = (next_q_values.multiply(GAMMA)) +  std::get<3>(batch).cuda();
+        torch::Tensor batch_reward = std::get<3>(batch);
+        batch_reward = batch_reward.unsqueeze(1);
+        batch_reward = batch_reward.unsqueeze(2);
+
+        target_q_values = (next_q_values.multiply(GAMMA)) + batch_reward.to(device);
+
         h_log("debug 07\n");
-        target_q_values = target_q_values.reshape({-1, NUM_OUTPUT});
+        //target_q_values = target_q_values.reshape({-1, NUM_OUTPUT});
         //target_q_values.print();
 
         h_log("debug 0605\n");
