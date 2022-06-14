@@ -228,6 +228,8 @@ int main(int argc, char** argv) {
     torch::Tensor action = torch::zeros({2,4});
     torch::Tensor action_input = torch::zeros(4);
 
+    clock_t infstart=clock();
+
     h_log("action ready\n");
 
     if(use_dqn) // select action explore/exploit in dqn
@@ -286,6 +288,7 @@ int main(int argc, char** argv) {
     torch::Tensor reward = networkEnv->CalculateReward(); 
     reward_copy = reward[0].item<float>();
 
+    if( (networkEnv->TTIcounter > TRAIN_TTI) && use_dqn) printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC * 1000, valid_TTI_exploit, valid_TTI_explore);
     if( (networkEnv->TTIcounter < TRAIN_TTI) && use_dqn)
     {
       torch::Tensor next_state  = networkEnv->CurrentState(false);
@@ -294,7 +297,6 @@ int main(int argc, char** argv) {
       // store experiece in replay memory
 
       start = std::chrono::steady_clock::now(); //training time logging
-      clock_t infstart=clock();
 
       exp->push(state, action_input.to(torch::kCPU), next_state, reward); 
       // if enough samples
@@ -386,7 +388,7 @@ int main(int argc, char** argv) {
       // checks the valid-TTI's explore/exploitation count
       if (action[1][0].item<int>() == 0) valid_TTI_exploit++;
       else if(action[1][0].item<int>() > 0) valid_TTI_explore++;
-      printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC, valid_TTI_exploit, valid_TTI_explore * 1000);
+      printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC * 1000, valid_TTI_exploit, valid_TTI_explore);
 
     } // training loop
     

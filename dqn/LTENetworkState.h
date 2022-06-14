@@ -340,6 +340,7 @@ class LTENetworkState{
 			sum_delay += delay_sum/sum_counter;
 			sum_plr += plr_sum/sum_counter;
 
+			printf("gbr sum: %f\n", sum_gbr);
 			if(print_qos) printf("TTI:%f/ AVgbr/AVdelay/AVplr:%f %f %f\n", TTIcounter, gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter);
 
 			return state;
