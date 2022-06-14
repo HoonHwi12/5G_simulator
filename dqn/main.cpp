@@ -41,8 +41,8 @@ void initWeights(torch::nn::Module& m);
 
 /* HyperParams*/
 int BATCH_SIZE              = 32;
-int TRAIN_TTI               = 10000; //20000;
-const int TEST_TTI          = 2500;
+int TRAIN_TTI               = 20000; //20000;
+const int TEST_TTI          = 5000;
 const int MIN_REPLAY_MEM    = 1000;// 1000;
 const int UPDATE_FREQUENCY  = 4;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
