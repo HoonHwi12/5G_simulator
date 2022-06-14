@@ -8,7 +8,7 @@ extern int ADA_ACTIONS;
 extern int ADA_ACTION;
 extern int NUM_OUTPUT;
 
-//#define HLOG
+#define HLOG
 #ifdef HLOG
 #define h_log(fmt, ...) \
     do { fprintf(stderr, "[hoonhwi] Log: " fmt, ## __VA_ARGS__); } while (0)        
@@ -22,15 +22,15 @@ extern int NUM_OUTPUT;
 struct DQNImpl : torch::nn::Module {
 
 	 DQNImpl(int64_t state_size, int64_t action_size) 
-	 	:conv1(torch::nn::Conv2dOptions(BATCH_SIZE, 64, 1).stride(8)),
-		conv2(torch::nn::Conv2dOptions(64, 64, 1).stride(4)),
-		conv3(torch::nn::Conv2dOptions(64, 128, 1).stride(1)),
-		linear1(torch::nn::Linear(16, 512) ),
-	 	linear2(torch::nn::Linear(512, ADA_ACTION) ),
-		state_conv1(torch::nn::Conv2dOptions(1, state_size, 1).stride(4)),
-		state_conv2(torch::nn::Conv2dOptions(state_size, 64, 1).stride(2)),
-		state_conv3(torch::nn::Conv2dOptions(64, 64, 1).stride(1)),
-		state_linear1(torch::nn::Linear(224, 512) ),
+	 	:conv1(torch::nn::Conv2dOptions(1, 32, 3).stride(1).padding(1)),
+		conv2(torch::nn::Conv2dOptions(32, 64, 3).stride(1).padding(1)),
+		conv3(torch::nn::Conv2dOptions(64, 64, 3).stride(1)),
+		linear1(torch::nn::Linear(368, 512) ),
+	 	linear2(torch::nn::Linear(512, ADA_ACTIONS) ),
+		state_conv1(torch::nn::Conv2dOptions(1, 32, 3).stride(1).padding(1)),
+		state_conv2(torch::nn::Conv2dOptions(32, 64, 3).stride(1).padding(1)),
+		state_conv3(torch::nn::Conv2dOptions(64, 64, 3).stride(1)),
+		state_linear1(torch::nn::Linear(368, 512) ),
 	 	state_linear2(torch::nn::Linear(512, ADA_ACTIONS) ) {
 	 		register_module("conv1", conv1);
 			register_module("conv2", conv2);
@@ -50,39 +50,34 @@ struct DQNImpl : torch::nn::Module {
 		// torch::Tensor h2 = torch::tanh(h1);
 		input = input.unsqueeze(0);
 		h_log("state forward before conv1\n");
+		input.print();
 		torch::Tensor h1 = state_conv1(input);
 		h_log("after conv1, h1:\n");
-		//h1.print();
+		h1.print();
 		h1 = torch::relu(h1);
-		h_log("after relu, h1:\n");
-		//h1.print();
+
 		torch::Tensor h2 = state_conv2(h1);
 		h_log("after conv2, h2:\n");
-		//h2.print();
+		h2.print();
 		h2 = torch::relu(h2);
-		h_log("after relu2, h2:\n");
-		//h2.print();
 
 		h2 = state_conv3(h2);
 		h_log("after conv3, h2:\n");
-		//h2.print();
+		h2.print();
 		h2 = torch::relu(h2);
-		h_log("after relu3, h2:\n");
-		//h2.print();
 
 		h2 = h2.view({NUM_OUTPUT, -1});
 		h_log("after VIEW h2:\n");
-		//h2.print();
+		h2.print();
 
 		h2 = state_linear1(h2);
 		h_log("after linear1, h2:\n");
-		//h2.print();
+		h2.print();
 		h2 = torch::relu(h2);
-		h_log("after relu4, h2:\n");
-		//h2.print();
+
 		h2 = state_linear2(h2);
 		h_log("after linear2, h2:\n");
-		//h2.print();
+		h2.print();
 
 		return h2;
 	}
@@ -90,42 +85,37 @@ struct DQNImpl : torch::nn::Module {
 	torch::Tensor forward(torch::Tensor input){
 		// torch::Tensor h1 = linear1(input);
 		// torch::Tensor h2 = torch::tanh(h1);
-		input = input.unsqueeze(2);
-
+		input = input.unsqueeze(1);
 		h_log("before conv1 *******************\n");
+		input.print();
 		torch::Tensor h1 = conv1(input);
 		h_log("after conv1, h1:\n");
-		//h1.print();
+		h1.print();
 		h1 = torch::relu(h1);
-		h_log("after relu, h1:\n");
-		//h1.print();
+
 		torch::Tensor h2 = conv2(h1);
 		h_log("after conv2, h2:\n");
-		//h2.print();
+		h2.print();
 		h2 = torch::relu(h2);
-		h_log("after relu2, h2:\n");
-		//h2.print();
 
 		h2 = conv3(h2);
 		h_log("after conv3, h2:\n");
-		//h2.print();
+		h2.print();
 		h2 = torch::relu(h2);
-		h_log("after relu3, h2:\n");
-		//h2.print();
 
-		h2 = h2.view({BATCH_SIZE, -1});
+
+		h2 = h2.view({BATCH_SIZE, NUM_OUTPUT, -1});
 		h_log("after VIEW h2:\n");
-		//h2.print();
+		h2.print();
 
 		torch::Tensor h3 = linear1(h2);
 		h_log("after linear1, h3:\n");
-		//h3.print();
+		h3.print();
 		h3 = torch::relu(h3);
-		h_log("after relu4, h3:\n");
-		//h3.print();
+
 		h3 = linear2(h3);
 		h_log("after linear2, h3:\n");
-		//h3.print();
+		h3.print();
 
 		return h3;
 	}
