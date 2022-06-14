@@ -48,7 +48,7 @@ const int UPDATE_FREQUENCY  = 4;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
 const float EPS_END         = 0.01;
-const float EPS_DECAY       = 0.001;
+const float EPS_DECAY       = 0.0001;
 
 const int NET_UPDATE        = 100;     // how many episodes until we update the target DQN 
 const int MEM_SIZE          = 50000; // replay memory size
@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
 
   //* hyunji
   //torch::Tensor ada_actions = torch::zeros({NUM_OUTPUT,ADA_ACTIONS});
-  Agent<EpsilonGreedy, DQN>* agent = new Agent<EpsilonGreedy, DQN>(eps,ADA_ACTIONS);
+  Agent<EpsilonGreedy, DQN>* agent = new Agent<EpsilonGreedy, DQN>(eps,NUM_ACTIONS);
   DQN policyNet(reset_state.size(1), ADA_ACTION);
   DQN targetNet(reset_state.size(1), ADA_ACTION);
 
@@ -288,7 +288,7 @@ int main(int argc, char** argv) {
     torch::Tensor reward = networkEnv->CalculateReward(); 
     reward_copy = reward[0].item<float>();
 
-    if( (networkEnv->TTIcounter > TRAIN_TTI) && use_dqn) printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC * 1000, valid_TTI_exploit, valid_TTI_explore);
+    if( (networkEnv->TTIcounter > TRAIN_TTI) && use_dqn) printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC, valid_TTI_exploit, valid_TTI_explore);
     if( (networkEnv->TTIcounter < TRAIN_TTI) && use_dqn)
     {
       torch::Tensor next_state  = networkEnv->CurrentState(false);
@@ -337,9 +337,10 @@ int main(int argc, char** argv) {
 
         h_log("currenQ ready\n");
         torch::Tensor next_q_index = torch::zeros(0);
-        
+
         next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).cuda();
         next_q_values = next_q_values.reshape({-1, 4,11}); // size: 32x4x11
+
         next_q_index = at::argmax(next_q_values,2);
         next_q_index = next_q_index.unsqueeze(2);
         h_log("next Q index\n");
@@ -388,7 +389,7 @@ int main(int argc, char** argv) {
       // checks the valid-TTI's explore/exploitation count
       if (action[1][0].item<int>() == 0) valid_TTI_exploit++;
       else if(action[1][0].item<int>() > 0) valid_TTI_explore++;
-      printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC * 1000, valid_TTI_exploit, valid_TTI_explore);
+      printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC, valid_TTI_exploit, valid_TTI_explore);
 
     } // training loop
     
@@ -484,7 +485,7 @@ experience processSamples(std::vector<experience> _samples){
 
 void ConnectSchedulerFifo(int *fd){
   // connect to scheduler fifo
-  *fd = open(SCHED_FIFO, O_CREAT|O_WRONLY);
+  *fd = open(SCHED_FIFO, O_WRONLY);
   close(*fd);
 }
 
