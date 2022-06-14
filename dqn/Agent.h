@@ -78,6 +78,7 @@ class Agent{
 
 			start = std::chrono::steady_clock::now();
 			clock_t infstart = clock();
+
 			torch::Tensor output = policy_net->state_forward(state);	
 
 			//std::cout <<"output_before:" << output<<std::endl;

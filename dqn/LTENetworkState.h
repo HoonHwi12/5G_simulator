@@ -214,9 +214,14 @@ class LTENetworkState{
 			// form the state size
 			// 1(#ues) + Each UE's(App QoS + cqi)
 		    //state_size = 1+noUEs*{(3+LSTMpacket)*noAPPs + cqi_size + fairness};
-			if(use_lstm) state_size = 1+noUEs*(4*noAPPs + cqi_size + 1); //HH
-			else state_size = 1+noUEs*(3*noAPPs + cqi_size + 1);
-		    reset_state = torch::ones({1, state_size});
+			// if(use_lstm) state_size = 1+noUEs*(4*noAPPs + cqi_size + 1); //HH
+			// else state_size = 1+noUEs*(3*noAPPs + cqi_size + 1);
+
+			//state_size = LSTMpacket + cqi_size
+			 if(use_lstm) state_size = 1 + cqi_size; //HH
+			 else state_size = cqi_size;
+
+		    reset_state = torch::ones({noUEs, state_size});
 		}
 
 		bool CheckIfUERegistered(float test_id){
@@ -251,14 +256,16 @@ class LTENetworkState{
 			
 			UESummary* this_UE;
 			Application* this_app;
-			float gbr_indicator, plr_indicator, delay_indicator, fairness_indicator;
+			//float gbr_indicator, plr_indicator, delay_indicator, fairness_indicator;
 			int packet_indicator;
 			std::vector<int> *this_UE_cqis;
-			state = torch::ones({1, state_size});
+			//state = torch::ones({1, state_size});
+			state = torch::ones({noUEs, state_size});
 			using namespace torch::indexing;
 			// Number of UEs
-			state.index_put_({0,0}, noUEs); 
-			int index = 1;
+			//state.index_put_({0,0}, noUEs); 
+			int index = 0;
+			int ue_index = -1;
 
 			// by HH
 			int dqn_shmid = SharedMemoryInit(DQN_KEY);;
@@ -271,6 +278,8 @@ class LTENetworkState{
 
 			for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
 				this_UE = (*it);
+				index = 0;
+				ue_index++;
 				// app QoS
 				for (std::vector<Application*>::iterator itt = this_UE->GetApplicationContainer()->begin(); itt != this_UE->GetApplicationContainer()->end(); ++itt)
 				{
@@ -279,25 +288,25 @@ class LTENetworkState{
 					//indicator = requirement - measured
 
 					 // gbr_indicator = 0;//sthis_app->realgbr - this_app->QoSgbr;
-					gbr_indicator = this_app->realgbr - this_app->QoSgbr; // realgbr-qosgbr ~ -qosgbr
-					state.index_put_({0,index}, gbr_indicator);
-					index++;
-					delay_indicator = this_app->QoSdelay - this_app->realdelay; // -realdelay ~ qosdelay
-					state.index_put_({0,index}, delay_indicator);
-					index++;
-					plr_indicator = this_app->QoSplr - this_app->realplr; // -realplr ~ qosplr
-					state.index_put_({0,index}, plr_indicator);
-					index++;				
+					// gbr_indicator = this_app->realgbr - this_app->QoSgbr; // realgbr-qosgbr ~ -qosgbr
+					// state.index_put_({0,index}, gbr_indicator);
+					// index++;
+					// delay_indicator = this_app->QoSdelay - this_app->realdelay; // -realdelay ~ qosdelay
+					// state.index_put_({0,index}, delay_indicator);
+					// index++;
+					// plr_indicator = this_app->QoSplr - this_app->realplr; // -realplr ~ qosplr
+					// state.index_put_({0,index}, plr_indicator);
+					// index++;				
 
 					// by HH, if use lstm
-					if(use_lstm)
-					{
-						SharedMemoryRead(dqn_shmid, dqn_buffer);
-						shared_buffer = atoi(dqn_buffer);
-						packet_indicator = shared_buffer;
-						state.index_put_({0,index}, packet_indicator);
-						index++;	
-					}
+					// if(use_lstm)
+					// {
+					// 	SharedMemoryRead(dqn_shmid, dqn_buffer);
+					// 	shared_buffer = atoi(dqn_buffer);
+					// 	packet_indicator = shared_buffer;
+					// 	state.index_put_({ue_index, index}, packet_indicator);
+					// 	index++;	
+					// }
 
 					gbr_sum += this_app->realgbr;
 					plr_sum += this_app->realplr;
@@ -306,15 +315,23 @@ class LTENetworkState{
 					sum_counter++;
 				}
 
+				if(use_lstm)
+				{
+					SharedMemoryRead(dqn_shmid, dqn_buffer);
+					shared_buffer = atoi(dqn_buffer);
+					packet_indicator = shared_buffer;
+					state.index_put_({ue_index, index}, packet_indicator);
+					index++;	
+				}
 				//fairness
-				fairness_indicator = fairness;
-				state.index_put_({0,index}, fairness_indicator);
-				index++;
+				// fairness_indicator = fairness;
+				// state.index_put_({0,index}, fairness_indicator);
+				// index++;
 
 				// UE CQIs
 				this_UE_cqis = this_UE->GetCQIContainer();
 				for (std::vector<int>::iterator ittt = this_UE_cqis->begin(); ittt != this_UE_cqis->end(); ++ittt){
-					state.index_put_({0,index}, (*ittt));
+					state.index_put_({ue_index, index}, (*ittt));
 					index++;
 				}
 			}
@@ -479,24 +496,34 @@ h_log("debug303\n");
 			std::vector<int> *this_UE_cqis;
 			using namespace torch::indexing;
 			// Number of UEs
-			reset_state.index_put_({0,0}, noUEs); 
-			int index = 1;
+			//reset_state.index_put_({0,0}, noUEs); 
+			int index = 0;
+			int ue_index=-1;
+
 			for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
 				this_UE = (*it);
+				index = 0;
+				ue_index++;
 				// app QoS
-				for (std::vector<Application*>::iterator itt = this_UE->GetApplicationContainer()->begin(); itt != this_UE->GetApplicationContainer()->end(); ++itt){
-					this_app = (*itt);
-					reset_state.index_put_({0,index}, this_app->QoSgbr);
-					index++;
-					reset_state.index_put_({0,index}, this_app->QoSdelay);
-					index++;
-					reset_state.index_put_({0,index}, this_app->QoSplr);
-					index++;
+				// for (std::vector<Application*>::iterator itt = this_UE->GetApplicationContainer()->begin(); itt != this_UE->GetApplicationContainer()->end(); ++itt){
+					// this_app = (*itt);
+					// reset_state.index_put_({0,index}, this_app->QoSgbr);
+					// index++;
+					// reset_state.index_put_({0,index}, this_app->QoSdelay);
+					// index++;
+					// reset_state.index_put_({0,index}, this_app->QoSplr);
+					// index++;
+				// }
+
+				if(use_lstm)
+				{
+					reset_state.index_put_({ue_index, index}, 0);
+					index++;	
 				}
 				// UE CQIs
 				this_UE_cqis = this_UE->GetCQIContainer();
 				for (std::vector<int>::iterator ittt = this_UE_cqis->begin(); ittt != this_UE_cqis->end(); ++ittt){
-					reset_state.index_put_({0,index}, (*ittt));
+					reset_state.index_put_({ue_index, index}, (*ittt));
 					index++;
 				}
 			}

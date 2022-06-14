@@ -289,6 +289,8 @@ int main(int argc, char** argv) {
     if( (networkEnv->TTIcounter < TRAIN_TTI) && use_dqn)
     {
       torch::Tensor next_state  = networkEnv->CurrentState(false);
+      next_state = next_state.unsqueeze(0);
+      state = state.unsqueeze(0);
       // store experiece in replay memory
 
       start = std::chrono::steady_clock::now(); //training time logging
@@ -464,7 +466,7 @@ experience processSamples(std::vector<experience> _samples){
     rewards.push_back(std::get<3>(i));
   }
 
-  torch::Tensor states_tensor = torch::zeros(0);
+  torch::Tensor states_tensor = torch::zeros({2});
   torch::Tensor new_states_tensor = torch::zeros(0);
   torch::Tensor actions_tensor = torch::zeros({4});
   torch::Tensor rewards_tensor = torch::zeros(0);
