@@ -94,7 +94,7 @@ class Agent{
 			
 			end = std::chrono::steady_clock::now();
 			h_log("debug402\n");
-			//if(timeLog) printf("InferenceTime %0.7f ms/ Exploit! \n", (float)(clock()-infstart)/CLOCKS_PER_SEC * 1000);
+			//if(timeLog) printf("InferenceTime %0.7f ms/ Exploit! \n", (float)(clock()-infstart)/CLOCKS_PER_SEC);
 
 			//* by HH: FLS dummy code
 			// if(arg_action > 14641)

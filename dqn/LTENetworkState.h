@@ -13,10 +13,16 @@
 //by HH
 #include "../src/shared-memory.cpp"
 bool use_lstm=false;
+
 float sum_delay = 0;
 float sum_gbr = 0;
 float sum_plr = 0;
 float sum_fairness = 0;
+
+float before_delay = 0;
+float before_gbr = 0;
+float before_plr = 0;
+float before_fairness = 0;
 
 typedef std::pair<int, int> id_size_pair;
 
@@ -336,12 +342,14 @@ class LTENetworkState{
 				}
 			}
 
-			sum_gbr += gbr_sum/sum_counter;
-			sum_delay += delay_sum/sum_counter;
-			sum_plr += plr_sum/sum_counter;
+			if(print_qos)
+			{
+				sum_gbr += gbr_sum/sum_counter;
+				sum_delay += delay_sum/sum_counter;
+				sum_plr += plr_sum/sum_counter;
 
-			printf("gbr sum: %f\n", sum_gbr);
-			if(print_qos) printf("TTI:%f/ AVgbr/AVdelay/AVplr:%f %f %f\n", TTIcounter, gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter);
+				printf("TTI:%f/ AVgbr/AVdelay/AVplr:%f %f %f\n", TTIcounter, gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter);
+			}
 
 			return state;
 
@@ -558,14 +566,28 @@ h_log("debug303\n");
          	RealReward = torch::zeros(1);
 	      	for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
 	         	for (std::vector<Application*>::iterator itt = (*it)->GetApplicationContainer()->begin(); itt != (*it)->GetApplicationContainer()->end(); ++itt){
-					if ((*(*itt)).realgbr >= (*(*itt)).QoSgbr) {
-		               gbrReward = 1;
-		            }
-		            else {
-		               //gbrReward = 0;
-					   gbrReward = (*(*itt)).realgbr/(*(*itt)).QoSgbr;
-					   if(gbrReward<0) gbrReward=0;
-		            }   
+					if ((*(*itt)).realgbr >= before_gbr ) gbrReward = 1;
+					else if ((*(*itt)).realgbr == before_gbr ) gbrReward = 0;
+					else gbrReward = -1;
+					before_gbr = (*(*itt)).realgbr;
+
+					if ((*(*itt)).realplr <= before_plr ) plrReward = 1;
+					else if ((*(*itt)).realplr == before_plr ) plrReward = 0;
+					else plrReward = -1;
+					before_plr = (*(*itt)).realplr;
+
+					if ((*(*itt)).realdelay <= before_delay ) delayReward = 1;
+					else if ((*(*itt)).realdelay == before_delay ) delayReward = 0;
+					else delayReward = -1;
+					before_delay = (*(*itt)).realdelay;					
+					// if ((*(*itt)).realgbr >= (*(*itt)).QoSgbr) {
+		            //    gbrReward = 1;
+		            // }
+		            // else {
+		            //    //gbrReward = 0;
+					//    gbrReward = (*(*itt)).realgbr/(*(*itt)).QoSgbr;
+					//    if(gbrReward<0) gbrReward=0;
+		            // }   
 
 					// fairness
 					if ((*(*itt)).realgbr > 0) {
@@ -574,33 +596,33 @@ h_log("debug303\n");
 						fairness_connection += 1;
 					}
 
-		            // there has been a TX
-		            if((*(*itt)).appTXCount > 0){
-		            	if ((*(*itt)).realplr <= (*(*itt)).QoSplr) {
-		               		plrReward = 1;
-		            	} else {
-		               		//plrReward = 0;
-							plrReward = 1 - ((*(*itt)).realplr - (*(*itt)).QoSplr)/(*(*itt)).realplr;
-							if(plrReward<0) plrReward=0;
-		            	}  
-		            // there hasnt been a TX
-		            } else {
-		            	plrReward = 0;
-		            }
+		            // // there has been a TX
+		            // if((*(*itt)).appTXCount > 0){
+		            // 	if ((*(*itt)).realplr <= (*(*itt)).QoSplr) {
+		            //    		plrReward = 1;
+		            // 	} else {
+		            //    		//plrReward = 0;
+					// 		plrReward = 1 - ((*(*itt)).realplr - (*(*itt)).QoSplr)/(*(*itt)).realplr;
+					// 		if(plrReward<0) plrReward=0;
+		            // 	}  
+		            // // there hasnt been a TX
+		            // } else {
+		            // 	plrReward = 0;
+		            // }
 
- 					//if there has been a RX
-					if((*(*itt)).appRXCount > 0){
-			            if ((*(*itt)).realdelay <= (*(*itt)).QoSdelay) {
-			               delayReward = 1;
-			            } else {
-			               //delayReward = 0;
-						   delayReward = 1 - ((*(*itt)).realdelay - (*(*itt)).QoSdelay)/(*(*itt)).realdelay;
-						   if(delayReward<0) delayReward=0;
-			            }
-			        // there hasnt been an RX
-			        } else {
-			        	delayReward = 0;
-			        }					
+ 					// //if there has been a RX
+					// if((*(*itt)).appRXCount > 0){
+			        //     if ((*(*itt)).realdelay <= (*(*itt)).QoSdelay) {
+			        //        delayReward = 1;
+			        //     } else {
+			        //        //delayReward = 0;
+					// 	   delayReward = 1 - ((*(*itt)).realdelay - (*(*itt)).QoSdelay)/(*(*itt)).realdelay;
+					// 	   if(delayReward<0) delayReward=0;
+			        //     }
+			        // // there hasnt been an RX
+			        // } else {
+			        // 	delayReward = 0;
+			        // }					
 
 	            	(*(*itt)).reward = gbr_coef*gbrReward + plr_coef*plrReward + dly_coef*delayReward;
 					sum_reward += (*(*itt)).reward; 
@@ -618,11 +640,14 @@ h_log("debug303\n");
 			fairness_sum_goodput = pow(fairness_sum, 2);
 			fairness_avg = fairness_sum / fairness_connection;
 			fi = fairness_sum_goodput / (fairness_connection * fairness_sum_quad);
-
 			fairness = fi;
-
-			fairness_reward = fi * fairness_coef;
-			if(fairness_reward<0) fairness_reward=0;
+			
+			if (fi > before_fairness ) fairness_reward = 1;
+			else if (fi == before_fairness ) fairness_reward = 0;
+			else fairness_reward = -1;
+			
+			fairness_reward = fairness_coef * fairness_coef;
+			before_fairness = fi;
 
 			if(fi>0) sum_fairness += fi;
 
