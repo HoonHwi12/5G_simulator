@@ -566,19 +566,25 @@ h_log("debug303\n");
          	RealReward = torch::zeros(1);
 	      	for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
 	         	for (std::vector<Application*>::iterator itt = (*it)->GetApplicationContainer()->begin(); itt != (*it)->GetApplicationContainer()->end(); ++itt){
-					if ((*(*itt)).realgbr >= before_gbr ) gbrReward = 1;
-					else if ((*(*itt)).realgbr == before_gbr ) gbrReward = 0;
-					else gbrReward = -1;
+					if ((*(*itt)).realgbr > before_gbr ) gbrReward = 1;
+					else
+					{
+						gbrReward = -1 + (*(*itt)).realgbr/before_gbr;
+					}
 					before_gbr = (*(*itt)).realgbr;
 
-					if ((*(*itt)).realplr <= before_plr ) plrReward = 1;
-					else if ((*(*itt)).realplr == before_plr ) plrReward = 0;
-					else plrReward = -1;
+					if ((*(*itt)).realplr < before_plr ) plrReward = 1;
+					else
+					{
+						plrReward = -1 + ((before_plr) / (*(*itt)).realplr);
+					}
 					before_plr = (*(*itt)).realplr;
 
-					if ((*(*itt)).realdelay <= before_delay ) delayReward = 1;
-					else if ((*(*itt)).realdelay == before_delay ) delayReward = 0;
-					else delayReward = -1;
+					if ((*(*itt)).realdelay < before_delay ) delayReward = 1;
+					else
+					{
+						-1 + ((before_delay) / (*(*itt)).realdelay);
+					}
 					before_delay = (*(*itt)).realdelay;					
 					// if ((*(*itt)).realgbr >= (*(*itt)).QoSgbr) {
 		            //    gbrReward = 1;
@@ -643,10 +649,12 @@ h_log("debug303\n");
 			fairness = fi;
 			
 			if (fi > before_fairness ) fairness_reward = 1;
-			else if (fi == before_fairness ) fairness_reward = 0;
-			else fairness_reward = -1;
+			else
+			{
+				fairness_reward = -1 + (fi / (before_fairness));
+			}
 			
-			fairness_reward = fairness_coef * fairness_coef;
+			fairness_reward = fairness_reward * fairness_coef;
 			before_fairness = fi;
 
 			if(fi>0) sum_fairness += fi;
