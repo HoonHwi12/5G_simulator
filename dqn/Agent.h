@@ -82,7 +82,7 @@ class Agent{
 			torch::Tensor output = policy_net->state_forward(state);	
 
 			//std::cout <<"output_before:" << output<<std::endl;
-			output = output.reshape({4,11});		
+			//output = output.reshape({4,11});		
 			//std::cout <<"reshape output: " <<output<<std::endl;		
 			h_log("debug401\n");
 			torch::Tensor exploit_action = torch::zeros({2, 4});
