@@ -270,6 +270,8 @@ GNodeB::UserEquipmentRecord::UserEquipmentRecord (UserEquipment *UE)
   BandwidthManager *s = m_UE->GetPhy ()->GetBandwidthManager ();
 
   int nbRbs = (int) s->GetDlSubChannels ().size ();
+  printf("nbRBs: %d\n", nbRbs);
+
   m_cqiFeedback.clear ();
   for (int i = 0; i < nbRbs; i++ )
     {

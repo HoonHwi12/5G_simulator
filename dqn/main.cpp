@@ -41,9 +41,9 @@ void initWeights(torch::nn::Module& m);
 
 /* HyperParams*/
 int BATCH_SIZE              = 32;
-int TRAIN_TTI               = 20000; //20000;
-const int TEST_TTI          = 5000;
-const int MIN_REPLAY_MEM    = 1000;// 1000;
+int TRAIN_TTI               = 10000; //20000;
+const int TEST_TTI          = 2500;
+const int MIN_REPLAY_MEM    = 3000;// 1000;
 const int UPDATE_FREQUENCY  = 4;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
@@ -223,7 +223,7 @@ int main(int argc, char** argv) {
     h_log("entering while(1)\n");
   	torch::Tensor state = networkEnv->CurrentState(true);
   	networkEnv->TTI_increment();
-
+h_log("2222\n");
   	// selecting an action
     torch::Tensor action = torch::zeros({2,4});
     torch::Tensor action_input = torch::zeros(4);
@@ -419,8 +419,8 @@ int main(int argc, char** argv) {
   close(cqi_fd);
   delete networkEnv;
 
-  printf("Average GBR: %0.6f, Average delay: %0.6f, Average plr: %0.6f, Average fairness: %0.6f\n",
-    sum_gbr/networkEnv->TTIcounter, sum_delay/networkEnv->TTIcounter, sum_plr/networkEnv->TTIcounter, sum_fairness/networkEnv->TTIcounter);
+  printf("Average GBR: %0.6f, Average delay: %0.6f, Average plr: %0.6f, Average fairness: %0.6f, throughput: %0.6f, goodput: %0.6f\n",
+    sum_gbr/networkEnv->TTIcounter, sum_delay/networkEnv->TTIcounter, sum_plr/networkEnv->TTIcounter, sum_fairness/networkEnv->TTIcounter, sum_throughput/throughput_num, sum_goodput/goodput_num);
   printf("TEST END, Test Duration: %0.4f s\n", (float)(clock()-test_start) / CLOCKS_PER_SEC);
 
   return 0;
@@ -521,12 +521,17 @@ void OpenStateFifo(int *fd, int *noUEs){
 
 std::string FetchState(int *fd){
   // read state size
+  h_log("open state fifo\n");
   *fd = open(STATE_FIFO, O_RDONLY);
   std::string::size_type size;
+  h_log("read state fifo\n");
   read(*fd, &size, sizeof(size));
   // read state/update from LTEsim
   std::string message(size, ' ');
+  h_log("read state message\n");
   read(*fd, &message[0], size);
+
+  h_log("close state message\n");
   close(*fd);
   return message;
 }

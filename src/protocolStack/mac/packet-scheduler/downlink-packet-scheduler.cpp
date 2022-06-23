@@ -620,6 +620,9 @@ DownlinkPacketScheduler::RBsAllocation ()
                     }
                 }
             }
+//                   printf("allocation RB: %d, MaxUserperRB: %d, nbOfRBs:%d, flow size: %d, FlowIndex: %d, targetMetric: %f\n",
+                    //rb, m_maxUsersPerRB, nbOfRBs, flows->size(), l_iScheduledFlowIndex, targetMetric);
+
             if (targetMetric > 0)
             {
                 allocationsPerRB.at(rb)++;

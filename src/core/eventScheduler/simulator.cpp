@@ -526,7 +526,9 @@ Simulator::Run (void)
         printf("bigbuf: %s\n", bigbuf.c_str() );
         // send the update TTI
         SendState(&st_fd, buffer.str().c_str());
+        printf("state send\n");
         SendCQISummary(&cqi_fd);
+        printf("cqi send\n");
         //printf("Waiting for first packets..  LTESIM: Waiting for new Scheduler. \n");
         m_stop = true;
         tti_tr1 = tti_tr2;

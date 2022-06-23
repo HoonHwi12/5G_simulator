@@ -88,11 +88,12 @@ static void MultiCellWithInterferenceMixedApps (int nbCells, double radius,
 	printf("Test Start\n");
 	
 	// define simulation times
-	double duration = 46;
-	double flow_duration = 40;
+	double duration = 100;
+	double flow_duration = 100;
 
   	int cluster = 4;
-  	double bandwidth = 5;
+  	//double bandwidth = 3;
+	double bandwidth = 5;
 
   	// CREATE COMPONENT MANAGER
   	// main event handler

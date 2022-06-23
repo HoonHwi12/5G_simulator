@@ -19,6 +19,13 @@ float sum_gbr = 0;
 float sum_plr = 0;
 float sum_fairness = 0;
 
+float this_throughput = 0;
+float this_goodput = 0;
+float sum_throughput = 0;
+float sum_goodput = 0;
+int throughput_num = 0;
+int goodput_num = 0;
+
 float before_delay;
 float before_gbr;
 float before_plr;
@@ -388,6 +395,7 @@ class LTENetworkState{
 					s_line >> td_field;	
 					s_line >> td_num_field;
 					s_line >> empt_field;
+
 					h_log("debug301\n");
 
 					UESummary* this_UE = GetUESummary(dst_num_field);
@@ -397,7 +405,8 @@ class LTENetworkState{
 					this_app->appTXCount ++;
 					this_UE->TXCount++;
 					this_app->realplr = 1 - (this_app->appRXCount) / (this_app->appTXCount);
-h_log("debug302\n");
+
+					h_log("debug302\n");
 					//PLR satisfied
 					if (this_app->realplr < this_app->QoSplr) {
 						this_app->appSatPLRCount ++;
@@ -421,7 +430,7 @@ h_log("debug302\n");
 					s_line >> dst_field;
 					s_line >> dst_num_field;
 					s_line >> td_field;
-					s_line >> td_num_field;
+					s_line >> td_num_field;				
 					s_line >> empt_field;
 					h_log("debug307\n");
 					UESummary* this_UE = GetUESummary(dst_num_field);
@@ -471,9 +480,25 @@ h_log("debug303\n");
 					}
 					h_log("debug304\n");
 					this_app->appMessageSizes += size_num_field;
+
+					if(this_app->realdelay>0)
+					{
+						//this_throughput = start_num_field / this_app->realdelay; // byte
+						this_goodput = message_sizes_in_buffer / this_app->realdelay; // byte
+
+						//sum_throughput += this_throughput;
+						sum_goodput += this_goodput;
+
+						goodput_num++;
+						//throughput_num++;
+					}
+
 					h_log("debug309\n");
 					h_log("debug msizeinbuffer:%d / ttisize:%d\n", message_sizes_in_buffer, TTIbuffer->size());
-					if(TTIbuffer->size()>0) this_app->realgbr = (8*message_sizes_in_buffer) / (TTIbuffer->size());
+					if(TTIbuffer->size()>0)
+					{
+						this_app->realgbr = (8*message_sizes_in_buffer) / (TTIbuffer->size());
+					}
 					else this_app->realgbr = 0;
 					h_log("debug306\n");
 					//printf("realgbr(%f)/appMessageSizes(%f)/message_sizes_in_buffer(%d)/TTIbuffer->size(%d)\n",
@@ -598,13 +623,6 @@ h_log("debug303\n");
 					//    if(gbrReward<0) gbrReward=0;
 		            // }   
 
-					// fairness
-					if ((*(*itt)).realgbr > 0) {
-						fairness_sum += (*(*itt)).realgbr;
-						fairness_sum_quad += pow((*(*itt)).realgbr, 2);
-						fairness_connection += 1;
-					}
-
 		            // // there has been a TX
 		            // if((*(*itt)).appTXCount > 0){
 		            // 	if ((*(*itt)).realplr <= (*(*itt)).QoSplr) {
@@ -646,6 +664,14 @@ h_log("debug303\n");
 	         	}
 	      	}
 
+
+			// fairness
+			if (this_goodput > 0) {
+				fairness_sum += this_goodput;
+				fairness_sum_quad += pow(this_goodput, 2);
+				fairness_connection += 1;
+			}
+
 			fairness_sum_goodput = pow(fairness_sum, 2);
 			fairness_avg = fairness_sum / fairness_connection;
 			fi = fairness_sum_goodput / (fairness_connection * fairness_sum_quad);
@@ -667,7 +693,11 @@ h_log("debug303\n");
 			
 			Accum_Reward += sum_reward;
 			//printf("\tAt %d TTI, TTI Reward= %f, \tAccum_reward= %f, #UEs %d \n", (int)TTIcounter, sum_reward, Accum_Reward, noUEs);
-			printf("\tAt %d TTI, TTI Reward= %f, fairness= %f\n", (int)TTIcounter, sum_reward, fi);
+			printf("\tAt %d TTI, TTI Reward= %f, fairness= %f, throughput= %f, goodput= %f\n",
+				(int)TTIcounter, sum_reward, fi, this_throughput, this_goodput);
+
+			this_goodput = 0;
+			this_throughput = 0;
 			//printf("AVgbr/AVdelay/AVplr %f %f %f\n", sumgbr/num_counter,sumdelay/num_counter, sumplr/num_counter);
 		
 			RealReward.index_put_({0}, sum_reward);

@@ -127,7 +127,6 @@ ApplicationSink::Receive (Packet* p)
        << " SRC " << p->GetSourceID ()
        << " DST " << p->GetDestinationID ()
        << " D " << delay;
-
   if (GetSourceApplication ()->GetDestination ()->GetNodeType() == NetworkNode::TYPE_UE)
     {
       UserEquipment* ue = (UserEquipment*) GetSourceApplication ()->GetDestination ();
