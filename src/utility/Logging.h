@@ -22,7 +22,7 @@
 #ifndef LOGGING_H_
 #define LOGGING_H_
 
-
+//#define DEBUG
 #ifdef DEBUG
     #define DEBUG_LOG_START_1(X1)          if(getenv(#X1)!=nullptr) {
     #define DEBUG_LOG_START_2(X1,X2)       if(getenv(#X1)!=nullptr || getenv(#X2)!=nullptr) {

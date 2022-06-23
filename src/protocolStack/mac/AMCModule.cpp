@@ -308,6 +308,7 @@ AMCModule::GetCQIFromEfficiency (double Efficiency)
     {
       cqi++;
     }
+    //printf("cqi: %d, Efficiency: %ld\n", cqi, Efficiency);
   return cqi;
 }
 
@@ -339,6 +340,7 @@ AMCModule::GetCQIFromSinr (double sinr)
     {
       cqi++;
     }
+    //printf("cqi: %d, sinr: %f\n", cqi, sinr);
   return cqi;
 }
 

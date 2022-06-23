@@ -329,7 +329,7 @@ class LTENetworkState{
 					s_line >> dst_field;
 					s_line >> dst_num_field;
 					s_line >> td_field;	
-					s_line >> td_num_field;
+					s_line >> td_num_field;				
 					s_line >> empt_field;
 
 					UESummary* this_UE = GetUESummary(dst_num_field);
@@ -362,7 +362,7 @@ class LTENetworkState{
 					s_line >> dst_field;
 					s_line >> dst_num_field;
 					s_line >> td_field;
-					s_line >> td_num_field;
+					s_line >> td_num_field;				
 					s_line >> empt_field;
 
 					UESummary* this_UE = GetUESummary(dst_num_field);

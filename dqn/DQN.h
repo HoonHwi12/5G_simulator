@@ -25,12 +25,12 @@ struct DQNImpl : torch::nn::Module {
 	 	:conv1(torch::nn::Conv2dOptions(1, 32, 3).stride(1).padding(1)),
 		conv2(torch::nn::Conv2dOptions(32, 32, 3).stride(1).padding(1)),
 		conv3(torch::nn::Conv2dOptions(64, 64, 3).stride(1)),
-		linear1(torch::nn::Linear(40000, 512) ),
+		linear1(torch::nn::Linear(120000, 512) ),
 	 	linear2(torch::nn::Linear(512, ADA_ACTIONS) ),
 		state_conv1(torch::nn::Conv2dOptions(1, 32, 3).stride(1).padding(1)),
 		state_conv2(torch::nn::Conv2dOptions(32, 32, 3).stride(1).padding(1)),
 		state_conv3(torch::nn::Conv2dOptions(64, 64, 3).stride(1)),
-		state_linear1(torch::nn::Linear(40000, 512) ),
+		state_linear1(torch::nn::Linear(120000, 512) ),
 	 	state_linear2(torch::nn::Linear(512, ADA_ACTIONS) ) {
 	 		register_module("conv1", conv1);
 			register_module("conv2", conv2);

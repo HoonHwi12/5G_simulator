@@ -66,7 +66,7 @@ DQN_PacketScheduler::DoSchedule ()
   UpdateAverageTransmissionRate ();
   CheckForDLDropPackets ();
   SelectFlowsToSchedule();
-
+  //printf("flows size: %d\n", GetFlowsToSchedule()->size());
   if (GetFlowsToSchedule ()->size() == 0)
 	{}
   else

@@ -390,6 +390,7 @@ DEBUG_LOG_END
                 {
                   sinrForScheduledChannels = measuredSinr.at(l-1);
                 }
+
               int MCS = amc->GetMCSFromCQI(amc->GetCQIFromSinr( GetMiesmEffectiveSinr( sinrForScheduledChannels ) ) );
               int TBS = amc->GetTBSizeFromMCS(
                                 MCS,
@@ -761,6 +762,7 @@ if (m_assignedLayers.size()==0)
                   sinrForScheduledChannels = SinrForPreferredPmis.at(l-1);
                 }
               effSinrForPreferredPmis.at(l-1) = GetMiesmEffectiveSinr(sinrForScheduledChannels);
+
               int MCS = amc->GetMCSFromCQI(amc->GetCQIFromSinr(effSinrForPreferredPmis.at(l-1) ) );
               int TBS = amc->GetTBSizeFromMCS(
                                 MCS,
