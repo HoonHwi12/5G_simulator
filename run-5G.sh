@@ -1,8 +1,7 @@
 #!/bin/bash
-
 while :
 do
-./5G-air-simulator MultiCellWithIMixedApps  6 1 600 100 0 0 0 0 1 30 0.1 242 1
+./5G-air-simulator MultiCellWithIMixedApps 12 1 600 50 0 0 0 0 1 30 0.1 242 1
 sleep 10s
 	'
 echo "video60_242k"
