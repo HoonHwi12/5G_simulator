@@ -43,7 +43,7 @@ void initWeights(torch::nn::Module& m);
 int BATCH_SIZE              = 32;
 int TRAIN_TTI               = 10000; //20000;
 const int TEST_TTI          = 2500;
-const int MIN_REPLAY_MEM    = 3000;// 1000;
+const int MIN_REPLAY_MEM    = 100;// 1000;
 const int UPDATE_FREQUENCY  = 4;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
@@ -323,6 +323,7 @@ h_log("2222\n");
 
         h_log("get current q start\n");
         current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch)); // size: 32x4x11
+        current_q_values = torch::nan_to_num(current_q_values);
         h_log("get current q end\n");
         //current_q_values = current_q_values.reshape({-1,4,11}); // size: 32x4x11
         //current_q_values.print();
@@ -339,6 +340,7 @@ h_log("2222\n");
         torch::Tensor next_q_index = torch::zeros(0);
 
         next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).to(device);
+        next_q_values = torch::nan_to_num(next_q_values);
         //next_q_values = next_q_values.reshape({-1, 4,11}); // size: 32x4x11
 
         next_q_index = at::argmax(next_q_values,2);
@@ -358,8 +360,10 @@ h_log("2222\n");
         torch::Tensor batch_reward = std::get<3>(batch);
         batch_reward = batch_reward.unsqueeze(1);
         batch_reward = batch_reward.unsqueeze(2);
+        batch_reward = torch::nan_to_num(batch_reward);
 
         target_q_values = (next_q_values.multiply(GAMMA)) + batch_reward.to(device);
+        target_q_values = torch::nan_to_num(target_q_values);
 
         h_log("debug 07\n");
         //target_q_values = target_q_values.reshape({-1, NUM_OUTPUT});
