@@ -24,7 +24,7 @@ int SharedMemoryCreate(key_t KEY_NUM)
     int shmid;
     if((shmid = shmget((key_t)KEY_NUM, SHARED_SIZE, IPC_CREAT| IPC_EXCL | 0666)) == -1)
     {
-        printf("Redefinition of Shared-Key, reset key\n");
+        //printf("Redefinition of Shared-Key, reset key\n");
 
         // if fail to create shared memory 
         shmid = shmget((key_t)KEY_NUM, SHARED_SIZE, IPC_CREAT| 0666);
@@ -115,6 +115,6 @@ int SharedMemoryFree(int shmid)
         return FAIL;
     }
 
-    printf("Shared memory removed");
+    printf("Shared memory removed\n");
     return SUCCESS;
 }

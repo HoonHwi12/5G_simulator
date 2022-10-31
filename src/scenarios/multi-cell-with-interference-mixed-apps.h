@@ -825,7 +825,7 @@ static void MultiCellWithInterferenceMixedApps (int nbCells, double radius,
 
 	simulator->SetStop(duration);
 	// main loop.
-	simulator->Run ();
+	simulator->Run (seed);
 	//Delete created objects
 	cells->clear ();
 	delete cells;

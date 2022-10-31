@@ -1,32 +1,50 @@
 #!/bin/bash
-while :
+
+NUM_CELL=3
+
+CAL_VID=0
+CAL_CBR=0
+CAL_BE=0
+CAL_VOIP=0
+
+for SC_TYPE in 0 1 2 4 5 7;
 do
-./5G-air-simulator MultiCellWithIMixedApps 12 1 600 50 0 0 0 0 1 30 0.1 242 1
-sleep 10s
-	'
-echo "video60_242k"
-./5G-air-simulator SingleCellWithIMixedApps 5 1 0 60 0 0 0 1 1 30 0.1 242 1  > result/video60_242k.log
-sleep 10s
+	NUM_VID=0
+	NUM_CBR=0
+	NUM_BE=0
+	NUM_VOIP=0
+	
+	for NUM_CBR in 360 480 600;
+	do
+		CAL_VID=$(($NUM_VID / $NUM_CELL))
+		CAL_CBR=$(($NUM_CBR / $NUM_CELL))
+		CAL_BE=$(($NUM_BE / $NUM_CELL))
+		CAL_VOIP=$(($NUM_VOIP / $NUM_CELL))
+		
+		sleep 7
+		echo "./5G-air-simulator MultiCellWithIMixedApps $NUM_CELL 1 600 $CAL_VID $CAL_CBR $CAL_BE $CAL_VOIP 0 1 30 0.1 242 $SEED"
+		./5G-air-simulator MultiCellWithIMixedApps $NUM_CELL 1 600 $CAL_VID $CAL_CBR $CAL_BE $CAL_VOIP 0 1 30 0.1 242 $SEED
+		sleep 7
+	done
 
-echo "video30_cbr30_242k"
-./5G-air-simulator SingleCellWithIMixedApps 5 1 0 30 30 0 0 1 1 30 0.1 242 1 > result/video30_cbr30_242k.log
-sleep 10s
+	NUM_VID=0
+	NUM_CBR=0
+	NUM_BE=0
+	NUM_VOIP=0
 
-echo "video15_cbr15_be15_voip15_242k"
-./5G-air-simulator SingleCellWithIMixedApps 5 1 0 15 15 15 15 1 1 30 0.1 242 1 > result/video15_cbr15_be15_voip15_242k.log
-sleep 10s
+	for NUM_BE in  360 480 600;
+	do      
+		CAL_VID=$(($NUM_VID/$NUM_CELL))
+		CAL_CBR=$(($NUM_CBR/$NUM_CELL))
+		CAL_BE=$(($NUM_BE/$NUM_CELL))
+		CAL_VOIP=$(($NUM_VOIP/$NUM_CELL))
 
-echo "video400_242k"
-./5G-air-simulator SingleCellWithIMixedApps 5 1 0 400 0 0 0 1 1 30 0.1 242 1 > result/video400_242k.log
-sleep 10s
-
-echo "video200_cbr200_242k"
-./5G-air-simulator SingleCellWithIMixedApps 5 1 0 200 200 0 0 1 1 30 0.1 242 1 > result/video200_cbr200_242k.log
-sleep 10s
-
-echo "video100_cbr100_be100_voip100_242k"
-./5G-air-simulator SingleCellWithIMixedApps 5 1 0 100 100 100 100 1 1 30 0.1 242 1 > result/video100_cbr100_be100_voip100_242k.log
-'
+		sleep 7
+		echo "./5G-air-simulator MultiCellWithIMixedApps $NUM_CELL 1 600 $CAL_VID $CAL_CBR $CAL_BE $CAL_VOIP 0 1 30 0.1 242 $SEED"
+		./5G-air-simulator MultiCellWithIMixedApps $NUM_CELL 1 600 $CAL_VID $CAL_CBR $CAL_BE $CAL_VOIP 0 1 30 0.1 242 $SEED
+		sleep 7
+	done
+done
 
 echo "test end"
-done
+#done

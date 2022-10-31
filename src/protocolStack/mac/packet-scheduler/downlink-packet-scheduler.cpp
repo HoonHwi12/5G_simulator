@@ -448,12 +448,20 @@ DownlinkPacketScheduler::RBsAllocation ()
     for (auto f : *flows) {
         vector<double> sinrs;
         AMCModule* amc = f->GetUe()->GetMacEntity()->GetAmcModule();
+
+        //printf("UE#%d ", f->GetUe()->GetIDNetworkNode());
         for (int rb = 0; rb < nbOfRBs; rb++) {
             sinrs.push_back( amc->GetSinrFromCQI (f->GetCqiFeedbacks ().at (rb)) );
+
+            //*by HH: PRINT SINR
+            //printf("%d ",
+                //round(amc->GetSinrFromCQI (f->GetCqiFeedbacks ().at (rb))));
         }
+        //printf("\n");
         f->widebandSinr = GetMiesmEffectiveSinr(sinrs);
         //amc->GetSinrFromCQI (scheduledFlow->GetCqiFeedbacks ().at (rb))
     }
+
     
     if (_harq_active_) {
         // collect flows for possible HARQ retransmission

@@ -86,8 +86,8 @@ private:
 	void FormUESummaryMessage(GNodeB *gNB, std::string *target_string);
 
 	void ConnectCQIFifo(int *fd);
-	void SendCQISummary(int *fd);
-	void FormCQIMessage(GNodeB *gNB, std::string *target_string);
+	void SendCQISummary(int *fd, int seed, int TTI);
+	void FormCQIMessage(GNodeB *gNB, std::string *target_string, int seed, int TTI);
 
 	void NumberToString(double number, std::string *target);
 	void NumberToString(int number, std::string *target);
@@ -110,7 +110,8 @@ public:
 
   double Now (void);
 
-  void Run (void);
+  void Run (int seed);
+  void Run ();
   void Stop (void);
   void SetStop (double time);
 

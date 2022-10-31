@@ -135,10 +135,13 @@ void Simulator::ConnectStateFifo(int *fd){
   printf("LTESIM: Waiting for STATE_FIFO.\n");
   //*fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
   *fd = open(STATE_FIFO, O_WRONLY);
-  printf("LTESIM: Connected to STATE_FIFO, Sending #UEs\n");
+  printf("LTESIM: Connected to STATE_FIFO, Sending #UEs(%s)\n", noUEs_send);
    // get the total number of UEs;
    // send size of message
-  write(*fd, noUEs_send, strlen(noUEs_send));
+  if(write(*fd, noUEs_send, strlen(noUEs_send)) != strlen(noUEs_send))
+  {
+    printf("write failed\n");
+  }
   close(*fd);
   printf("LTESIM: Sent #UEs: \"%s\\n", noUEs_send);
 
@@ -262,54 +265,64 @@ void Simulator::SendUESummary(int *fd){
     FormUESummaryMessage(*it, &UEsummaries);
   }
   std::string::size_type size = UEsummaries.size();
-  printf("LTESIM: Size of UEsummaries: %d \n", (int)size);
+  //printf("LTESIM: Size of UEsummaries: %d \n", (int)size);
   //*fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
   *fd = open(STATE_FIFO, O_WRONLY);
   // send the cqi size
   write(*fd, &size, sizeof(size));
   // then the whole message
-  printf("uesum: %s\n", UEsummaries.c_str());
+  //printf("uesum: %s\n", UEsummaries.c_str());
   write(*fd, UEsummaries.c_str(), UEsummaries.size());
-  printf("LTESIM: Sent UEsummaries.\n");
+  //printf("LTESIM: Sent UEsummaries.\n");
+  unlockpt(*fd);
   close(*fd);
 }
 
-void  Simulator::SendCQISummary(int *fd){
+void  Simulator::SendCQISummary(int *fd, int seed, int TTI){
+  printf("LTESIM: sendcqiusmany \n");
   std::vector<GNodeB*> *gNBs = NetworkManager::Init()->GetGNodeBContainer ();
   // cqi string to send
   std::string CQIs;
+  printf("LTESIM: for loop cqiusmany \n");
   for (std::vector<GNodeB*>::iterator it = gNBs->begin(); it != gNBs->end(); ++it){
     // form cqi message of this eNB
-    FormCQIMessage(*it, &CQIs);
+    FormCQIMessage(*it, &CQIs, seed, TTI);
   }
 
   std::string::size_type size = CQIs.size();
-  //printf("LTESIM: Size of cqis: %d \n", (int)size);
+  printf("LTESIM: Size of cqis: %d \n", (int)size);
   printf("send cqi summary\n");
-  //*fd = open(CQI_FIFO, O_CREAT|O_WRONLY);
-  *fd = open(CQI_FIFO, O_WRONLY);
+  *fd = open(CQI_FIFO, O_CREAT|O_WRONLY);
+  //*fd = open(CQI_FIFO, O_WRONLY);
   // send the cqi size
   write(*fd, &size, sizeof(size));
   // then the whole message
   write(*fd, CQIs.c_str(), CQIs.size());
+
   // printf("LTESIM: Sent cqis.\n%s\n", CQIs.c_str());
-  //printf("LTESIM: Sent cqis.\n");
+  printf("LTESIM: Sent cqis.\n");
+  unlockpt(*fd);
   close(*fd);
   printf("send cqi summary end\n");
 }
 
 void Simulator::SendState(int *fd, std::string state){
   std::string::size_type size = state.size();
-  //printf("LTESIM: Size of state: %d \n", (int)size);
+  printf("LTESIM: Size of state: %d \n", (int)size);
   //*fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
   *fd = open(STATE_FIFO, O_WRONLY);
+  printf("LTESIM: open state.\n");
   // send the size of message
   write(*fd, &size, sizeof(size));
+  printf("LTESIM: write state.\n");
   //  then the whole message
   write(*fd, state.c_str(), state.size());
+
   // printf("LTESIM: Sent state.\n%s\n", state.c_str());
-  //printf("LTESIM: Sent state.\n");
+  unlockpt(*fd);
+  printf("LTESIM: Sent state.\n");
   close(*fd);
+  printf("LTESIM: close state.\n");
 }
 
 void Simulator::FormUESummaryMessage(GNodeB *eNB, std::string *target_string){
@@ -390,7 +403,8 @@ void Simulator::UpdateAllScheduler(Simulator::SchedulerType new_scheduler){
   }
 }
 
-void Simulator::FormCQIMessage(GNodeB *eNB, std::string *target_string){
+#include "../../protocolStack/mac/AMCModule.h"
+void Simulator::FormCQIMessage(GNodeB *eNB, std::string *target_string, int seed, int TTI){
     std::vector<GNodeB::UserEquipmentRecord*> *UserEquipmentRecords = eNB->GetUserEquipmentRecords();
     GNodeB::UserEquipmentRecord* UErecord;
     // cqi vector for each UE
@@ -399,23 +413,49 @@ void Simulator::FormCQIMessage(GNodeB *eNB, std::string *target_string){
     std::string cqiString;
     // temp string
     std::string temp;
+
+    //* by HH: LOG SINR
+    AMCModule* amc;
+    std::string file_name;
+
+    file_name = "result/seed" + std::to_string(seed) + "/SINR_TTI#" + std::to_string(TTI) + "_SEED#" + std::to_string(seed) + ".log";
+    std::ofstream output_file;
+    output_file.open(file_name, std::ios_base::out | std::ios_base::app);
+
     for (std::vector<GNodeB::UserEquipmentRecord*>::iterator it = UserEquipmentRecords->begin(); it != UserEquipmentRecords->end(); ++it){
       UErecord = (*it);
       cqi = UErecord->GetCQI();
+
+      amc = (*it)->GetUE()->GetMacEntity()->GetAmcModule();
+      //file_name = "result/seed" + std::to_string(seed) + "/SINR_UE#" + std::to_string((*it)->GetUE()->GetIDNetworkNode()) + "_SEED#" + std::to_string(seed) + ".log";
+      // std::ofstream output_file;
+      // output_file.open(file_name, std::ios_base::out | std::ios_base::app);
+
       for (size_t i = 0; i < cqi.size(); ++i){
-        NumberToString(cqi[i], &temp);
+        output_file << round(amc->GetSinrFromCQI(cqi[i])) << " ";
+
+        //NumberToString(cqi[i], &temp);
+        NumberToString(round(amc->GetSinrFromCQI(cqi[i])), &temp);
         cqiString += temp + " ";
       }
+      output_file << std::endl;
+
       *target_string += cqiString + "\n";
       cqiString = "";
-     
     }
+    output_file.close();
 }
-
 
 void
 Simulator::Run (void)
 {
+  printf("temp debug: no test!\n");
+}
+
+void
+Simulator::Run (int seed)
+{
+  test_reset:
   /*
    * This method start the whole simulation
    * The simulation will end when no events are into the
@@ -458,7 +498,7 @@ Simulator::Run (void)
 
 
   // DQN에서 LSTM 사용여부 확인
-  while(use_lstm != -1 && use_lstm != 0X89)
+  while(use_lstm != -1 && use_lstm != 0X89 &&use_lstm != 0X71)
   {     
     dqn_shmid = SharedMemoryInit(DQN_KEY);  
     if(dqn_shmid != -1)
@@ -479,7 +519,7 @@ Simulator::Run (void)
       printf("shared memory write failed\n");
     }
 
-    printf("waiting for LSTM\n");
+    //printf("waiting for LSTM\n");
     
     while(buffer_value != atoi(shared_buffer))
     {     
@@ -498,7 +538,12 @@ Simulator::Run (void)
     {
       printf("shared memory write failed\n");
     }  
-  } 
+  }
+  // else if(use_lstm==0x71)
+  // {
+  //   printf("PIPE BUG DETECTED! reset test\n");
+  //   goto test_reset;
+  // }  
 
 
   // tti trackers
@@ -513,6 +558,16 @@ Simulator::Run (void)
   std::string bigbuf; 
   m_stop = false;
   while (!m_calendar->IsEmpty () && !m_stop){
+
+    //*check pipe error
+    // SharedMemoryRead(dqn_shmid, dqn_buffer);
+    // use_lstm = atoi(dqn_buffer);
+    // if(use_lstm==0x71)
+    // {
+    //   printf("PIPE BUG DETECTED! reset test\n");
+    //   goto test_reset;
+    // }
+
     tti_tr1 = FrameManager::Init()->GetTTICounter();
     ProcessOneEvent ();
     tti_tr2 = FrameManager::Init()->GetTTICounter();
@@ -523,13 +578,16 @@ Simulator::Run (void)
       bigbuf = bigbuf + buffer.str();
       // if we are past empty TTIs
       if(!bigbuf.empty()){
-        printf("bigbuf: %s\n", bigbuf.c_str() );
+        //printf("bigbuf: %s\n", bigbuf.c_str() );
         // send the update TTI
+        printf("waiting for first packet, send state\n");
         SendState(&st_fd, buffer.str().c_str());
-        printf("state send\n");
-        SendCQISummary(&cqi_fd);
-        printf("cqi send\n");
-        //printf("Waiting for first packets..  LTESIM: Waiting for new Scheduler. \n");
+        //printf("state send\n");
+        printf("waiting for first packet, send cqi\n");
+
+        SendCQISummary(&cqi_fd, seed, tti_tr2);
+        //printf("cqi send\n");
+        printf("Waiting for first packets..  LTESIM: Waiting for new Scheduler. \n");
         m_stop = true;
         tti_tr1 = tti_tr2;
         buffer.str("");
@@ -570,6 +628,19 @@ Simulator::Run (void)
   m_stop = false;
 
   while (!m_calendar->IsEmpty () && !m_stop){
+
+    //*check pipe error
+    // if(SharedMemoryRead(dqn_shmid, dqn_buffer))
+    // {
+    //   printf("SH read failed\n");
+    // }
+    // use_lstm = atoi(dqn_buffer);
+    // if(use_lstm==0x71)
+    // {
+    //   printf("PIPE BUG DETECTED! reset test\n");
+    //   goto test_reset;
+    // }
+
     // fetch the new scheduler
     scheduler = FetchScheduler(&sh_fd);
     if(scheduler == Scheduler_TYPE_FINAL_PROPORTIONAL_FAIR)
@@ -589,11 +660,11 @@ Simulator::Run (void)
     // append onto big buffer
     bigbuf = bigbuf + buffer.str();
     // send the last TTI
-    printf("send state\n");
+    //printf("send state\n");
     SendState(&st_fd, buffer.str().c_str());
-    printf("send cqi\n");
-    SendCQISummary(&cqi_fd);
-    printf("send cqi end\n");
+    //printf("send cqi\n");
+    SendCQISummary(&cqi_fd, seed, tti_tr2);
+    //printf("send cqi end\n");
 
     if(use_lstm == 0x89)
     {
@@ -602,7 +673,7 @@ Simulator::Run (void)
       lstm_packet_size[packet_index] = tti_packet_size;
       if(packet_index == 9 && tti_tr2<19999)
       {
-        printf("waiting for LSTM\n");
+        //printf("waiting for LSTM\n");
         for(int index=0; index < 10; index++)
         {
           //send signal to LSTM

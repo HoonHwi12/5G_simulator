@@ -270,7 +270,6 @@ GNodeB::UserEquipmentRecord::UserEquipmentRecord (UserEquipment *UE)
   BandwidthManager *s = m_UE->GetPhy ()->GetBandwidthManager ();
 
   int nbRbs = (int) s->GetDlSubChannels ().size ();
-  printf("nbRBs: %d\n", nbRbs);
 
   m_cqiFeedback.clear ();
   for (int i = 0; i < nbRbs; i++ )
@@ -467,7 +466,6 @@ GNodeB::SetDLScheduler (Simulator::SchedulerType type)
     	mac->SetDownlinkPacketScheduler (scheduler);      
       break;      
     case Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR:
-      printf("SET SCHEDULER TO PF\n");
       scheduler = new  DL_PF_PacketScheduler ();
       scheduler->SetMacEntity (mac);
       mac->SetDownlinkPacketScheduler (scheduler);

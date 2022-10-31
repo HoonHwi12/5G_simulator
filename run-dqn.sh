@@ -1,202 +1,65 @@
 #!/bin/bash
 
-#dqn
-echo "video60_242k"
-./main > test_results/output/dqn_video60_242k.log
-sleep 5s
+#600 UE
 
-echo "video30_cbr30_242k"
-./main > test_results/output/dqn_video30_cbr30_242k.log
-sleep 5s
+for SC_TYPE in 7;
+do
+	NUM_CELL=3
+	NUM_VID=0
+	NUM_CBR=0
+	NUM_BE=0
+	NUM_VOIP=0
+'
+	for NUM_VID in 120;
+	do
+		sleep 5
+		echo "./main ${SC_TYPE} > test_results/output/SCHED${SC_TYPE}_CELL${NUM_CELL}_VID${NUM_VID}_CBR${NUM_CBR}_BE${NUM_BE}_VOIP${NUM_VOIP}.log"
+		./main ${SC_TYPE} > test_results/output/SCHED${SC_TYPE}_CELL${NUM_CELL}_VID${NUM_VID}_CBR${NUM_CBR}_BE${NUM_BE}_VOIP${NUM_VOIP}.log
+		sleep 5
+	done
+'
+	NUM_VID=0
+	for NUM_VOIP in 360 600;
+        do
+                sleep 5
+                echo "./main ${SC_TYPE} > test_results/output/SCHED${SC_TYPE}_CELL${NUM_CELL}_VID${NUM_VID}_CBR${NUM_CBR}_BE${NUM_BE}_VOIP${NUM_VOIP}.log"
+                ./main ${SC_TYPE} > test_results/output/SCHED${SC_TYPE}_CELL${NUM_CELL}_VID${NUM_VID}_CBR${NUM_CBR}_BE${NUM_BE}_VOIP${NUM_VOIP}.log
+                sleep 5
+        done
 
-echo "video15_cbr15_be15_voip15_242k"
-./main > test_results/output/dqn_video15_cbr15_be15_voip15_242k.log
-sleep 5s
-
-echo "video400_242k"
-./main > test_results/output/dqn_video400_242k.log
-sleep 5s
-
-echo "video200_cbr200_242k"
-./main > test_results/output/dqn_video200_cbr200_242k.log
-sleep 5s
-
-echo "video100_cbr100_be100_voip100_242k"
-./main > test_results/output/dqn_video100_cbr100_be100_voip100_242k.log
-
-
-#pf
-echo "video60_242k"
-./main 0 > test_results/output/pf_video60_242k.log
-sleep 5s
-
-echo "video30_cbr30_242k"
-./main 0 > test_results/output/pf_video30_cbr30_242k.log
-sleep 5s
-
-echo "video15_cbr15_be15_voip15_242k"
-./main 0 > test_results/output/pf_video15_cbr15_be15_voip15_242k.log
-sleep 5s
-
-echo "video400_242k"
-./main 0 > test_results/output/pf_video400_242k.log
-sleep 5s
-
-echo "video200_cbr200_242k"
-./main 0 > test_results/output/pf_video200_cbr200_242k.log
-sleep 5s
-
-echo "video100_cbr100_be100_voip100_242k"
-./main 0 > test_results/output/pf_video100_cbr100_be100_voip100_242k.log
+done
 
 
-#mlwdf
-echo "video60_242k"
-./main 1 > test_results/output/mlwdf_video60_242k.log
-sleep 5s
-
-echo "video30_cbr30_242k"
-./main 1 > test_results/output/mlwdf_video30_cbr30_242k.log
-sleep 5s
-
-echo "video15_cbr15_be15_voip15_242k"
-./main 1 > test_results/output/mlwdf_video15_cbr15_be15_voip15_242k.log
-sleep 5s
-
-echo "video400_242k"
-./main 1 > test_results/output/mlwdf_video400_242k.log
-sleep 5s
-
-echo "video200_cbr200_242k"
-./main 1 > test_results/output/mlwdf_video200_cbr200_242k.log
-sleep 5s
-
-echo "video100_cbr100_be100_voip100_242k"
-./main 1 > test_results/output/mlwdf_video100_cbr100_be100_voip100_242k.log
-
-
-#exp
-echo "video60_242k"
-./main 2 > test_results/output/exp_video60_242k.log
-sleep 5s
-
-echo "video30_cbr30_242k"
-./main 2 > test_results/output/exp_video30_cbr30_242k.log
-sleep 5s
-
-echo "video15_cbr15_be15_voip15_242k"
-./main 2 > test_results/output/exp_video15_cbr15_be15_voip15_242k.log
-sleep 5s
-
-echo "video400_242k"
-./main 2 > test_results/output/exp_video400_242k.log
-sleep 5s
-
-echo "video200_cbr200_242k"
-./main 2 > test_results/output/exp_video200_cbr200_242k.log
-sleep 5s
-
-echo "video100_cbr100_be100_voip100_242k"
-./main 2 > test_results/output/exp_video100_cbr100_be100_voip100_242k.log
-
-
-#fls
-echo "video60_242k"
-./main 3 > test_results/output/fls_video60_242k.log
-sleep 5s
-
-echo "video30_cbr30_242k"
-./main 3 > test_results/output/fls_video30_cbr30_242k.log
-sleep 5s
-
-echo "video15_cbr15_be15_voip15_242k"
-./main 3 > test_results/output/fls_video15_cbr15_be15_voip15_242k.log
-sleep 5s
-
-echo "video400_242k"
-./main 3 > test_results/output/fls_video400_242k.log
-sleep 5s
-
-echo "video200_cbr200_242k"
-./main 3 > test_results/output/fls_video200_cbr200_242k.log
-sleep 5s
-
-echo "video100_cbr100_be100_voip100_242k"
-./main 3 > test_results/output/fls_video100_cbr100_be100_voip100_242k.log
-
-
-#exp-rule
-echo "video60_242k"
-./main 4 > test_results/output/exp-rule_video60_242k.log
-sleep 5s
-
-echo "video30_cbr30_242k"
-./main 4 > test_results/output/exp-rule_video30_cbr30_242k.log
-sleep 5s
-
-echo "video15_cbr15_be15_voip15_242k"
-./main 4 > test_results/output/exp-rule_video15_cbr15_be15_voip15_242k.log
-sleep 5s
-
-echo "video400_242k"
-./main 4 > test_results/output/exp-rule_video400_242k.log
-sleep 5s
-
-echo "video200_cbr200_242k"
-./main 4 > test_results/output/exp-rule_video200_cbr200_242k.log
-sleep 5s
-
-echo "video100_cbr100_be100_voip100_242k"
-./main 4 > test_results/output/exp-rule_video100_cbr100_be100_voip100_242k.log
-
-
-#log
-echo "video60_242k"
-./main 5 > test_results/output/log_video60_242k.log
-sleep 5s
-
-echo "video30_cbr30_242k"
-./main 5 > test_results/output/log_video30_cbr30_242k.log
-sleep 5s
-
-echo "video15_cbr15_be15_voip15_242k"
-./main 5 > test_results/output/log_video15_cbr15_be15_voip15_242k.log
-sleep 5s
-
-echo "video400_242k"
-./main 5 > test_results/output/log_video400_242k.log
-sleep 5s
-
-echo "video200_cbr200_242k"
-./main 5 > test_results/output/log_video200_cbr200_242k.log
-sleep 5s
-
-echo "video100_cbr100_be100_voip100_242k"
-./main 5 > test_results/output/log_video100_cbr100_be100_voip100_242k.log
-
-
-# MAX_THROUGHPUT
-echo "video60_242k"
-./main 6 > test_results/output/max_throuput_video60_242k.log
-sleep 5s
-
-echo "video30_cbr30_242k"
-./main 6 > test_results/output/max_throuput_video30_cbr30_242k.log
-sleep 5s
-
-echo "video15_cbr15_be15_voip15_242k"
-./main 6 > test_results/output/max_throuput_video15_cbr15_be15_voip15_242k.log
-sleep 5s
-
-echo "video400_242k"
-./main 6 > test_results/output/max_throuput_video400_242k.log
-sleep 5s
-
-echo "video200_cbr200_242k"
-./main 6 > test_results/output/max_throuput_video200_cbr200_242k.log
-sleep 5s
-
-echo "video100_cbr100_be100_voip100_242k"
-./main 6 > test_results/output/max_throuput_video100_cbr100_be100_voip100_242k.log
-
+'
+for IS_VID in 1;
+do
+	for IS_CBR in {0..1}
+	do
+		for IS_BE in {0..1}
+		do
+			for IS_VOIP in {0..1}
+			do
+				for NUM_CELL in 5;
+				do
+					for SC_TYPE in 1 2 3 4 5;
+					do
+						TOT_APP=$(($IS_VID + $IS_CBR + $IS_BE + $IS_VOIP))
+						if [ ${TOT_APP} -ne 0 ];then
+							NUM_APP=$((600 / $NUM_CELL / $TOT_APP))
+							
+							NUM_VID=$(($NUM_APP * $IS_VID))
+							NUM_CBR=$(($NUM_APP * $IS_CBR))
+							NUM_BE=$(($NUM_APP * $IS_BE))
+							NUM_VOIP=$(($NUM_APP * $IS_VOIP))
+							echo "./main ${SC_TYPE} > test_results/output/600UE_CELL${NUM_CELL}_VID${NUM_VID}_CBR${NUM_CBR}_BE${NUM_BE}_VOIP${NUM_VOIP}.log"
+							./main ${SC_TYPE} > test_results/output/SCHED${SC_TYPE}_600UE_CELL${NUM_CELL}_VID${NUM_VID}_CBR${NUM_CBR}_BE${NUM_BE}_VOIP${NUM_VOIP}.log
+							sleep 3
+						fi
+					done
+				done
+			done
+		done
+	done
+done
+'
 echo "test end"

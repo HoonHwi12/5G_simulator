@@ -14,6 +14,7 @@ TORCH_MODULE(DQN); // shared ownership
 // others
 #include <iostream>
 #include <cstdlib>
+#include <pthread.h>
 
 #include "../src/shared-memory.h"
 
@@ -43,7 +44,7 @@ void initWeights(torch::nn::Module& m);
 int BATCH_SIZE              = 32;
 int TRAIN_TTI               = 10000; //20000;
 const int TEST_TTI          = 2500;
-const int MIN_REPLAY_MEM    = 100;// 1000;
+const int MIN_REPLAY_MEM    = 3000;// 1000;
 const int UPDATE_FREQUENCY  = 4;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
@@ -67,18 +68,46 @@ int ADA_ACTIONS       = 11;
 int ADA_ACTION        = 44;
 int NUM_OUTPUT        = 4;
 
+//* HH: for dqn network size
+int NUMUE             = 0;
+
 // training times
 std::chrono::steady_clock::time_point start;
 std::chrono::steady_clock::time_point end;
 std::chrono::nanoseconds duration;
 
+// clock_t function_clock = clock();
+// void *thread_function_clock(void* a)
+// {
+//   clock_t thread_clock = clock();
+//   while(1)
+//   {
+//     if( (thread_clock > function_clock)
+//         && (float)(thread_clock - function_clock)/CLOCKS_PER_SEC >60 )
+//     {
+//       printf("timeout (%f) (%f)\n", thread_clock/CLOCKS_PER_SEC, function_clock/CLOCKS_PER_SEC);
+//       sleep(10000);
+//       break;
+//     }
+//     else
+//     {
+//       printf("not timeout (%f) (%f)\n", thread_clock/CLOCKS_PER_SEC, function_clock/CLOCKS_PER_SEC);
+//       thread_clock = clock();
+//       sleep(1);
+//     }
+//   }
+// }
+
 int main(int argc, char** argv) {
+  //main_start:
+  //pipe_bug = false;
+  
 	int constant_scheduler = 0;
   bool use_dqn = false;
   bool model_saved = false;
 
-  printf("batch(%d)/minReplay(%d)/EPS(%0.2f~%0.2f/%0.4f)/Update(%d)\n",
-    BATCH_SIZE, MIN_REPLAY_MEM, EPS_START, EPS_END, EPS_DECAY, NET_UPDATE);
+  //printf("batch(%d)/minReplay(%d)/EPS(%0.2f~%0.2f/%0.4f)/Update(%d)\n",
+//    BATCH_SIZE, MIN_REPLAY_MEM, EPS_START, EPS_END, EPS_DECAY, NET_UPDATE);
   // file naming
   std::string scheduler_string = "dqn";
   std::string model_number = "0";
@@ -86,6 +115,11 @@ int main(int argc, char** argv) {
 
   // by HH test time
   clock_t test_start = clock();
+  // pthread_t thread_id1;
+  // if(pthread_create(&thread_id1, NULL, thread_function_clock, NULL) != 0)
+  // {
+  //   printf("thread create error!\n");
+  // }
   
 	if(argc >= 2 )
   {
@@ -136,19 +170,37 @@ int main(int argc, char** argv) {
   }
 
 
-  std::cout << "PYTORCH version " << TORCH_VERSION << std::endl;
+  //std::cout << "PYTORCH version " << TORCH_VERSION << std::endl;
 
 	// Decide CPU or GPU
 	torch::Device device = torch::kCPU;
-	std::cout << "CUDA DEVICE COUNT: " << torch::cuda::device_count() << std::endl;
+	//std::cout << "CUDA DEVICE COUNT: " << torch::cuda::device_count() << std::endl;
 	if (torch::cuda::is_available()) {
-    	std::cout << "CUDA available - working on GPU." << std::endl;
+    	//std::cout << "CUDA available - working on GPU." << std::endl;
     	device = torch::kCUDA;
   }
   // pipe 
   int sh_fd, st_fd, cqi_fd;
   // initial connections
   LTENetworkState* networkEnv = initConnections(&sh_fd, &st_fd, &cqi_fd);
+
+  // if(pipe_bug == true)
+  // {
+  //   remove(STATE_FIFO);
+  //   remove(CQI_FIFO);
+  //   remove(SCHED_FIFO);
+
+  //   // LTE-SIM에 PIPE BUG 발생 알림
+  //   sprintf(dqn_buffer,"%d", 0x71);
+  //   printf("pipe bug detected %s\n", dqn_buffer);
+
+  //   if( SharedMemoryWrite(dqn_shmid, dqn_buffer) == -1)
+  //   {
+  //     printf("shared memory write failed\n");
+  //   }
+
+  //   goto main_start;
+  // }
   int noUEs = networkEnv->noUEs;
 
   // simulation output traces
@@ -288,7 +340,7 @@ h_log("2222\n");
     torch::Tensor reward = networkEnv->CalculateReward(); 
     reward_copy = reward[0].item<float>();
 
-    if( (networkEnv->TTIcounter > TRAIN_TTI) && use_dqn) printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC, valid_TTI_exploit, valid_TTI_explore);
+    //if( (networkEnv->TTIcounter > TRAIN_TTI) && use_dqn) printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC, valid_TTI_exploit, valid_TTI_explore);
     if( (networkEnv->TTIcounter < TRAIN_TTI) && use_dqn)
     {
       torch::Tensor next_state  = networkEnv->CurrentState(false);
@@ -372,7 +424,7 @@ h_log("2222\n");
         h_log("debug 0605\n");
         // loss and backprop
         torch::Tensor loss = (torch::mse_loss(current_q_values[0][0].to(device), target_q_values[0][0].to(device))).to(device);
-        printf("loss %f\n", loss.item<float>());
+        //printf("loss %f\n", loss.item<float>());
 
         loss.set_requires_grad(true);
         h_log("debug 0608\n");
@@ -398,7 +450,7 @@ h_log("2222\n");
       // checks the valid-TTI's explore/exploitation count
       if (action[1][0].item<int>() == 0) valid_TTI_exploit++;
       else if(action[1][0].item<int>() > 0) valid_TTI_explore++;
-      printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC, valid_TTI_exploit, valid_TTI_explore);
+      //printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC, valid_TTI_exploit, valid_TTI_explore);
 
     } // training loop
     
@@ -495,16 +547,18 @@ experience processSamples(std::vector<experience> _samples){
 void ConnectSchedulerFifo(int *fd){
   // connect to scheduler fifo
   *fd = open(SCHED_FIFO, O_WRONLY);
+  unlockpt(*fd);
   close(*fd);
 }
 
 void OpenCQIFifo(int *fd){
   // create the cqi fifo
-  printf("mk cqi fifo\n");
+  //printf("mk cqi fifo\n");
   mkfifo(CQI_FIFO, S_IFIFO|0777);
   // block for LTESim to connect
   *fd = open(CQI_FIFO, O_RDONLY);
-  printf("close cqi fifo\n");
+  //printf("close cqi fifo\n");
+  unlockpt(*fd);
   close(*fd);
 }
 
@@ -519,6 +573,7 @@ void OpenStateFifo(int *fd, int *noUEs){
   
   // read the number of UEs
   input_bytes = read(*fd, noUEs_in, sizeof(noUEs_in));
+  unlockpt(*fd);
   close(*fd);
   *noUEs = atoi(noUEs_in);
 }
@@ -536,6 +591,7 @@ std::string FetchState(int *fd){
   read(*fd, &message[0], size);
 
   h_log("close state message\n");
+  unlockpt(*fd);
   close(*fd);
   return message;
 }
@@ -552,6 +608,7 @@ std::string FetchCQIs(int *fd){
   read(*fd, &message[0], size);
   close(*fd);
   h_log("close fetch cqi fifo\n");
+
   return message;
 }
 
@@ -614,6 +671,7 @@ LTENetworkState* initConnections(int* _sh_fd, int* _st_fd, int* _cqi_fd){
   
   // initialise the network state environment
   LTENetworkState *networkEnv = new LTENetworkState(_noUEs, CQI_SIZE);
+  NUMUE = networkEnv->noUEs;
   // initialise UE and Application from LTE-sim
   h_log("fetch init ues\n");
   FetchInitUEs(_st_fd, networkEnv);

@@ -13,13 +13,13 @@
 //by HH
 #include "../src/shared-memory.cpp"
 bool use_lstm=false;
+bool pipe_bug;
 
 float sum_delay = 0;
 float sum_gbr = 0;
 float sum_plr = 0;
 float sum_fairness = 0;
 
-float this_throughput = 0;
 float this_goodput = 0;
 float sum_throughput = 0;
 float sum_goodput = 0;
@@ -69,6 +69,7 @@ struct Application
 	float realgbr;
 	float realdelay;
 	float realplr;
+	float realgoodput;
 
 	float reward;
 	float fairness;
@@ -153,7 +154,7 @@ struct UESummary
 		Application* summary;
 		h_log("application size: %d\n", applications->empty());
 		for (std::vector<Application*>::iterator it = applications->begin(); it != applications->end(); ++it){
-			h_log("debug401\n");
+			h_log("debug411\n");
 			known_id = (*it)->id;
 			if(known_id == test_id){
 				summary = *it;
@@ -355,7 +356,8 @@ class LTENetworkState{
 				sum_delay += delay_sum/sum_counter;
 				sum_plr += plr_sum/sum_counter;
 
-				printf("TTI:%f/ AVgbr/AVdelay/AVplr:%f %f %f\n", TTIcounter, gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter);
+				//printf("TTI:%f/ AVgbr/AVdelay/AVplr:%f %f %f\n", TTIcounter, gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter);
+				printf("%f %f %f\n", gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter);
 			}
 
 			return state;
@@ -483,14 +485,10 @@ h_log("debug303\n");
 
 					if(this_app->realdelay>0)
 					{
-						//this_throughput = start_num_field / this_app->realdelay; // byte
-						this_goodput = message_sizes_in_buffer / this_app->realdelay; // byte
-
-						//sum_throughput += this_throughput;
-						sum_goodput += this_goodput;
+						this_app->realgoodput = message_sizes_in_buffer / this_app->realdelay; // byte
+						sum_goodput += this_app->realgoodput;
 
 						goodput_num++;
-						//throughput_num++;
 					}
 
 					h_log("debug309\n");
@@ -661,23 +659,34 @@ h_log("debug303\n");
 					//if((int)TTIcounter%1000==0) printf("counter(%d) id(%d) gbr/plr/delay %f %f %f\n",
 					//	num_counter, (*(*itt)).id, gbr_coef*gbrReward, plr_coef*plrReward, dly_coef*delayReward);
 					//num_counter++;
-	         	}
-	      	}
 
+					// fairness
+					if ((*(*itt)).realgoodput > 0)
+					{
+						fairness_connection++;
+						fairness_sum += (*(*itt)).realgoodput;
+						fairness_sum_quad += pow((*(*itt)).realgoodput, 2);
+					}
+				}
+			}
+			
+			fairness_avg = fairness_sum / fairness_connection;
+			fairness_sum_goodput = pow(fairness_sum, 2);
 
-			// fairness
-			if (this_goodput > 0) {
-				fairness_sum += this_goodput;
-				fairness_sum_quad += pow(this_goodput, 2);
-				fairness_connection += 1;
+			if(fairness_connection != 0)
+			{
+				fi = fairness_sum_goodput / (fairness_connection * fairness_sum_quad);
+				//printf("fi: %f, fairness_sum_goodput: %f, fairness_connection: %d, fairness_sum_quad: %f\n",
+				//	fi, fairness_sum_goodput, fairness_connection, fairness_sum_quad);
+			}
+			else
+			{
+				fi = 1;
 			}
 
-			fairness_sum_goodput = pow(fairness_sum, 2);
-			fairness_avg = fairness_sum / fairness_connection;
-			fi = fairness_sum_goodput / (fairness_connection * fairness_sum_quad);
 			fairness = fi;
 			
-			if (fi > before_fairness ) fairness_reward = 1;
+			if (fi >= before_fairness ) fairness_reward = 1;
 			else
 			{
 				fairness_reward = -1 + (fi / (before_fairness));
@@ -693,11 +702,10 @@ h_log("debug303\n");
 			
 			Accum_Reward += sum_reward;
 			//printf("\tAt %d TTI, TTI Reward= %f, \tAccum_reward= %f, #UEs %d \n", (int)TTIcounter, sum_reward, Accum_Reward, noUEs);
-			printf("\tAt %d TTI, TTI Reward= %f, fairness= %f, throughput= %f, goodput= %f\n",
-				(int)TTIcounter, sum_reward, fi, this_throughput, this_goodput);
+			//printf("\tAt %d TTI, TTI Reward= %f, fairness= %f, goodput= %f bytes/sec\n",
+				//(int)TTIcounter, sum_reward, fi, this_goodput);
 
 			this_goodput = 0;
-			this_throughput = 0;
 			//printf("AVgbr/AVdelay/AVplr %f %f %f\n", sumgbr/num_counter,sumdelay/num_counter, sumplr/num_counter);
 		
 			RealReward.index_put_({0}, sum_reward);
@@ -729,18 +737,23 @@ h_log("debug303\n");
 		}
 
 		void print_summary(){
+			//uint32_t bug_check = 0;
 			for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
-				printf("UE id#%d\n", (*it)->GetID() );
+				//bug_check++;
+				//printf("UE id#%d\n", (*it)->GetID() );
 				for (std::vector<Application*>::iterator itt = (*it)->GetApplicationContainer()->begin(); itt != (*it)->GetApplicationContainer()->end(); ++itt){
-					printf("appID: %d appGBR: %f appDelay: %f appPLR: %f appPOWER: %f cqi:\n", (int)(*(*itt)).id,  (*(*itt)).QoSgbr, (*(*itt)).QoSdelay, (*(*itt)).QoSplr, (*(*itt)).QoSpower);
+					//printf("appID: %d appGBR: %f appDelay: %f appPLR: %f appPOWER: %f cqi:\n", (int)(*(*itt)).id,  (*(*itt)).QoSgbr, (*(*itt)).QoSdelay, (*(*itt)).QoSplr, (*(*itt)).QoSpower);
 				}
 				std::vector<int> *thisCQIs = (*it)->GetCQIContainer();		
-				printf("[");
 				for (int i = 0; i < thisCQIs->size(); i++){
 					printf(" %d ", thisCQIs->at(i));
 				}
-				printf("]\n");
 			}
+
+			// if(bug_check == 0)
+			// {
+			// 	pipe_bug = true;
+			// }
 		}
 
 		void TTI_increment(){
@@ -771,7 +784,7 @@ h_log("debug303\n");
 				file_name = "test_results/" + sched + "_" + std::to_string(noUEs) + "_train_satis.txt";
 			}
   			
-			printf("Satisfy Log\n");
+			//printf("Satisfy Log\n");
   			std::ofstream output_file(file_name);
 			output_file << "App_id, SatPLRCount, SatDelayCount, SatGBRCount" << std::endl;
 
@@ -783,7 +796,7 @@ h_log("debug303\n");
 					output_file << this_app->id << ", " << this_app->appSatPLRCount
 								<< ", " << this_app->appSatDelayCount
 								<< ", " << this_app->appSatGBRCount << std::endl;
-					printf("ID %d SatisPLR %f, SatisDelay %f, SatisGBR %f\n", this_app->id, this_app->appSatPLRCount, this_app->appSatDelayCount, this_app->appSatGBRCount);
+					//printf("ID %d SatisPLR %f, SatisDelay %f, SatisGBR %f\n", this_app->id, this_app->appSatPLRCount, this_app->appSatDelayCount, this_app->appSatGBRCount);
 				}
 			} 
 			output_file.close();

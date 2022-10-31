@@ -14,7 +14,7 @@ class EpsilonGreedy{
 			start = start_;
 			end   = end_;
 			decay = decay_;
-			std::cout << "EpsGreedy Ready ~" << std::endl;
+			//std::cout << "EpsGreedy Ready ~" << std::endl;
 		}
 
 		float explorationRate(int current_step){
