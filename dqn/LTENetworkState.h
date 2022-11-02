@@ -18,7 +18,6 @@ bool pipe_bug;
 float sum_delay = 0;
 float sum_gbr = 0;
 float sum_plr = 0;
-float sum_fairness = 0;
 
 float this_goodput = 0;
 float sum_throughput = 0;
@@ -26,10 +25,16 @@ float sum_goodput = 0;
 int throughput_num = 0;
 int goodput_num = 0;
 
-float before_delay;
-float before_gbr;
-float before_plr;
-float before_fairness;
+float before_delay=0;
+float before_gbr=0;
+float before_plr=0;
+float before_fairness=0;
+
+int fairness_counter = 0;
+float fairness_sum=0;
+float fairness_sum_square=0;
+float fairness_total_square=0;
+float jfi=0;
 
 typedef std::pair<int, int> id_size_pair;
 
@@ -357,7 +362,7 @@ class LTENetworkState{
 				sum_plr += plr_sum/sum_counter;
 
 				//printf("TTI:%f/ AVgbr/AVdelay/AVplr:%f %f %f\n", TTIcounter, gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter);
-				printf("%f %f %f\n", gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter);
+				printf("%f %f %f %f\n", gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter, jfi);
 			}
 
 			return state;
@@ -574,19 +579,8 @@ h_log("debug303\n");
          	float dly_coef = 0.25;
 			float fairness_coef = 0.25;
 
-			int num_counter=0;
-			float sumgbr=0;
-			float sumdelay=0;
-			float sumplr=0;
-
-			float fairness_sum=0;
-			float fairness_sum_quad=0;
-			float fairness_sum_goodput=0;
-			float fairness_avg=0;
-			u_int32_t fairness_connection=0;
-			float fi=0;
-
          	RealReward = torch::zeros(1);
+
 	      	for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
 	         	for (std::vector<Application*>::iterator itt = (*it)->GetApplicationContainer()->begin(); itt != (*it)->GetApplicationContainer()->end(); ++itt){
 					if ((*(*itt)).realgbr > before_gbr ) gbrReward = 1;
@@ -611,94 +605,45 @@ h_log("debug303\n");
 						if((*(*itt)).realdelay == 0) delayReward = -1;
 						else delayReward = -1 + ((before_delay) / (*(*itt)).realdelay);
 					}
-					before_delay = (*(*itt)).realdelay;					
-					// if ((*(*itt)).realgbr >= (*(*itt)).QoSgbr) {
-		            //    gbrReward = 1;
-		            // }
-		            // else {
-		            //    //gbrReward = 0;
-					//    gbrReward = (*(*itt)).realgbr/(*(*itt)).QoSgbr;
-					//    if(gbrReward<0) gbrReward=0;
-		            // }   
+					before_delay = (*(*itt)).realdelay;									
 
-		            // // there has been a TX
-		            // if((*(*itt)).appTXCount > 0){
-		            // 	if ((*(*itt)).realplr <= (*(*itt)).QoSplr) {
-		            //    		plrReward = 1;
-		            // 	} else {
-		            //    		//plrReward = 0;
-					// 		plrReward = 1 - ((*(*itt)).realplr - (*(*itt)).QoSplr)/(*(*itt)).realplr;
-					// 		if(plrReward<0) plrReward=0;
-		            // 	}  
-		            // // there hasnt been a TX
-		            // } else {
-		            // 	plrReward = 0;
-		            // }
 
- 					// //if there has been a RX
-					// if((*(*itt)).appRXCount > 0){
-			        //     if ((*(*itt)).realdelay <= (*(*itt)).QoSdelay) {
-			        //        delayReward = 1;
-			        //     } else {
-			        //        //delayReward = 0;
-					// 	   delayReward = 1 - ((*(*itt)).realdelay - (*(*itt)).QoSdelay)/(*(*itt)).realdelay;
-					// 	   if(delayReward<0) delayReward=0;
-			        //     }
-			        // // there hasnt been an RX
-			        // } else {
-			        // 	delayReward = 0;
-			        // }					
-
-	            	(*(*itt)).reward = gbr_coef*gbrReward + plr_coef*plrReward + dly_coef*delayReward;
+	            	(*(*itt)).reward = (gbr_coef*gbrReward + plr_coef*plrReward + dly_coef*delayReward) / (*it)->GetApplicationContainer()->size();
 					sum_reward += (*(*itt)).reward; 
 
-					sumgbr += (*(*itt)).realgbr;
-					sumdelay += (*(*itt)).realdelay;
-					sumplr += (*(*itt)).realplr;
-
-					//if((int)TTIcounter%1000==0) printf("counter(%d) id(%d) gbr/plr/delay %f %f %f\n",
-					//	num_counter, (*(*itt)).id, gbr_coef*gbrReward, plr_coef*plrReward, dly_coef*delayReward);
-					//num_counter++;
-
 					// fairness
-					if ((*(*itt)).realgoodput > 0)
+					if ((*(*itt)).realgbr > 0)
 					{
-						fairness_connection++;
-						fairness_sum += (*(*itt)).realgoodput;
-						fairness_sum_quad += pow((*(*itt)).realgoodput, 2);
+						fairness_counter++;
+						fairness_sum += (*(*itt)).realgbr;
+						fairness_sum_square += pow((*(*itt)).realgbr, 2);
+						//printf("increment (*(*itt)).realgbr(%f)/fairness_sum(%f)/fairness_sum_square(%f)\n", (*(*itt)).realgbr,fairness_sum,fairness_sum_square);
 					}
 				}
 			}
-			
-			fairness_avg = fairness_sum / fairness_connection;
-			fairness_sum_goodput = pow(fairness_sum, 2);
 
-			if(fairness_connection != 0)
-			{
-				fi = fairness_sum_goodput / (fairness_connection * fairness_sum_quad);
-				//printf("fi: %f, fairness_sum_goodput: %f, fairness_connection: %d, fairness_sum_quad: %f\n",
-				//	fi, fairness_sum_goodput, fairness_connection, fairness_sum_quad);
-			}
+			fairness_total_square = pow(fairness_sum, 2);
+
+			if(fairness_sum_square>0) jfi = fairness_total_square / (fairness_counter * fairness_sum_square);
+			else jfi=0;
+			
+			//printf("fairness_reward(%.4f)/jfi(%.4f)/fairness_sum(%.4f)/fairness_counter(%d)/fairness_total_square(%.4f)/fairness_sum_square(%.4f)\n",
+			//	fairness_reward, jfi, fairness_sum, fairness_counter, fairness_total_square, fairness_sum_square);
+
+			fairness = jfi;
+			
+			if (jfi >= before_fairness ) fairness_reward = 1;
 			else
 			{
-				fi = 1;
-			}
-
-			fairness = fi;
-			
-			if (fi >= before_fairness ) fairness_reward = 1;
-			else
-			{
-				fairness_reward = -1 + (fi / (before_fairness));
+				fairness_reward = -1 + (jfi / (before_fairness));
 			}
 			
 			fairness_reward = fairness_reward * fairness_coef;
-			before_fairness = fi;
+			sum_reward += fairness_reward;
+			before_fairness = jfi;
 
-			if(fi>0) sum_fairness += fi;
-
-			//printf("fairness total %f avg %f fi %f reward %f\n", fairness_sum, fairness_avg, fi, fairness_reward);
-			sum_reward = (sum_reward / (float) noUEs) + fairness_reward;
+			//printf("fairness total %f fi %f reward %f\n", fairness_sum, , fi, fairness_reward);
+			sum_reward = (sum_reward / (float) noUEs);
 			
 			Accum_Reward += sum_reward;
 			//printf("\tAt %d TTI, TTI Reward= %f, \tAccum_reward= %f, #UEs %d \n", (int)TTIcounter, sum_reward, Accum_Reward, noUEs);
@@ -706,7 +651,6 @@ h_log("debug303\n");
 				//(int)TTIcounter, sum_reward, fi, this_goodput);
 
 			this_goodput = 0;
-			//printf("AVgbr/AVdelay/AVplr %f %f %f\n", sumgbr/num_counter,sumdelay/num_counter, sumplr/num_counter);
 		
 			RealReward.index_put_({0}, sum_reward);
 	      	return RealReward;  

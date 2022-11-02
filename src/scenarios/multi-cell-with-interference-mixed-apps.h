@@ -85,6 +85,9 @@ static void MultiCellWithInterferenceMixedApps (int nbCells, double radius,
 		                                double maxDelay, int videoBitRate,
                                         int seed)
 {
+	//* hoonhwi: 현재 for(nbCELL: for(eachApplication:createUE))
+	//* 			INTER CELL: 한 CELL 안에 / INTRA CELL: ??????
+	//* 			JFI(Jain's Fairness Index): [sum(T)^2 / {n*sum(T^2)}]
 	printf("Test Start\n");
 	
 	// define simulation times
@@ -238,9 +241,15 @@ static void MultiCellWithInterferenceMixedApps (int nbCells, double radius,
 	{	  
 		for (int i = 0; i < nbVideo; i++){
 			//ue's random position
-			vector<CartesianCoordinates*> *positions = GetUniformUsersDistribution (j, nbUE);
-			double posX = positions->at (i)->GetCoordinateX ();
-			double posY = positions->at (i)->GetCoordinateY ();
+			//vector<CartesianCoordinates*> *positions = GetUniformUsersDistribution (j, nbUE);
+			//double posX = positions->at (i)->GetCoordinateX ();
+			//double posY = positions->at (i)->GetCoordinateY ();
+						//ue's random position
+			double posX = (double)rand()/RAND_MAX; posX = 0.95 *
+				(((2*radius*1000)*posX) - (radius*1000));
+			double posY = (double)rand()/RAND_MAX; posY = 0.95 *
+			(((2*radius*1000)*posY) - (radius*1000));
+
 			double speedDirection = (double)(rand() %360) * ((2*M_PI)/360);
 
 			UserEquipment* ue = new UserEquipment (idUE,

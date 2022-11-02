@@ -475,8 +475,8 @@ h_log("2222\n");
   close(cqi_fd);
   delete networkEnv;
 
-  printf("Average GBR: %0.6f, Average delay: %0.6f, Average plr: %0.6f, Average fairness: %0.6f, throughput: %0.6f, goodput: %0.6f\n",
-    sum_gbr/networkEnv->TTIcounter, sum_delay/networkEnv->TTIcounter, sum_plr/networkEnv->TTIcounter, sum_fairness/networkEnv->TTIcounter, sum_throughput/throughput_num, sum_goodput/goodput_num);
+  printf("Average GBR: %0.6f, Average delay: %0.6f, Average plr: %0.6f, fairness: %0.6f, throughput: %0.6f, goodput: %0.6f\n",
+    sum_gbr/networkEnv->TTIcounter, sum_delay/networkEnv->TTIcounter, sum_plr/networkEnv->TTIcounter, jfi, sum_throughput/throughput_num, sum_goodput/goodput_num);
   printf("TEST END, Test Duration: %0.4f s\n", (float)(clock()-test_start) / CLOCKS_PER_SEC);
 
   return 0;
