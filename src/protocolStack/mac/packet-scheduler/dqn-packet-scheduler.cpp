@@ -113,7 +113,7 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
     if(isfinite(mlwdf_metric) == 0) mlwdf_metric = 0;
     if(isfinite(exprule_metric) == 0) exprule_metric = 0;
 
-    printf("Metric EXP LOG MLWDF EXP_RULE: %f %f %f %f\n", exp_metric, log_metric, mlwdf_metric, exprule_metric);
+    //printf("Metric EXP LOG MLWDF EXP_RULE: %f %f %f %f\n", exp_metric, log_metric, mlwdf_metric, exprule_metric);
     metric = (spectralEfficiency * 180000.) / bearer->GetAverageTransmissionRate() // PF
                * ( pow(exp_metric, weight0) // EXP
                     + pow(log_metric, weight1) // LOG
