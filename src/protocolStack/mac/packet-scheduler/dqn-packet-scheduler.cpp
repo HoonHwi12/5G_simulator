@@ -129,7 +129,7 @@ double DQN_PacketScheduler::ComputeEXPrule(RadioBearer *bearer)
 {
   double avgHOL = 0.;
   int nbFlows = 0;
-
+ 
   // compute average of hol delays
   for (auto flow : *GetFlowsToSchedule())
   {
