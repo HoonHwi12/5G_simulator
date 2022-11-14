@@ -647,7 +647,6 @@ Simulator::Run (int seed)
     {
       break;
     }
-
     // Update everything needed for scheduler changes
     UpdateAllScheduler(scheduler);
     // execute "action"

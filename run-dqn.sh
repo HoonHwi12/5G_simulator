@@ -1,31 +1,34 @@
 #!/bin/bash
-
-#600 UE
+cd dqn/build
+NUM_CELL=3
 
 for SC_TYPE in 7;
 do
-	NUM_CELL=3
 	NUM_VID=0
 	NUM_CBR=0
 	NUM_BE=0
 	NUM_VOIP=0
 '
-	for NUM_VID in 120;
+	for NUM_VOIP in 1200;
 	do
 		sleep 5
 		echo "./main ${SC_TYPE} > test_results/output/SCHED${SC_TYPE}_CELL${NUM_CELL}_VID${NUM_VID}_CBR${NUM_CBR}_BE${NUM_BE}_VOIP${NUM_VOIP}.log"
 		./main ${SC_TYPE} > test_results/output/SCHED${SC_TYPE}_CELL${NUM_CELL}_VID${NUM_VID}_CBR${NUM_CBR}_BE${NUM_BE}_VOIP${NUM_VOIP}.log
 		sleep 5
 	done
-'
+
 	NUM_VID=0
-	for NUM_VOIP in 360 600;
-        do
-                sleep 5
-                echo "./main ${SC_TYPE} > test_results/output/SCHED${SC_TYPE}_CELL${NUM_CELL}_VID${NUM_VID}_CBR${NUM_CBR}_BE${NUM_BE}_VOIP${NUM_VOIP}.log"
-                ./main ${SC_TYPE} > test_results/output/SCHED${SC_TYPE}_CELL${NUM_CELL}_VID${NUM_VID}_CBR${NUM_CBR}_BE${NUM_BE}_VOIP${NUM_VOIP}.log
-                sleep 5
-        done
+	NUM_CBR=0
+	NUM_BE=0
+	NUM_VOIP=0
+'	
+	for NUM_VID in 600;
+    do
+		sleep 5
+		echo "./main ${SC_TYPE} > test_results/output/SCHED${SC_TYPE}_CELL${NUM_CELL}_VID${NUM_VID}_CBR${NUM_CBR}_BE${NUM_BE}_VOIP${NUM_VOIP}.log"
+		./main ${SC_TYPE} > test_results/output/SCHED${SC_TYPE}_CELL${NUM_CELL}_VID${NUM_VID}_CBR${NUM_CBR}_BE${NUM_BE}_VOIP${NUM_VOIP}.log
+		sleep 5
+	done
 
 done
 
@@ -62,4 +65,5 @@ do
 	done
 done
 '
+cd ../../
 echo "test end"

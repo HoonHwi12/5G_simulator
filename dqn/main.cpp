@@ -275,7 +275,7 @@ int main(int argc, char** argv) {
     h_log("entering while(1)\n");
   	torch::Tensor state = networkEnv->CurrentState(true);
   	networkEnv->TTI_increment();
-h_log("2222\n");
+    h_log("2222\n");
   	// selecting an action
     torch::Tensor action = torch::zeros({2,4});
     torch::Tensor action_input = torch::zeros(4);
@@ -453,6 +453,8 @@ h_log("2222\n");
       //printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC, valid_TTI_exploit, valid_TTI_explore);
 
     } // training loop
+
+    printf("%0.7f\n", (float)(clock()-infstart)/CLOCKS_PER_SEC/1000);
     
     if( model_saved == false && (networkEnv->TTIcounter >= TRAIN_TTI ))
     {

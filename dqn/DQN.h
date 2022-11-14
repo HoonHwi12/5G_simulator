@@ -10,6 +10,8 @@ extern int NUM_OUTPUT;
 extern int NUMUE;
 
 //#define HLOG
+#define INF_LOG
+
 #ifdef HLOG
 #define h_log(fmt, ...) \
     do { fprintf(stderr, "[hoonhwi] Log: " fmt, ## __VA_ARGS__); } while (0)        
@@ -18,6 +20,17 @@ extern int NUMUE;
 #define h_log(fmt, ...) \
     do {  } while (0)        
 #endif // HLOG
+
+#ifdef INF_LOG
+#define inf_log(fmt, ...) \
+    do { fprintf(stderr, fmt, ## __VA_ARGS__); } while (0)        
+#endif
+#ifndef INF_LOG
+#define inf_log(fmt, ...) \
+    do {  } while (0)        
+#endif // inf_log
+
+
 
 struct DQNImpl : torch::nn::Module {
 

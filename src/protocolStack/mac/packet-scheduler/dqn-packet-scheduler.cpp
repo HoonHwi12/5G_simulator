@@ -94,21 +94,21 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
 
   //printf("Compute DQN metric weight0(%f)/weight1(%f)/weight2(%f)\n", weight0, weight1, weight2);
 
-  // if (bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_INFINITE_BUFFER ||
-  //     bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_CBR ||
-  //     bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_TRACE_BASED ||
-	// 	  bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_VOIP)
-  // {
-	//   metric = (spectralEfficiency * 180000.) / bearer->GetAverageTransmissionRate();
-  // }
-  // else
-  // {
+  if (bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_INFINITE_BUFFER ||
+      bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_CBR ||
+      bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_TRACE_BASED ||
+		  bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_VOIP)
+  {
+	  metric = (spectralEfficiency * 180000.) / bearer->GetAverageTransmissionRate();
+  }
+  else
+  {
     double exp_metric = ComputeEXP(bearer);
     double log_metric = ComputeLOG(bearer);
     double mlwdf_metric = ComputeMLWDF(bearer);
     double exprule_metric = ComputeEXPrule(bearer);
 
-    if( isfinite(exp_metric) == 0 ) exp_metric = 0;
+    if(isfinite(exp_metric) == 0 ) exp_metric = 0;
     if(isfinite(log_metric) == 0) log_metric = 0;
     if(isfinite(mlwdf_metric) == 0) mlwdf_metric = 0;
     if(isfinite(exprule_metric) == 0) exprule_metric = 0;
@@ -119,7 +119,7 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
                     + pow(log_metric, weight1) // LOG
                     + pow(mlwdf_metric, weight2) // MLWDF
                     + pow(exprule_metric, weight3) ); //EXP rule
-    // }
+  }
 
 
     return metric;
