@@ -612,36 +612,36 @@ h_log("debug303\n");
 	            	(*(*itt)).reward = (gbr_coef*gbrReward + plr_coef*plrReward + dly_coef*delayReward) / (*it)->GetApplicationContainer()->size();
 					sum_reward += (*(*itt)).reward; 
 
-					// fairness
-					// if ((*(*itt)).realgbr > 0)
-					// {
-					// 	fairness_counter++;
-					// 	fairness_sum += (*(*itt)).realgbr;
-					// 	fairness_sum_square += pow((*(*itt)).realgbr, 2);
-					// 	//printf("increment (*(*itt)).realgbr(%f)/fairness_sum(%f)/fairness_sum_square(%f)\n", (*(*itt)).realgbr,fairness_sum,fairness_sum_square);
-					// }
+					//fairness
+					if ((*(*itt)).realgbr > 0)
+					{
+						fairness_counter++;
+						fairness_sum += (*(*itt)).realgbr;
+						fairness_sum_square += pow((*(*itt)).realgbr, 2);
+						//printf("increment (*(*itt)).realgbr(%f)/fairness_sum(%f)/fairness_sum_square(%f)\n", (*(*itt)).realgbr,fairness_sum,fairness_sum_square);
+					}
 				}
 			}
 
-			//fairness_total_square = pow(fairness_sum, 2);
+			fairness_total_square = pow(fairness_sum, 2);
 
-			//if(fairness_sum_square>0) jfi = fairness_total_square / (fairness_counter * fairness_sum_square);
-			//else jfi=0;
+			if(fairness_sum_square>0) jfi = fairness_total_square / (fairness_counter * fairness_sum_square);
+			else jfi=0;
 			
 			//printf("fairness_reward(%.4f)/jfi(%.4f)/fairness_sum(%.4f)/fairness_counter(%d)/fairness_total_square(%.4f)/fairness_sum_square(%.4f)\n",
 			//	fairness_reward, jfi, fairness_sum, fairness_counter, fairness_total_square, fairness_sum_square);
 
-			//fairness = jfi;
+			fairness = jfi;
 			
-			// if (jfi >= before_fairness ) fairness_reward = 1;
-			// else
-			// {
-			// 	fairness_reward = -1 + (jfi / (before_fairness));
-			// }
+			if (jfi >= before_fairness ) fairness_reward = 1;
+			else
+			{
+				fairness_reward = -1 + (jfi / (before_fairness));
+			}
 			
-			// fairness_reward = fairness_reward * fairness_coef;
-			// sum_reward += fairness_reward;
-			// before_fairness = jfi;
+			fairness_reward = fairness_reward * fairness_coef;
+			sum_reward += fairness_reward;
+			before_fairness = jfi;
 
 			//printf("fairness total %f fi %f reward %f\n", fairness_sum, , fi, fairness_reward);
 			sum_reward = (sum_reward / (float) noUEs);

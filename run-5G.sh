@@ -32,7 +32,7 @@ do
 	NUM_BE=0
 	NUM_VOIP=0
 '
-	for NUM_VID in 600;
+	for NUM_VID in 120 240 360 480;
 	do      
 		CAL_VID=$(($NUM_VID/$NUM_CELL))
 		CAL_CBR=$(($NUM_CBR/$NUM_CELL))

@@ -22,7 +22,7 @@ do
 	NUM_BE=0
 	NUM_VOIP=0
 '	
-	for NUM_VID in 600;
+	for NUM_VID in 120 240 360 480;
     do
 		sleep 5
 		echo "./main ${SC_TYPE} > test_results/output/SCHED${SC_TYPE}_CELL${NUM_CELL}_VID${NUM_VID}_CBR${NUM_CBR}_BE${NUM_BE}_VOIP${NUM_VOIP}.log"
