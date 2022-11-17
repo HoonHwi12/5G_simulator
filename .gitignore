@@ -48,6 +48,8 @@ state_fifo
 #Fast Fading Traces
 dqn/libtorch/*
 dqn/build/*
+jdqn/libtorch/*
+jdqn/build/*
 old_dqn/*
 LSTM/build/*
 LSTM/libtorch/*

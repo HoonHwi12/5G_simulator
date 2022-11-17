@@ -1,5 +1,5 @@
 #!/bin/bash
-cd dqn/build
+cd jdqn/build
 NUM_CELL=3
 
 for SC_TYPE in 7;

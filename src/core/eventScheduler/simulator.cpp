@@ -192,7 +192,7 @@ Simulator::SchedulerType Simulator::FetchScheduler(int *fd){
 //  printf("LTESIM: Received scheduler: \"%f / %f / %f / %f\"\n", d_dqn_output0, d_dqn_output1, d_dqn_output2, d_dqn_output3);
 
 
-  if(d_dqn_output0 >= 0)
+  if(d_dqn_output0 >= 0 && d_dqn_output1 != -890)
   {
     if(DQN_TYPE == Simulator::Scheduler_TYPE_DQN)
     {
@@ -209,6 +209,50 @@ Simulator::SchedulerType Simulator::FetchScheduler(int *fd){
         downlink_scheduler_type = Simulator::Scheduler_TYPE_DQN_MIXED;
         printf("5G_SIM: Scheduler is DQN MIXED\n");
     }    
+  }
+  else if(d_dqn_output0 >= 0 && d_dqn_output1 == -890)
+  {
+   switch ((int)d_dqn_output0/10)
+      {
+        case 0:
+          downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
+          printf("5G_SIM: Scheduler is PF_Fair.\n");
+          break;
+        case 1:
+          downlink_scheduler_type = Simulator::Scheduler_TYPE_MLWDF;
+          printf("5G_SIM: Scheduler is MLWDF.\n");
+          break;
+        case 2:
+          downlink_scheduler_type = Simulator::Scheduler_TYPE_EXP;
+          printf("5G_SIM: Scheduler is EXP.\n");
+          break;
+        case 3:
+          downlink_scheduler_type = Simulator::Scheduler_LOG_RULE;
+          printf("5G_SIM: Scheduler is LOG_RULE.\n");
+          // downlink_scheduler_type = Simulator::Scheduler_TYPE_FLS;
+          // printf("5G_SIM: Scheduler is FLS.\n");
+          break;
+        case 4:
+          downlink_scheduler_type = Simulator::Scheduler_EXP_RULE;
+          printf("5G_SIM: Scheduler is EXP_RULE.\n");
+          break;
+        case 5:
+          downlink_scheduler_type = Simulator::Scheduler_LOG_RULE;
+          printf("5G_SIM: Scheduler is LOG_RULE.\n");
+          break;
+        case 6:
+          downlink_scheduler_type = Simulator::Scheduler_TYPE_MAXIMUM_THROUGHPUT;
+          printf("5G_SIM: Scheduler is MAX_THROUGHPUT.\n");
+          break;              
+        case 11:
+          downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
+          printf("5G_SIM: SETTING UEs stationary.\n");
+          //makeUEsStationary();
+          break;
+        default:
+          downlink_scheduler_type = Simulator::Scheduler_TYPE_PROPORTIONAL_FAIR;
+          break;
+      }
   }
   else
   {

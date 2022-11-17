@@ -363,7 +363,8 @@ class LTENetworkState{
 
 				//printf("TTI:%f/ AVgbr/AVdelay/AVplr:%f %f %f\n", TTIcounter, gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter);
 				// * performance log
-				//printf("%f %f %f %f ", gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter, jfi);
+				printf("%f %f %f %f ", gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter, jfi);
+
 				//inf_log("%f %f %f %f ", gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter, jfi);
 			}
 

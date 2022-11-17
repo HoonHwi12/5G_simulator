@@ -60,15 +60,15 @@ const float LR_END          = 0.00001;
 const float LR_DECAY        = 0.0001; //0.001
 const float MOMENTUM        = 0.05;  // SGD MOMENTUM
  // environment concerns
-const int NUM_ACTIONS       = 5;    // number of schedulers
+const int NUM_ACTIONS       = 5;    // number of schedulers (pf, mlwdf, exp-mlwdf, exp-pfp, log)
 const int CQI_SIZE          = 25;   // number of downlink channels per eNB
 
 //Adaptive DQN
 //const int ADA_ACTIONS       = 17569; // 14641 + 2928
 //* hyunji
-int ADA_ACTIONS       = 11;
-int ADA_ACTION        = 44;
-int NUM_OUTPUT        = 4;
+int ADA_ACTIONS       = 5; // 0 1 2 4 5
+int NUM_OUTPUT        = 1; // just one scheduler
+int ADA_ACTION        = ADA_ACTIONS*NUM_OUTPUT;
 
 //* HH: for dqn network size
 int NUMUE             = 0;
@@ -78,51 +78,18 @@ std::chrono::steady_clock::time_point start;
 std::chrono::steady_clock::time_point end;
 std::chrono::nanoseconds duration;
 
-// clock_t function_clock = clock();
-// void *thread_function_clock(void* a)
-// {
-//   clock_t thread_clock = clock();
-//   while(1)
-//   {
-//     if( (thread_clock > function_clock)
-//         && (float)(thread_clock - function_clock)/CLOCKS_PER_SEC >60 )
-//     {
-//       printf("timeout (%f) (%f)\n", thread_clock/CLOCKS_PER_SEC, function_clock/CLOCKS_PER_SEC);
-//       sleep(10000);
-//       break;
-//     }
-//     else
-//     {
-//       printf("not timeout (%f) (%f)\n", thread_clock/CLOCKS_PER_SEC, function_clock/CLOCKS_PER_SEC);
-//       thread_clock = clock();
-//       sleep(1);
-//     }
-//   }
-// }
-
 int main(int argc, char** argv) {
-  //main_start:
-  //pipe_bug = false;
-  
 	int constant_scheduler = 0;
   bool use_dqn = false;
   bool model_saved = false;
 
-  //printf("batch(%d)/minReplay(%d)/EPS(%0.2f~%0.2f/%0.4f)/Update(%d)\n",
-//    BATCH_SIZE, MIN_REPLAY_MEM, EPS_START, EPS_END, EPS_DECAY, NET_UPDATE);
-  // file naming
   std::string scheduler_string = "dqn";
   std::string model_number = "0";
   bool is_load=false;
 
   // by HH test time
   clock_t test_start = clock();
-  // pthread_t thread_id1;
-  // if(pthread_create(&thread_id1, NULL, thread_function_clock, NULL) != 0)
-  // {
-  //   printf("thread create error!\n");
-  // }
-  
+
 	if(argc >= 2 )
   {
     // use fixed scheduler or dqn
@@ -155,7 +122,6 @@ int main(int argc, char** argv) {
     return FAIL;
   }
 
-
   // LTE-Sim에 LSTM 사용여부 전송
   if(use_lstm == false)
   {    
@@ -186,23 +152,6 @@ int main(int argc, char** argv) {
   // initial connections
   LTENetworkState* networkEnv = initConnections(&sh_fd, &st_fd, &cqi_fd);
 
-  // if(pipe_bug == true)
-  // {
-  //   remove(STATE_FIFO);
-  //   remove(CQI_FIFO);
-  //   remove(SCHED_FIFO);
-
-  //   // LTE-SIM에 PIPE BUG 발생 알림
-  //   sprintf(dqn_buffer,"%d", 0x71);
-  //   printf("pipe bug detected %s\n", dqn_buffer);
-
-  //   if( SharedMemoryWrite(dqn_shmid, dqn_buffer) == -1)
-  //   {
-  //     printf("shared memory write failed\n");
-  //   }
-
-  //   goto main_start;
-  // }
   int noUEs = networkEnv->noUEs;
 
   // simulation output traces
@@ -279,8 +228,8 @@ int main(int argc, char** argv) {
   	networkEnv->TTI_increment();
     h_log("2222\n");
   	// selecting an action
-    torch::Tensor action = torch::zeros({2,4});
-    torch::Tensor action_input = torch::zeros(4);
+    torch::Tensor action = torch::zeros({2,1});
+    torch::Tensor action_input = torch::zeros(1);
 
     clock_t infstart=clock();
 
@@ -296,35 +245,16 @@ int main(int argc, char** argv) {
       {
         action = agent->selectAction(state.to(device), policyNet);
 
-        if(use_dqn && action[0][0].item<int>() >= 0)
-        {
-          /*
-          action_input.index_put_({0}, action[0][0].item<int>() * 1331
-                + action[0][1].item<int>() * 121
-                + action[0][2].item<int>() * 11
-                + action[0][3].item<int>() );
-                */
-          action_input.index_put_({0}, action[0][0]);
-          action_input.index_put_({1}, action[0][1]);
-          action_input.index_put_({2}, action[0][2]);
-          action_input.index_put_({3}, action[0][3]);
-        }
-        else
-        {
-          action_input.index_put_({0}, action[0][2].item<int>()); // fls
-        }
+        action_input.index_put_({0}, action[0][0]);
       }
     }
     else { // use fixed scheduler
-      action.index_put_({0,0}, -1);
-      action.index_put_({0,1}, constant_scheduler);
-      action.index_put_({0,2}, -1);
-      action.index_put_({0,3}, -1);
+      action.index_put_({0,0}, constant_scheduler);
       action.index_put_({1}, -1);
     }
     h_log("select action complete\n");
 
-    SendScheduler(&sh_fd, action[0][0].item<int>(), action[0][1].item<int>(), action[0][2].item<int>(), action[0][3].item<int>());
+    SendScheduler(&sh_fd, action[0][0].item<int>(), -89, -89, -89);
 
   	// observe new state
   	update     = FetchState(&st_fd); 
@@ -431,7 +361,7 @@ int main(int argc, char** argv) {
         torch::Tensor loss = (torch::mse_loss(current_q_values[0][0].to(device), target_q_values[0][0].to(device))).to(device);
 
         //* loss log
-        printf("%f\n", loss.item<float>());
+        //printf("%f\n", loss.item<float>());
 
         loss = loss.set_requires_grad(true);
         h_log("debug 0608\n");
@@ -462,7 +392,7 @@ int main(int argc, char** argv) {
     } // training loop
 
     //* inference log
-    //printf("%0.7f\n", (float)(clock()-infstart)/CLOCKS_PER_SEC/1000);
+    printf("%0.7f\n", (float)(clock()-infstart)/CLOCKS_PER_SEC/1000);
     
     if( model_saved == false && (networkEnv->TTIcounter >= TRAIN_TTI ))
     {
@@ -542,7 +472,7 @@ experience processSamples(std::vector<experience> _samples){
 
   torch::Tensor states_tensor = torch::zeros({2});
   torch::Tensor new_states_tensor = torch::zeros(0);
-  torch::Tensor actions_tensor = torch::zeros({4});
+  torch::Tensor actions_tensor = torch::zeros({1});
   torch::Tensor rewards_tensor = torch::zeros(0);
 
   states_tensor = torch::cat(states, 0);
