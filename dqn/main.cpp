@@ -53,11 +53,11 @@ const float EPS_START       = 1.0;    // greedy stuff
 const float EPS_END         = 0.01;
 const float EPS_DECAY       = 0.0001;
 
-const int NET_UPDATE        = 10;     // how many episodes until we update the target DQN 
+const int NET_UPDATE        = 100;     // how many episodes until we update the target DQN 
 const int MEM_SIZE          = 50000; // replay memory size
 const float LR_START        = 0.01;
 const float LR_END          = 0.00001;
-const float LR_DECAY        = 0.0001; //0.001
+const float LR_DECAY        = 0.001; //0.001
 const float MOMENTUM        = 0.05;  // SGD MOMENTUM
  // environment concerns
 const int NUM_ACTIONS       = 5;    // number of schedulers
