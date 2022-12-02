@@ -1,13 +1,13 @@
 #!/bin/bash
 
-NUM_CELL=3
+NUM_CELL=1
 
 CAL_VID=0
 CAL_CBR=0
 CAL_BE=0
 CAL_VOIP=0
 
-for SC_TYPE in 7;
+for SC_TYPE in 0 1 2 4 5 7;
 do
 	NUM_VID=0
 	NUM_CBR=0
@@ -32,7 +32,8 @@ do
 	NUM_BE=0
 	NUM_VOIP=0
 '
-	for NUM_VID in 600;
+# weight log
+	for NUM_VID in 120 240 360 480 600 720 840;
 	do      
 		CAL_VID=$(($NUM_VID/$NUM_CELL))
 		CAL_CBR=$(($NUM_CBR/$NUM_CELL))

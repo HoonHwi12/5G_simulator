@@ -60,7 +60,7 @@ const float LR_END          = 0.00001;
 const float LR_DECAY        = 0.001; //0.001
 const float MOMENTUM        = 0.05;  // SGD MOMENTUM
  // environment concerns
-const int NUM_ACTIONS       = 5;    // number of schedulers
+const int NUM_ACTIONS       = 11;    // number of actions (0~10 = 11)
 const int CQI_SIZE          = 25;   // number of downlink channels per eNB
 
 //Adaptive DQN
@@ -314,6 +314,9 @@ int main(int argc, char** argv) {
           action_input.index_put_({0}, action[0][2].item<int>()); // fls
         }
       }
+
+      // * hperf weight logging
+      //printf("%d %d %d %d\n", action[0][0].item<int>(), action[0][1].item<int>(), action[0][2].item<int>(), action[0][3].item<int>());
     }
     else { // use fixed scheduler
       action.index_put_({0,0}, -1);
@@ -342,7 +345,7 @@ int main(int argc, char** argv) {
     torch::Tensor reward = networkEnv->CalculateReward(); 
     reward_copy = reward[0].item<float>();
 
-    // * reward log
+    // * hperf reward log
     //printf("%f\n", reward[0].item<float>());
 
     //if( (networkEnv->TTIcounter > TRAIN_TTI) && use_dqn) printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC, valid_TTI_exploit, valid_TTI_explore);
@@ -430,8 +433,8 @@ int main(int argc, char** argv) {
         // loss and backprop
         torch::Tensor loss = (torch::mse_loss(current_q_values[0][0].to(device), target_q_values[0][0].to(device))).to(device);
 
-        //* loss log
-        printf("%f\n", loss.item<float>());
+        //* hperf loss log
+        //printf("%f\n", loss.item<float>());
 
         loss = loss.set_requires_grad(true);
         h_log("debug 0608\n");
@@ -461,8 +464,8 @@ int main(int argc, char** argv) {
 
     } // training loop
 
-    //* inference log
-    //printf("%0.7f\n", (float)(clock()-infstart)/CLOCKS_PER_SEC/1000);
+    //* hperf inference log
+    // printf("%0.7f\n", (float)(clock()-infstart)/CLOCKS_PER_SEC/1000);
     
     if( model_saved == false && (networkEnv->TTIcounter >= TRAIN_TTI ))
     {
