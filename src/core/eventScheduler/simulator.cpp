@@ -62,6 +62,15 @@ Simulator* Simulator::ptr=nullptr;
 #define CQI_FIFO   "cqi_fifo"
 
 double d_dqn_output0, d_dqn_output1, d_dqn_output2, d_dqn_output3; 
+double computeTime=0;
+
+int exp_flag=0;
+double aWi;
+double HOL;
+double m_avgHOLDelayes;
+double avgHOL;
+double m_aW;
+int nbFlow;
 
 extern int DQN_TYPE;
 
@@ -686,7 +695,10 @@ Simulator::Run (int seed)
     // }
 
     // fetch the new scheduler
+    clock_t infstart=clock();
     scheduler = FetchScheduler(&sh_fd);
+    printf("SchedulerFetch(%0.7f ms)\n", (float)(clock()-infstart)/CLOCKS_PER_SEC*1000);
+
     if(scheduler == Scheduler_TYPE_FINAL_PROPORTIONAL_FAIR)
     {
       break;
@@ -694,11 +706,17 @@ Simulator::Run (int seed)
     // Update everything needed for scheduler changes
     UpdateAllScheduler(scheduler);
     // execute "action"
+    clock_t processstart=clock();
     while(tti_tr1 == tti_tr2 && !m_calendar->IsEmpty()){
         ProcessOneEvent ();
         tti_tr2 = FrameManager::Init()->GetTTICounter();
     }
+    printf("ApplicationProcess(%0.7f ms)\n", (float)(clock()-processstart)/CLOCKS_PER_SEC*1000);
+    printf("MetricCompute(%0.7f ms)\n", computeTime);
+
     tti_tr1 = tti_tr2;
+    computeTime = 0;
+    exp_flag = 0;
     printf("\nLTESIM: TTI Change! Now in TTI # %ld.\n", tti_tr2);
     // append onto big buffer
     bigbuf = bigbuf + buffer.str();

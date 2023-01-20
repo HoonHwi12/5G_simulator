@@ -33,7 +33,7 @@ do
 	NUM_VOIP=0
 '
 # weight log
-	for NUM_VID in 720 840;
+	for NUM_VID in 600;
 	do      
 		CAL_VID=$(($NUM_VID/$NUM_CELL))
 		CAL_CBR=$(($NUM_CBR/$NUM_CELL))

@@ -316,7 +316,7 @@ int main(int argc, char** argv) {
       }
 
       // * hperf weight logging
-      //printf("%d %d %d %d\n", action[0][0].item<int>(), action[0][1].item<int>(), action[0][2].item<int>(), action[0][3].item<int>());
+      //printf("%d %d %d %d ", action[0][0].item<int>(), action[0][1].item<int>(), action[0][2].item<int>(), action[0][3].item<int>());
     }
     else { // use fixed scheduler
       action.index_put_({0,0}, -1);

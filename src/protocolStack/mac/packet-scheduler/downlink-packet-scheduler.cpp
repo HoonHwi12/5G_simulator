@@ -51,6 +51,8 @@
 #include "../../../utility/miesm-effective-sinr.h"
 #include "../../../componentManagers/FrameManager.h"
 
+extern double computeTime;
+
 DownlinkPacketScheduler::DownlinkPacketScheduler()
 {
     m_maxUsersPerRB = 1;
@@ -421,6 +423,7 @@ DownlinkPacketScheduler::RBsAllocation ()
     
     FlowsToSchedule flowsForRetransmission;
     
+    clock_t infstart=clock();
     for (int i = 0; i < nbOfRBs; i++) {
         for (int j = 0; j < (int)flows->size (); j++) {
             int harqPid;
@@ -444,7 +447,9 @@ DownlinkPacketScheduler::RBsAllocation ()
             }
         }
     }
-    
+    computeTime += (float)(clock()-infstart)/CLOCKS_PER_SEC*1000;
+    //printf("ComputeTime(%0.7f ms)\n", (float)(clock()-infstart)/CLOCKS_PER_SEC*1000);
+
     for (auto f : *flows) {
         vector<double> sinrs;
         AMCModule* amc = f->GetUe()->GetMacEntity()->GetAmcModule();

@@ -32,10 +32,24 @@ public:
 	void DoSchedule();
 
 	virtual double ComputeSchedulingMetric (RadioBearer *bearer, double spectralEfficiency, int subChannel);
+	double ComputeEXPcomponent(RadioBearer *bearer);
 	double ComputeEXP(RadioBearer *bearer);
 	double ComputeLOG(RadioBearer *bearer);
 	double ComputeMLWDF(RadioBearer *bearer);
 	double ComputeEXPrule(RadioBearer *bearer);
+
+	double mean_mlwdf = 0;
+	double mean_expmlwdf = 0;
+	double mean_exppf = 0;
+	double mean_log = 0;
+
+	double cov_mlwdf = 0;
+	double cov_expmlwdf = 0;
+	double cov_exppf = 0;
+	double cov_log = 0;
+
+	int t_samples = 0;
+
 
 private:
 
