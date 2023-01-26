@@ -317,7 +317,10 @@ static void MultiCellWithInterferenceMixedApps (int nbCells, double radius,
 				}
 				case 242:
 				{
-					string _file (path + "src/flows/application/Trace/" + video_trace + "242k.dat");
+					//string _file (path + "src/flows/application/Trace/" + video_trace + "440k.dat");
+					//string _file (path + "src/flows/application/Trace/foreman_H264_128k.dat");
+					string _file (path + "src/flows/application/Trace/trailer_H264_7000k.dat");
+					//string _file (path + "src/flows/application/Trace/foreman_H264_440k.dat");
 					VideoApplication[videoApplication].SetTraceFile(_file);
 					std::cout << "		selected video @ 242k"<< std::endl;
 					break;

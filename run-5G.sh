@@ -7,7 +7,7 @@ CAL_CBR=0
 CAL_BE=0
 CAL_VOIP=0
 
-for SC_TYPE in 7;
+for SC_TYPE in 0 1 2 4 5 7;
 do
 	NUM_VID=0
 	NUM_CBR=0
@@ -33,7 +33,7 @@ do
 	NUM_VOIP=0
 '
 # weight log
-	for NUM_VID in 600;
+	for NUM_VID in 12;
 	do      
 		CAL_VID=$(($NUM_VID/$NUM_CELL))
 		CAL_CBR=$(($NUM_CBR/$NUM_CELL))

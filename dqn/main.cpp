@@ -474,7 +474,10 @@ int main(int argc, char** argv) {
       torch::save(policyNet, model_name);
     }
 
-    if(networkEnv->TTIcounter >= (TRAIN_TTI + TEST_TTI)) break;
+    if(networkEnv->TTIcounter >= (TRAIN_TTI + TEST_TTI))
+    {
+      break;
+    }
   }// training loop
 
   // log training loop satisfaction rates, false flag signals training

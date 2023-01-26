@@ -364,6 +364,7 @@ void Simulator::SendState(int *fd, std::string state){
   printf("LTESIM: Size of state: %d \n", (int)size);
   //*fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
   *fd = open(STATE_FIFO, O_WRONLY);
+  
   printf("LTESIM: open state.\n");
   // send the size of message
   write(*fd, &size, sizeof(size));
@@ -531,6 +532,7 @@ Simulator::Run (int seed)
   ConnectStateFifo(&st_fd);
   // form information about each eNB's UE's application QoS and send!
   SendUESummary(&st_fd);
+
 
 
 
@@ -723,6 +725,7 @@ Simulator::Run (int seed)
     // send the last TTI
     //printf("send state\n");
     SendState(&st_fd, buffer.str().c_str());
+    //printf("%s\n", buffer.str().c_str());
     //printf("send cqi\n");
     SendCQISummary(&cqi_fd, seed, tti_tr2);
     //printf("send cqi end\n");

@@ -302,6 +302,7 @@ DownlinkPacketScheduler::DoSchedule (void)
     DEBUG_LOG_END
     
     UpdateAverageTransmissionRate ();
+    CheckForDLDropPackets ();
     SelectFlowsToSchedule ();
     
     if (GetFlowsToSchedule ()->size() > 0)

@@ -103,9 +103,9 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
   //printf("Compute DQN metric weight0(%f)/weight1(%f)/weight2(%f)\n", weight0, weight1, weight2);
 
   if (bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_INFINITE_BUFFER ||
-      bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_CBR ||
-      bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_TRACE_BASED ||
-		  bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_VOIP)
+      bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_CBR )
+      //bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_TRACE_BASED ||
+		  //bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_VOIP)
   {
 	  metric = (spectralEfficiency * 180000.) / bearer->GetAverageTransmissionRate();
 

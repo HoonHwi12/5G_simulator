@@ -106,6 +106,7 @@ TraceBased::LoadTrace (string traceFile)
       entry.FrameIndex = index;
       entry.FrameType = frameType;
       m_entries->push_back (entry);
+      usleep(0.00001);
     }
   ifTraceFile.close ();
   iter = m_entries->begin ();

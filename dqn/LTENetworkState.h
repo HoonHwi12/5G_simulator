@@ -441,17 +441,17 @@ class LTENetworkState{
 					s_line >> td_field;
 					s_line >> td_num_field;				
 					s_line >> empt_field;
-					h_log("debug307\n");
+					h_log("debug3007\n");
 					UESummary* this_UE = GetUESummary(dst_num_field);
-					h_log("debug308\n");
+					h_log("debug3008\n");
 					Application* this_app = this_UE->GetApplication(b_num_field);
-					h_log("debug306\n");		
+					h_log("debug3006\n");		
 					// Update this RX's delay and PLR
 					this_app->realdelay = td_num_field; // we said that we will use the running average?
 					this_app->appRXCount++;
 					this_UE->RXCount++;
 					this_app->realplr = 1 - (this_app->appRXCount) / (this_app->appTXCount);
-h_log("debug303\n");
+h_log("debug3003\n");
 					//PLR satisfied
 					if (this_app->realplr < this_app->QoSplr) {
 						this_app->appSatPLRCount ++;
