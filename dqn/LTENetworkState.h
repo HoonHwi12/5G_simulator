@@ -585,27 +585,31 @@ h_log("debug3003\n");
 
 	      	for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
 	         	for (std::vector<Application*>::iterator itt = (*it)->GetApplicationContainer()->begin(); itt != (*it)->GetApplicationContainer()->end(); ++itt){
-					if ((*(*itt)).realgbr > before_gbr ) gbrReward = 1;
+					//if ((*(*itt)).realgbr > before_gbr ) gbrReward = 1;
+					if ((*(*itt)).realgbr > 2500 ) gbrReward = 1;
 					else
 					{
-						if(before_gbr == 0) gbrReward = 0;
-						else gbrReward = -1 + (*(*itt)).realgbr/before_gbr;
+						gbrReward = 0;
+						//if(before_gbr == 0) gbrReward = 0;
+						//else gbrReward = -1 + (*(*itt)).realgbr/before_gbr;
 					}
 					before_gbr = (*(*itt)).realgbr;
 
 					if ((*(*itt)).realplr < before_plr ) plrReward = 1;
 					else
 					{
-						if( (*(*itt)).realplr == 0) plrReward = -1;
-						else plrReward = -1 + ((before_plr) / (*(*itt)).realplr);
+						plrReward = 0;
+						//if( (*(*itt)).realplr == 0) plrReward = -1;
+						//else plrReward = -1 + ((before_plr) / (*(*itt)).realplr);
 					}
 					before_plr = (*(*itt)).realplr;
 
 					if ((*(*itt)).realdelay < before_delay ) delayReward = 1;
 					else
 					{
-						if((*(*itt)).realdelay == 0) delayReward = -1;
-						else delayReward = -1 + ((before_delay) / (*(*itt)).realdelay);
+						delayReward = 0;
+						//if((*(*itt)).realdelay == 0) delayReward = -1;
+						//else delayReward = -1 + ((before_delay) / (*(*itt)).realdelay);
 					}
 					before_delay = (*(*itt)).realdelay;									
 
@@ -637,7 +641,8 @@ h_log("debug3003\n");
 			if (jfi >= before_fairness ) fairness_reward = 1;
 			else
 			{
-				fairness_reward = -1 + (jfi / (before_fairness));
+				fairness_reward = 0;
+				//fairness_reward = -1 + (jfi / (before_fairness));
 			}
 			
 			fairness_reward = fairness_reward * fairness_coef;
