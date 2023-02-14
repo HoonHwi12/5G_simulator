@@ -45,8 +45,8 @@ void initWeights(torch::nn::Module& m);
 /* HyperParams*/
 int BATCH_SIZE              = 32;
 int TRAIN_START             = 6000;
-int TRAIN_TTI               = 45000;
-const int TEST_TTI          = 5000;
+int TRAIN_TTI               = 50000;
+const int TEST_TTI          = 0000;
 const int MIN_REPLAY_MEM    = 3000; //3000
 const int UPDATE_FREQUENCY  = 1;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
@@ -135,17 +135,18 @@ int main(int argc, char** argv) {
       scheduler_string = "dqn";
     }
 	} 
-  if(argc >= 3)
+  if(argc >= 3) model_number = argv[2]; // default="0"
+  if(argc >= 4)
   {
-    if( strcmp(argv[2], "0")==0) use_lstm=false;          // default=false
-    else use_lstm=true;
-  }
-  if(argc >= 4) model_number = argv[3]; // default="0"
+    if( strcmp(argv[3], "0")==0 ) is_load=false;          // default=false
+    else is_load=true;
+  }  
   if(argc == 5)
   {
-    if( strcmp(argv[4], "0")==0 ) is_load=false;          // default=false
-    else is_load=true;
+    if( strcmp(argv[4], "0")==0) use_lstm=false;          // default=false
+    else use_lstm=true;
   }
+
 
   // connect shared memory
   int dqn_shmid = SharedMemoryCreate(DQN_KEY);
@@ -235,8 +236,10 @@ int main(int argc, char** argv) {
   // by HH LOAD MODEL
   if(is_load)
   {
+    //printf("model [%s] loading...", model_name.c_str());
     torch::load(policyNet, model_name);
-    printf("load model success, waiting for LTE-Sim\n");
+    //printf("success\n");
+    //sleep(3);
   }
   else{
     policyNet->apply(initWeights);
@@ -365,7 +368,7 @@ int main(int argc, char** argv) {
       reward_copy = reward[0].item<float>();
 
       // * hperf reward log
-      //printf("%f\n", reward[0].item<float>());
+      if(networkEnv->TTIcounter > TRAIN_START) printf("%f ", reward[0].item<float>());
 
       //if( (networkEnv->TTIcounter > TRAIN_TTI) && use_dqn) printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC, valid_TTI_exploit, valid_TTI_explore);
       if( (networkEnv->TTIcounter < TRAIN_TTI) && use_dqn)
@@ -453,7 +456,7 @@ int main(int argc, char** argv) {
           torch::Tensor loss = (torch::mse_loss(current_q_values[0][0].to(device), target_q_values[0][0].to(device))).to(device);
 
           //* hperf loss log
-          //printf("%f\n", loss.item<float>());
+          //if(networkEnv->TTIcounter > TRAIN_START) printf("%f", loss.item<float>());
 
           loss = loss.set_requires_grad(true);
           h_log("debug 0608\n");
@@ -498,6 +501,7 @@ int main(int argc, char** argv) {
     {
       break;
     }
+    if(networkEnv->TTIcounter > TRAIN_START) printf("\n");
   }// training loop
 
   // log training loop satisfaction rates, false flag signals training
@@ -511,9 +515,9 @@ int main(int argc, char** argv) {
   close(cqi_fd);
   delete networkEnv;
 
-  printf("Average GBR: %0.6f, Average delay: %0.6f, Average plr: %0.6f, fairness: %0.6f, throughput: %0.6f, goodput: %0.6f\n",
-    sum_gbr/networkEnv->TTIcounter, sum_delay/networkEnv->TTIcounter, sum_plr/networkEnv->TTIcounter, jfi, sum_throughput/throughput_num, sum_goodput/goodput_num);
-  printf("TEST END, Test Duration: %0.4f s\n", (float)(clock()-test_start) / CLOCKS_PER_SEC);
+  //printf("Average GBR: %0.6f, Average delay: %0.6f, Average plr: %0.6f, fairness: %0.6f, throughput: %0.6f, goodput: %0.6f\n",
+  //  sum_gbr/networkEnv->TTIcounter, sum_delay/networkEnv->TTIcounter, sum_plr/networkEnv->TTIcounter, jfi, sum_throughput/throughput_num, sum_goodput/goodput_num);
+  //printf("TEST END, Test Duration: %0.4f s\n", (float)(clock()-test_start) / CLOCKS_PER_SEC);
 
   return 0;
 }

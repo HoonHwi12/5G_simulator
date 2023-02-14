@@ -12,6 +12,9 @@
 
 //by HH
 #include "../src/shared-memory.cpp"
+
+extern int TRAIN_START;
+
 bool use_lstm=false;
 bool pipe_bug;
 
@@ -355,7 +358,7 @@ class LTENetworkState{
 				}
 			}
 
-			if(print_qos)
+			if(print_qos && TTIcounter>TRAIN_START)
 			{
 				sum_gbr += gbr_sum/sum_counter;
 				sum_delay += delay_sum/sum_counter;
@@ -363,7 +366,7 @@ class LTENetworkState{
 
 				//printf("TTI:%f/ AVgbr/AVdelay/AVplr:%f %f %f\n", TTIcounter, gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter);
 				// * hperf performance log
-				printf("%f %f %f %f\n", gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter, jfi);
+				printf("%f %f %f %f ", gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter, jfi);
 				//inf_log("%f %f %f %f ", gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter, jfi);
 			}
 
@@ -576,17 +579,17 @@ h_log("debug3003\n");
          	float sum_reward = 0;
 			float fairness_reward = 0;
 
-         	float gbr_coef = 0.25;
-         	float plr_coef = 0.25;
-         	float dly_coef = 0.25;
-			float fairness_coef = 0.25;
+         	float gbr_coef = 1;
+         	float plr_coef = 1;
+         	float dly_coef = 1;
+			float fairness_coef = noUEs/2;
 
          	RealReward = torch::zeros(1);
 
 	      	for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
 	         	for (std::vector<Application*>::iterator itt = (*it)->GetApplicationContainer()->begin(); itt != (*it)->GetApplicationContainer()->end(); ++itt){
 					//if ((*(*itt)).realgbr > before_gbr ) gbrReward = 1;
-					if ((*(*itt)).realgbr > 2500 ) gbrReward = 1;
+					if ((*(*itt)).realgbr > 1950 ) gbrReward = 1;
 					else
 					{
 						gbrReward = 0;
@@ -595,7 +598,8 @@ h_log("debug3003\n");
 					}
 					before_gbr = (*(*itt)).realgbr;
 
-					if ((*(*itt)).realplr < before_plr ) plrReward = 1;
+					//if ((*(*itt)).realplr < before_plr ) plrReward = 1;
+					if ((*(*itt)).realplr < 0.73 ) plrReward = 1;
 					else
 					{
 						plrReward = 0;
@@ -604,10 +608,11 @@ h_log("debug3003\n");
 					}
 					before_plr = (*(*itt)).realplr;
 
-					if ((*(*itt)).realdelay < before_delay ) delayReward = 1;
+					//if ((*(*itt)).realdelay < before_delay ) delayReward = 1;
+					if ((*(*itt)).realdelay < 0.08 ) delayReward = 1;
 					else
 					{
-						delayReward = 0;
+						delayReward = 0; 
 						//if((*(*itt)).realdelay == 0) delayReward = -1;
 						//else delayReward = -1 + ((before_delay) / (*(*itt)).realdelay);
 					}
@@ -638,7 +643,8 @@ h_log("debug3003\n");
 
 			fairness = jfi;
 			
-			if (jfi >= before_fairness ) fairness_reward = 1;
+			//if (jfi >= before_fairness ) fairness_reward = 1;
+			if (jfi >= 0.53 ) fairness_reward = 1;
 			else
 			{
 				fairness_reward = 0;
@@ -646,11 +652,12 @@ h_log("debug3003\n");
 			}
 			
 			fairness_reward = fairness_reward * fairness_coef;
+			//sum_reward = (sum_reward / (float) noUEs);
+
 			sum_reward += fairness_reward;
 			before_fairness = jfi;
 
 			//printf("fairness total %f fi %f reward %f\n", fairness_sum, , fi, fairness_reward);
-			sum_reward = (sum_reward / (float) noUEs);
 			
 			Accum_Reward += sum_reward;
 			//printf("\tAt %d TTI, TTI Reward= %f, \tAccum_reward= %f, #UEs %d \n", (int)TTIcounter, sum_reward, Accum_Reward, noUEs);
