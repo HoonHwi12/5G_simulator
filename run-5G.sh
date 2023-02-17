@@ -7,7 +7,7 @@ CAL_CBR=0
 CAL_BE=0
 CAL_VOIP=0
 
-for SC_TYPE in 7;
+for SC_TYPE in 5;
 do
 	NUM_VID=12
 	NUM_CBR=0

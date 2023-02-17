@@ -174,18 +174,18 @@ Simulator::SchedulerType Simulator::FetchScheduler(int *fd){
   *fd = open(SCHE_FIFO, O_RDONLY);
   i_input_bytes = read(*fd, c_readbuf, sizeof(c_readbuf));
   close(*fd);
-  //printf("i_input_bytes(%s %f %f %f %f)\n", c_readbuf, d_dqn_output0,d_dqn_output1,d_dqn_output2,d_dqn_output3);
+  printf("dqn_output(%s)\n", c_readbuf);
 
   if ( strchr(c_readbuf, '|') != NULL) // DIRECT DQN
   {
     c_read_ptr = strtok(c_readbuf, "|");
-    d_dqn_output0 = atoi(c_read_ptr);
+    d_dqn_output0 = 10*atoi(c_read_ptr);
     c_read_ptr = strtok(NULL,"|");  
-    d_dqn_output1 = atoi(c_read_ptr);
+    d_dqn_output1 = 10*atoi(c_read_ptr);
     c_read_ptr = strtok(NULL,"|");  
-    d_dqn_output2 = atoi(c_read_ptr);
+    d_dqn_output2 = 10*atoi(c_read_ptr);
     c_read_ptr = strtok(NULL,"|");  
-    d_dqn_output3 = atoi(c_read_ptr);
+    d_dqn_output3 = 10*atoi(c_read_ptr);
     c_readbuf[i_input_bytes] = '\0';
   }
   else if (strchr(c_readbuf, 'e') != NULL)
