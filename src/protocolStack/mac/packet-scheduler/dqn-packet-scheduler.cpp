@@ -100,6 +100,17 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
   double weight2 = d_dqn_output2 / 10; 
   double weight3 = d_dqn_output3 / 10;
 
+  // weight0 = 0;
+  // weight1 = 1;
+  // weight2=0;
+  // weight3=0;
+
+  if(weight0 > 1 || weight1 >1 || weight2 > 1 || weight3 > 1)
+  {
+    printf("weight value error(%f %f %f %f)\n", weight0,weight1,weight2,weight3);
+    sleep(1000);
+  }
+
   //printf("Compute DQN metric weight0(%f)/weight1(%f)/weight2(%f)\n", weight0, weight1, weight2);
 
   if (bearer->GetApplication ()->GetApplicationType () == Application::APPLICATION_TYPE_INFINITE_BUFFER ||
@@ -116,6 +127,7 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
   }
   else
   {
+    
     if(exp_flag==0)
     {
       exp_flag=1;
@@ -137,11 +149,12 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
     double log_metric = ComputeLOG(bearer);
     //printf("%0.3f)\n", (float)(clock()-inf_log)/CLOCKS_PER_SEC*1000);
 
-    if(isfinite(exp_metric) == 0 ) exp_metric = 0;
-    if(isfinite(log_metric) == 0) log_metric = 0;
     if(isfinite(mlwdf_metric) == 0) mlwdf_metric = 0;
+    if(isfinite(exp_metric) == 0 ) exp_metric = 0;
     if(isfinite(exprule_metric) == 0) exprule_metric = 0;
+    if(isfinite(log_metric) == 0) log_metric = 0;
 
+/*
     t_samples++;
     mean_mlwdf = (mean_mlwdf*(t_samples-1) + mlwdf_metric) / t_samples;
     mean_expmlwdf = (mean_expmlwdf*(t_samples-1) + exprule_metric) / t_samples;
@@ -162,14 +175,26 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
     if(isfinite(log_metric) == 0) log_metric = 0;
     if(isfinite(mlwdf_metric) == 0) mlwdf_metric = 0;
     if(isfinite(exprule_metric) == 0) exprule_metric = 0;
-    
-    //printf("Metric EXP LOG MLWDF EXP_RULE(%f %f %f %f) weight(%f %f %f %f)",
-    //  exp_metric, log_metric, mlwdf_metric, exprule_metric, weight0,weight1,weight2,weight3);
-    metric = (spectralEfficiency * 180000.) / bearer->GetAverageTransmissionRate() // PF
-               * ( pow(exp_metric, weight0) // EXP
-                    + pow(log_metric, weight1) // LOG
-                    + pow(mlwdf_metric, weight2) // MLWDF
-                    + pow(exprule_metric, weight3) ); //EXP rule
+  */
+  //  if(min_mlwdf > mlwdf_metric) min_mlwdf=mlwdf_metric;
+  //  if(min_expmlwdf > exp_metric) min_expmlwdf=exp_metric;
+  //  if(min_exppf > exprule_metric) min_exppf=exprule_metric;
+    //if(min_log > log_metric) min_log=log_metric;
+
+   // if(max_mlwdf < mlwdf_metric) max_mlwdf=mlwdf_metric;
+   // if(max_expmlwdf < exp_metric) max_expmlwdf=exp_metric;
+   // if(max_exppf < exprule_metric) max_exppf=exprule_metric;
+    //if(max_log < log_metric) max_log=log_metric;
+
+   // mlwdf_metric = (mlwdf_metric-min_mlwdf) / (max_mlwdf - min_mlwdf);
+    //if((max_log - min_log) != 0) log_metric = (log_metric-min_log) / (max_log - min_log);
+
+    // printf("Metric EXP LOG MLWDF EXP_RULE(%f %f %f %f)",exp_metric, log_metric, mlwdf_metric, exprule_metric);
+    //printf("weight(%f %f %f %f)\n",weight0, weight1, weight2, weight3);   
+
+    //metric = (spectralEfficiency * 180000.) / bearer->GetAverageTransmissionRate() * ( pow(exp_metric, weight0) + pow(log_metric, weight1) + pow(mlwdf_metric, weight2) + pow(exprule_metric, weight3) ); //EXP rule
+    metric = (spectralEfficiency * 180000.) / bearer->GetAverageTransmissionRate() * ( pow(log_metric, weight1) ); //EXP rule                    
+                  
   }
 
     //printf("metric(%f)\n", metric);

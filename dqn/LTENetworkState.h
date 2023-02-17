@@ -20,18 +20,14 @@ bool pipe_bug;
 
 float sum_delay = 0;
 float sum_gbr = 0;
+float sum_goodput = 0;
 float sum_plr = 0;
 
 float this_goodput = 0;
 float sum_throughput = 0;
-float sum_goodput = 0;
+
 int throughput_num = 0;
 int goodput_num = 0;
-
-float before_delay=0;
-float before_gbr=0;
-float before_plr=0;
-float before_fairness=0;
 
 int fairness_counter = 0;
 float fairness_sum=0;
@@ -295,6 +291,7 @@ class LTENetworkState{
 			int shared_buffer=0;
 			int sum_counter=0;
 			float gbr_sum = 0;
+			float goodput_sum = 0;
 			float plr_sum = 0;
 			float delay_sum = 0;
 
@@ -331,6 +328,7 @@ class LTENetworkState{
 					// }
 
 					gbr_sum += this_app->realgbr;
+					goodput_sum += this_app->realgoodput;
 					plr_sum += this_app->realplr;
 					delay_sum += this_app->realdelay;
 
@@ -358,7 +356,7 @@ class LTENetworkState{
 				}
 			}
 
-			if(print_qos && TTIcounter>TRAIN_START)
+			if(print_qos && TTIcounter>=TRAIN_START)
 			{
 				sum_gbr += gbr_sum/sum_counter;
 				sum_delay += delay_sum/sum_counter;
@@ -366,7 +364,7 @@ class LTENetworkState{
 
 				//printf("TTI:%f/ AVgbr/AVdelay/AVplr:%f %f %f\n", TTIcounter, gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter);
 				// * hperf performance log
-				printf("%f %f %f %f ", gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter, jfi);
+				printf("%f %f %f %f %f ", gbr_sum/sum_counter,goodput_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter, jfi);
 				//inf_log("%f %f %f %f ", gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter, jfi);
 			}
 
@@ -495,7 +493,7 @@ h_log("debug3003\n");
 
 					if(this_app->realdelay>0)
 					{
-						this_app->realgoodput = message_sizes_in_buffer / this_app->realdelay; // byte
+						this_app->realgoodput = message_sizes_in_buffer / this_app->realdelay / 1024 / 1024; // Mbyte
 						sum_goodput += this_app->realgoodput;
 
 						goodput_num++;
@@ -574,52 +572,118 @@ h_log("debug3003\n");
 		torch::Tensor CalculateReward(){
 			float reward = 0;
         	float gbrReward = 0;
+			float goodputReward = 0;
          	float plrReward = 0;
          	float delayReward = 0;
          	float sum_reward = 0;
 			float fairness_reward = 0;
 
-         	float gbr_coef = 1;
+         	float gbr_coef = 0;
+			float goodput_coef = 0;
          	float plr_coef = 1;
-         	float dly_coef = 1;
-			float fairness_coef = noUEs/2;
+         	float dly_coef = 0;
+			//float fairness_coef = noUEs/2;
+			float fairness_coef = 0;
+
+			float before_gbr[12][0];
+			float before_goodput[12][0];
+			float before_delay[12][0];
+			float before_plr[12][0];
+			float before_fairness=0;
+
+			memset(before_gbr, 0, sizeof(before_gbr));
+			memset(before_goodput, 0, sizeof(before_goodput));
+			memset(before_delay, 0, sizeof(before_delay));
+			memset(before_plr, 0, sizeof(before_plr));
+
+			int i=-1;
 
          	RealReward = torch::zeros(1);
 
 	      	for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
+				i++;
 	         	for (std::vector<Application*>::iterator itt = (*it)->GetApplicationContainer()->begin(); itt != (*it)->GetApplicationContainer()->end(); ++itt){
-					//if ((*(*itt)).realgbr > before_gbr ) gbrReward = 1;
-					if ((*(*itt)).realgbr > 1950 ) gbrReward = 1;
+					// * gbr
+					if ((*(*itt)).realgbr > 2200 ) gbrReward = 2;
+					else if ((*(*itt)).realgbr > 2000 ) gbrReward = 1;					
+					else if ((*(*itt)).realgbr > before_gbr[i][0]+30 ) gbrReward = 1;
+					
+					//else if ((*(*itt)).realgbr > 2100 ) gbrReward = 0.7;
+					//else if ((*(*itt)).realgbr > 2000 ) gbrReward = 0.5;
+					else if ((*(*itt)).realgbr > 1900 ) gbrReward = 0.5;
+					else if ((*(*itt)).realgbr > 1800 ) gbrReward = 0;
+					//else if ((*(*itt)).realgbr > 1700 ) gbrReward = -0.3;
+					else if ((*(*itt)).realgbr > 1600 ) gbrReward = -0.5;
+					//else if ((*(*itt)).realgbr > 1500 ) gbrReward = -0.7;
 					else
 					{
-						gbrReward = 0;
+						gbrReward = -1;
 						//if(before_gbr == 0) gbrReward = 0;
 						//else gbrReward = -1 + (*(*itt)).realgbr/before_gbr;
 					}
-					before_gbr = (*(*itt)).realgbr;
+					before_gbr[i][0] = (*(*itt)).realgbr;
 
-					//if ((*(*itt)).realplr < before_plr ) plrReward = 1;
-					if ((*(*itt)).realplr < 0.73 ) plrReward = 1;
+					// * goodput
+					if ((*(*itt)).realgoodput > 2200 ) goodputReward = 2;
+					else if ((*(*itt)).realgoodput > 2000 ) goodputReward = 1;					
+					else if ((*(*itt)).realgoodput > before_goodput[i][0] + 30 ) goodputReward = 1;
+					
+					//else if ((*(*itt)).realgoodput > 2100 ) goodputReward = 0.7;
+					//else if ((*(*itt)).realgoodput > 2000 ) goodputReward = 0.5;
+					else if ((*(*itt)).realgoodput > 1900 ) goodputReward = 0.5;
+					else if ((*(*itt)).realgoodput > 1800 ) goodputReward = 0;
+					//else if ((*(*itt)).realgoodput > 1700 ) goodputReward = -0.3;
+					else if ((*(*itt)).realgoodput > 1600 ) goodputReward = -0.5;
+					//else if ((*(*itt)).realgoodput > 1500 ) goodputReward = -0.7;
 					else
 					{
-						plrReward = 0;
-						//if( (*(*itt)).realplr == 0) plrReward = -1;
-						//else plrReward = -1 + ((before_plr) / (*(*itt)).realplr);
+						goodputReward = -1;
+						//if(before_goodput == 0) goodputReward = 0;
+						//else goodputReward = -1 + (*(*itt)).realgoodput/before_goodput;
 					}
-					before_plr = (*(*itt)).realplr;
+					before_goodput[i][0] = (*(*itt)).realgoodput;
 
-					//if ((*(*itt)).realdelay < before_delay ) delayReward = 1;
-					if ((*(*itt)).realdelay < 0.08 ) delayReward = 1;
+					// * DELAY
+					if ((*(*itt)).realdelay < 0.085 ) delayReward = 2;
+					else if ((*(*itt)).realdelay < 0.095 ) delayReward = 1;
+					else if ((*(*itt)).realdelay < before_delay[i][0] - 0.1 ) delayReward = 1;
+					
+					//else if ((*(*itt)).realdelay < 0.095 ) delayReward = 0.7;
+					else if ((*(*itt)).realdelay < 0.100 ) delayReward = 0.5;
+					//else if ((*(*itt)).realdelay < 0.105 ) delayReward = 0.3;
+					else if ((*(*itt)).realdelay < 0.110 ) delayReward = 0;
+					//else if ((*(*itt)).realdelay < 0.115 ) delayReward = -0.3;
+					else if ((*(*itt)).realdelay < 0.120 ) delayReward = -0.5;
+					//else if ((*(*itt)).realdelay < 0.125 ) delayReward = -0.7;
 					else
 					{
-						delayReward = 0; 
+						delayReward = -1; 
 						//if((*(*itt)).realdelay == 0) delayReward = -1;
 						//else delayReward = -1 + ((before_delay) / (*(*itt)).realdelay);
 					}
-					before_delay = (*(*itt)).realdelay;									
+					before_delay[i][0] = (*(*itt)).realdelay;		
 
+					// * PLR
+					//if ((*(*itt)).realplr < before_plr ) plrReward = 1;
+					if ((*(*itt)).realplr < 0.66 ) plrReward = 1;
+					//else if ((*(*itt)).realplr < 0.68 ) plrReward = 1;
+					else if ((*(*itt)).realplr < before_plr[i][0] - 0.2) plrReward = 1;
+					//else if ((*(*itt)).realplr < 0.68 ) plrReward = 0.7;
+					else if ((*(*itt)).realplr < 0.70 ) plrReward = 0.5;
+					//else if ((*(*itt)).realplr < 0.70 ) plrReward = 0.3;
+					else if ((*(*itt)).realplr < 0.71 ) plrReward = 0;
+					//else if ((*(*itt)).realplr < 0.72 ) plrReward = -0.3;
+					else if ((*(*itt)).realplr < 0.73 ) plrReward = -0.5;
+					//else if ((*(*itt)).realplr < 0.74 ) plrReward = -0.7;
+					else
+					{
+						plrReward = -1;
+						//if( (*(*itt)).realplr == 0) plrReward = -1;
+						//else plrReward = -1 + ((before_plr) / (*(*itt)).realplr);
+					}
+					before_plr[i][0] = (*(*itt)).realplr;							
 
-	            	(*(*itt)).reward = (gbr_coef*gbrReward + plr_coef*plrReward + dly_coef*delayReward) / (*it)->GetApplicationContainer()->size();
+	            	(*(*itt)).reward = (gbr_coef*gbrReward + goodput_coef*goodputReward + plr_coef*plrReward + dly_coef*delayReward) / (*it)->GetApplicationContainer()->size();
 					sum_reward += (*(*itt)).reward; 
 
 					//fairness
@@ -643,11 +707,20 @@ h_log("debug3003\n");
 
 			fairness = jfi;
 			
+			// * FAIRNESS
 			//if (jfi >= before_fairness ) fairness_reward = 1;
-			if (jfi >= 0.53 ) fairness_reward = 1;
+			if (jfi >= 0.58 ) fairness_reward = 2;
+			//else if (jfi >= 0.58 ) fairness_reward = 0.7;
+			else if (jfi >= 0.56 ) fairness_reward = 1;
+			else if (jfi >= 0.53 ) fairness_reward = 0.5;
+			//else if (jfi >= 0.56 ) fairness_reward = 0.3;
+			else if (jfi >= 0.51 ) fairness_reward = 0;
+			//else if (jfi >= 0.52 ) fairness_reward = -0.3;
+			else if (jfi >= 0.49 ) fairness_reward = -0.5;
+			//else if (jfi >= 0.50 ) fairness_reward = -0.7;
 			else
 			{
-				fairness_reward = 0;
+				fairness_reward = -1;
 				//fairness_reward = -1 + (jfi / (before_fairness));
 			}
 			

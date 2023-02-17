@@ -174,17 +174,18 @@ Simulator::SchedulerType Simulator::FetchScheduler(int *fd){
   *fd = open(SCHE_FIFO, O_RDONLY);
   i_input_bytes = read(*fd, c_readbuf, sizeof(c_readbuf));
   close(*fd);
+  //printf("i_input_bytes(%s %f %f %f %f)\n", c_readbuf, d_dqn_output0,d_dqn_output1,d_dqn_output2,d_dqn_output3);
 
   if ( strchr(c_readbuf, '|') != NULL) // DIRECT DQN
   {
     c_read_ptr = strtok(c_readbuf, "|");
-    d_dqn_output0 = 10*atoi(c_read_ptr);
+    d_dqn_output0 = atoi(c_read_ptr);
     c_read_ptr = strtok(NULL,"|");  
-    d_dqn_output1 = 10*atoi(c_read_ptr);
+    d_dqn_output1 = atoi(c_read_ptr);
     c_read_ptr = strtok(NULL,"|");  
-    d_dqn_output2 = 10*atoi(c_read_ptr);
+    d_dqn_output2 = atoi(c_read_ptr);
     c_read_ptr = strtok(NULL,"|");  
-    d_dqn_output3 = 10*atoi(c_read_ptr);
+    d_dqn_output3 = atoi(c_read_ptr);
     c_readbuf[i_input_bytes] = '\0';
   }
   else if (strchr(c_readbuf, 'e') != NULL)
@@ -343,8 +344,8 @@ void  Simulator::SendCQISummary(int *fd, int seed, int TTI){
   }
 
   std::string::size_type size = CQIs.size();
-  printf("LTESIM: Size of cqis: %d \n", (int)size);
-  printf("send cqi summary\n");
+  //printf("LTESIM: Size of cqis: %d \n", (int)size);
+  //printf("send cqi summary\n");
   *fd = open(CQI_FIFO, O_CREAT|O_WRONLY);
   //*fd = open(CQI_FIFO, O_WRONLY);
   // send the cqi size
@@ -353,10 +354,10 @@ void  Simulator::SendCQISummary(int *fd, int seed, int TTI){
   write(*fd, CQIs.c_str(), CQIs.size());
 
   // printf("LTESIM: Sent cqis.\n%s\n", CQIs.c_str());
-  printf("LTESIM: Sent cqis.\n");
+  //printf("LTESIM: Sent cqis.\n");
   unlockpt(*fd);
   close(*fd);
-  printf("send cqi summary end\n");
+  //printf("send cqi summary end\n");
 }
 
 void Simulator::SendState(int *fd, std::string state){
@@ -365,18 +366,18 @@ void Simulator::SendState(int *fd, std::string state){
   //*fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
   *fd = open(STATE_FIFO, O_WRONLY);
   
-  printf("LTESIM: open state.\n");
+  //printf("LTESIM: open state.\n");
   // send the size of message
   write(*fd, &size, sizeof(size));
-  printf("LTESIM: write state.\n");
+  //printf("LTESIM: write state.\n");
   //  then the whole message
   write(*fd, state.c_str(), state.size());
 
   // printf("LTESIM: Sent state.\n%s\n", state.c_str());
   unlockpt(*fd);
-  printf("LTESIM: Sent state.\n");
+  //printf("LTESIM: Sent state.\n");
   close(*fd);
-  printf("LTESIM: close state.\n");
+  //printf("LTESIM: close state.\n");
 }
 
 void Simulator::FormUESummaryMessage(GNodeB *eNB, std::string *target_string){

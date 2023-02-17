@@ -116,7 +116,7 @@ class Agent{
 				exploit_action.index_put_({1}, 0);
 			}
 
-			//printf("exploit action %d %d %d %d\n", exploit_action[0][0].item<int>(), exploit_action[0][1].item<int>(), exploit_action[0][2].item<int>(), exploit_action[0][3].item<int>());
+			n_log("exploit action %d %d %d %d\n", exploit_action[0][0].item<int>(), exploit_action[0][1].item<int>(), exploit_action[0][2].item<int>(), exploit_action[0][3].item<int>());
 		
 			//if(!timeLog) printf("Exploit! \n");
 			
@@ -127,6 +127,7 @@ class Agent{
 
 		torch::Tensor selectAction(torch::Tensor state, R policy_net){
 			float exploration_rate = strategy->explorationRate(current_step);
+			//printf("exploration_rate(%f)\n", exploration_rate);
 			// printf("eps: %f\n", exploration_rate);
 			current_step++;
 			std::uniform_int_distribution<int> dist_actions(0, num_actions);

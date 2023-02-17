@@ -48,6 +48,16 @@ public:
 	double cov_exppf = 0;
 	double cov_log = 0;
 
+	double min_mlwdf = 100;
+	double min_expmlwdf = 100;
+	double min_exppf = 100;
+	double min_log = 100;
+
+	double max_mlwdf = 0;
+	double max_expmlwdf = 0;
+	double max_exppf = 0;
+	double max_log = 0;
+
 	int t_samples = 0;
 
 

@@ -52,10 +52,10 @@ const int UPDATE_FREQUENCY  = 1;
 const float GAMMA           = 0.999;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
 const float EPS_END         = 0.01;
-const float EPS_DECAY       = 0.0001;
+const float EPS_DECAY       = 0.0001; // exploration rate, small->slower
 
 const int NET_UPDATE        = 10;     // how many episodes until we update the target DQN 
-const int MEM_SIZE          = 50000; // replay memory size
+const int MEM_SIZE          = 200000; // replay memory size
 const float LR_START        = 0.01;
 const float LR_END          = 0.00001;
 const float LR_DECAY        = 0.001; //0.001
@@ -222,8 +222,8 @@ int main(int argc, char** argv) {
   //* hyunji
   //torch::Tensor ada_actions = torch::zeros({NUM_OUTPUT,ADA_ACTIONS});
   Agent<EpsilonGreedy, DQN>* agent = new Agent<EpsilonGreedy, DQN>(eps,NUM_ACTIONS);
-  DQN policyNet(reset_state.size(1), ADA_ACTION);
-  DQN targetNet(reset_state.size(1), ADA_ACTION);
+  DQN policyNet(reset_state.size(1), NUM_ACTIONS);
+  DQN targetNet(reset_state.size(1), NUM_ACTIONS);
 
   // logging files for training 
   //  ~ please make sure that test_results/ is valid folder
@@ -458,7 +458,7 @@ int main(int argc, char** argv) {
           //* hperf loss log
           //if(networkEnv->TTIcounter > TRAIN_START) printf("%f", loss.item<float>());
 
-          loss = loss.set_requires_grad(true);
+          loss.set_requires_grad(true);
           h_log("debug 0608\n");
           optimizer.zero_grad();
           h_log("debug 0606\n");
@@ -546,6 +546,7 @@ void loadStateDict(DQN model, DQN target_model) {
     auto* t = params.find(name);
     if (t != nullptr) {
       t->copy_(val.value());
+
     } else {
       t = buffers.find(name);
       if (t != nullptr) {
