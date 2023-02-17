@@ -45,7 +45,7 @@ void initWeights(torch::nn::Module& m);
 /* HyperParams*/
 int BATCH_SIZE              = 32;
 int TRAIN_START             = 6000;
-int TRAIN_TTI               = 50000;
+int TRAIN_TTI               = 20000;
 const int TEST_TTI          = 0000;
 const int MIN_REPLAY_MEM    = 3000; //3000
 const int UPDATE_FREQUENCY  = 1;
@@ -292,7 +292,13 @@ int main(int argc, char** argv) {
 
     if(use_dqn && networkEnv->TTIcounter < TRAIN_START)
     {
-      action = agent->explore(state.to(device));
+      //action = agent->explore(state.to(device));
+      action.index_put_({0,0}, 0);
+      action.index_put_({0,1}, 0);
+      action.index_put_({0,2}, 0);
+      action.index_put_({0,3}, 10);
+      action.index_put_({1}, 0);      
+      
       SendScheduler(&sh_fd, action[0][0].item<int>(), action[0][1].item<int>(), action[0][2].item<int>(), action[0][3].item<int>());
 
       // observe new state
@@ -456,7 +462,7 @@ int main(int argc, char** argv) {
           torch::Tensor loss = (torch::mse_loss(current_q_values[0][0].to(device), target_q_values[0][0].to(device))).to(device);
 
           //* hperf loss log
-          //if(networkEnv->TTIcounter > TRAIN_START) printf("%f", loss.item<float>());
+          if(networkEnv->TTIcounter > TRAIN_START) printf("%f ", loss.item<float>());
 
           loss.set_requires_grad(true);
           h_log("debug 0608\n");

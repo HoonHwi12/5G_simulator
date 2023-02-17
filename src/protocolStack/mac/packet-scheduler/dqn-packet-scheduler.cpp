@@ -179,20 +179,25 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
     if(isfinite(exprule_metric) == 0) exprule_metric = 0;
   */
 
-    if(min_mlwdf > mlwdf_metric) min_mlwdf=mlwdf_metric;
-    if(min_expmlwdf > exp_metric) min_expmlwdf=exp_metric;
-    if(min_exppf > exprule_metric) min_exppf=exprule_metric;
-    if(min_log > log_metric) min_log=log_metric;
+    // if(min_mlwdf > mlwdf_metric) min_mlwdf=mlwdf_metric;
+    // if(min_expmlwdf > exp_metric) min_expmlwdf=exp_metric;
+    // if(min_exppf > exprule_metric) min_exppf=exprule_metric;
+    // if(min_log > log_metric) min_log=log_metric;
 
-    if(max_mlwdf < mlwdf_metric) max_mlwdf=mlwdf_metric;
-    if(max_expmlwdf < exp_metric) max_expmlwdf=exp_metric;
-    if(max_exppf < exprule_metric) max_exppf=exprule_metric;
-    if(max_log < log_metric) max_log=log_metric;
+    // if(max_mlwdf < mlwdf_metric) max_mlwdf=mlwdf_metric;
+    // if(max_expmlwdf < exp_metric) max_expmlwdf=exp_metric;
+    // if(max_exppf < exprule_metric) max_exppf=exprule_metric;
+    // if(max_log < log_metric) max_log=log_metric;
 
-    if((max_mlwdf - min_mlwdf) != 0) mlwdf_metric = (mlwdf_metric-min_mlwdf) / (max_mlwdf - min_mlwdf);
-    if((max_expmlwdf - min_expmlwdf) != 0) exp_metric = (exp_metric-min_expmlwdf) / (max_expmlwdf - min_expmlwdf);
-    if((max_exppf - min_exppf) != 0) exprule_metric = (exprule_metric-min_exppf) / (max_exppf - min_exppf);
-    if((max_log - min_log) != 0) log_metric = (log_metric-min_log) / (max_log - min_log);
+    // if((max_mlwdf - min_mlwdf) != 0) mlwdf_metric = (mlwdf_metric-min_mlwdf) / (max_mlwdf - min_mlwdf);
+    // if((max_expmlwdf - min_expmlwdf) != 0) exp_metric = (exp_metric-min_expmlwdf) / (max_expmlwdf - min_expmlwdf);
+    // if((max_exppf - min_exppf) != 0) exprule_metric = (exprule_metric-min_exppf) / (max_exppf - min_exppf);
+    // if((max_log - min_log) != 0) log_metric = (log_metric-min_log) / (max_log - min_log);
+
+    // mlwdf_metric = mlwdf_metric*10;
+    // exp_metric = exp_metric*10;
+    // exprule_metric = exprule_metric*10;
+    // log_metric = log_metric*10;
 
     mlwdf_metric = pow(mlwdf_metric, weight0);
     exp_metric = pow(exp_metric, weight1);
