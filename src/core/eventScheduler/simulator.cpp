@@ -187,7 +187,7 @@ Simulator::SchedulerType Simulator::FetchScheduler(int *fd){
     d_dqn_output3 = 10*atoi(c_read_ptr);
     c_readbuf[i_input_bytes] = '\0';
 
-    printf("dqn_output(%f %f %f %f)\n", d_dqn_output0,d_dqn_output1,d_dqn_output2,d_dqn_output3);
+    printf("dqn_output(%.0f %.0f %.0f %.0f)\n", d_dqn_output0,d_dqn_output1,d_dqn_output2,d_dqn_output3);
   }
   else if (strchr(c_readbuf, 'e') != NULL)
   {
@@ -701,7 +701,7 @@ Simulator::Run (int seed)
     // fetch the new scheduler
     clock_t infstart=clock();
     scheduler = FetchScheduler(&sh_fd);
-    printf("SchedulerFetch(%0.7f ms)\n", (float)(clock()-infstart)/CLOCKS_PER_SEC*1000);
+    printf("SchedulerFetch(%0.4f ms)\n", (float)(clock()-infstart)/CLOCKS_PER_SEC*1000);
 
     if(scheduler == Scheduler_TYPE_FINAL_PROPORTIONAL_FAIR)
     {
@@ -716,7 +716,7 @@ Simulator::Run (int seed)
         tti_tr2 = FrameManager::Init()->GetTTICounter();
     }
     printf("ApplicationProcess(%0.7f ms)\n", (float)(clock()-processstart)/CLOCKS_PER_SEC*1000);
-    printf("MetricCompute(%0.7f ms)\n", computeTime);
+    printf("MetricCompute(%0.4f ms)\n", computeTime);
 
     tti_tr1 = tti_tr2;
     computeTime = 0;

@@ -110,7 +110,27 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
   if(weight0 > 1 || weight1 >1 || weight2 > 1 || weight3 > 1)
   {
     printf("weight value error(%f %f %f %f)\n", weight0,weight1,weight2,weight3);
-    sleep(1000);
+    if(weight0 > 1)
+    {
+      printf("[weight0] fixed to 0\n");
+      weight0 = 0;
+    }
+    if(weight1 > 1)
+    {
+      printf("[weight1] fixed to 0\n");
+      weight1 = 0;
+    }
+    if(weight2 > 1)
+    {
+      printf("[weight2] fixed to 0\n");
+      weight2 = 0;
+    }
+    if(weight3 > 1)
+    {
+      printf("[weight3] fixed to 0\n");
+      weight3 = 0;
+    }    
+    sleep(5);
   }
 
   //printf("Compute DQN metric weight0(%f)/weight1(%f)/weight2(%f)\n", weight0, weight1, weight2);
