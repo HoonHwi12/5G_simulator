@@ -592,7 +592,7 @@ h_log("debug3003\n");
 
          	float gbr_coef = 1;
 			float goodput_coef = 0;
-         	float plr_coef = 2;
+         	float plr_coef = 1;
          	float dly_coef = 1;
 			//float fairness_coef = noUEs/2;
 			float fairness_coef = 1;
@@ -746,7 +746,7 @@ h_log("debug3003\n");
 			//else if ((*(*itt)).realdelay < 0.095 ) delayReward = 0.7;
 			else if (calculate_delay < 0.100 ) delayReward = 0.5;
 			//else if ((*(*itt)).realdelay < 0.105 ) delayReward = 0.3;
-			else if (calculate_delay < 0.150 ) delayReward = 0;
+			else if (calculate_delay < 0.105 ) delayReward = 0;
 			//else if ((*(*itt)).realdelay < 0.115 ) delayReward = -0.3;
 			else if (calculate_delay < 0.110 ) delayReward = -0.5;
 			//else if ((*(*itt)).realdelay < 0.125 ) delayReward = -0.7;
@@ -760,7 +760,7 @@ h_log("debug3003\n");
 
 			// * PLR
 			//if ((*(*itt)).realplr < before_plr ) plrReward = 1;
-			if (calculate_plr < 0.65 ) plrReward = 3;
+			if (calculate_plr < 0.66 ) plrReward = 3;
 			else if (calculate_plr < 0.68 ) plrReward = 1;
 			else if (TTIcounter>15000 && calculate_plr < before_tti_plr - 0.0002) plrReward = 1;
 			//else if ((*(*itt)).realplr < 0.68 ) plrReward = 0.7;
