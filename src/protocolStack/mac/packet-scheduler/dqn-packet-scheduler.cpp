@@ -43,7 +43,7 @@ extern double d_dqn_output1;
 extern double d_dqn_output2;
 extern double d_dqn_output3;
 
-extern int exp_flag;
+//extern int exp_flag;
 extern double aWi;
 extern double HOL;
 extern double m_avgHOLDelayes;
@@ -150,11 +150,13 @@ DQN_PacketScheduler::ComputeSchedulingMetric (RadioBearer *bearer, double spectr
   else
   {
     
-    if(exp_flag==0)
-    {
-      exp_flag=1;
-      ComputeEXPcomponent(bearer);
-    }
+    // if(exp_flag==0)
+    // {
+    //   exp_flag=1;
+    //   ComputeEXPcomponent(bearer);
+    // }
+    ComputeEXPcomponent(bearer);
+
     //clock_t inf_mlwdf=clock();
     double mlwdf_metric = ComputeMLWDF(bearer)*seff;
     //printf("mlwdf expm exppf log(%0.3f ", (float)(clock()-inf_mlwdf)/CLOCKS_PER_SEC*1000);

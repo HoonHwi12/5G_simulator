@@ -64,7 +64,7 @@ Simulator* Simulator::ptr=nullptr;
 double d_dqn_output0, d_dqn_output1, d_dqn_output2, d_dqn_output3; 
 double computeTime=0;
 
-int exp_flag=0;
+//int exp_flag=0;
 double aWi;
 double HOL;
 double m_avgHOLDelayes;
@@ -720,7 +720,7 @@ Simulator::Run (int seed)
 
     tti_tr1 = tti_tr2;
     computeTime = 0;
-    exp_flag = 0;
+    //exp_flag = 0;
     printf("\nLTESIM: TTI Change! Now in TTI # %ld.\n", tti_tr2);
     // append onto big buffer
     bigbuf = bigbuf + buffer.str();
