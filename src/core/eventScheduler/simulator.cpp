@@ -334,11 +334,11 @@ void Simulator::SendUESummary(int *fd){
 }
 
 void  Simulator::SendCQISummary(int *fd, int seed, int TTI){
-  printf("LTESIM: sendcqiusmany \n");
+  //printf("LTESIM: sendcqiusmany \n");
   std::vector<GNodeB*> *gNBs = NetworkManager::Init()->GetGNodeBContainer ();
   // cqi string to send
   std::string CQIs;
-  printf("LTESIM: for loop cqiusmany \n");
+  //printf("LTESIM: for loop cqiusmany \n");
   for (std::vector<GNodeB*>::iterator it = gNBs->begin(); it != gNBs->end(); ++it){
     // form cqi message of this eNB
     FormCQIMessage(*it, &CQIs, seed, TTI);
@@ -363,7 +363,7 @@ void  Simulator::SendCQISummary(int *fd, int seed, int TTI){
 
 void Simulator::SendState(int *fd, std::string state){
   std::string::size_type size = state.size();
-  printf("LTESIM: Size of state: %d \n", (int)size);
+  //printf("LTESIM: Size of state: %d \n", (int)size);
   //*fd = open(STATE_FIFO, O_CREAT|O_WRONLY);
   *fd = open(STATE_FIFO, O_WRONLY);
   
