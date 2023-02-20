@@ -45,7 +45,7 @@ void initWeights(torch::nn::Module& m);
 /* HyperParams*/
 int BATCH_SIZE              = 32;
 int TRAIN_START             = 6000;
-int TRAIN_TTI               = 20000;
+int TRAIN_TTI               = 50000;
 const int TEST_TTI          = 0000;
 const int MIN_REPLAY_MEM    = 3000; //3000
 const int UPDATE_FREQUENCY  = 1;
@@ -54,7 +54,7 @@ const float EPS_START       = 1.0;    // greedy stuff
 const float EPS_END         = 0.01;
 const float EPS_DECAY       = 0.0001; // exploration rate, small->slower
 
-const int NET_UPDATE        = 10;     // how many episodes until we update the target DQN 
+const int NET_UPDATE        = 10;     // how many episodes until we update the target DQN, ACTUALLY=>NET_UPDATExUPDATE_FREQUENCY
 const int MEM_SIZE          = 20000; // replay memory size
 const float LR_START        = 0.01;
 const float LR_END          = 0.00001;
@@ -368,7 +368,6 @@ int main(int argc, char** argv) {
         std::cout << "END signal received!" << std::endl;
         break;
       }
-      update_counter++;
       
       // process new state + cqis
       networkEnv->UpdateNetworkState(update); 
@@ -394,7 +393,7 @@ int main(int argc, char** argv) {
         exp->push(state, action_input.to(torch::kCPU), next_state, reward); 
         // if enough samples
         if(exp->canProvideSamples((size_t)MIN_REPLAY_MEM) && ((int)networkEnv->TTIcounter % UPDATE_FREQUENCY == 0) ){ 
-          //update_counter++;
+          update_counter++;
           // access learning rate
           auto options = static_cast<torch::optim::AdamOptions&> (optimizer.defaults());
           options.lr(lr_rate->explorationRate(networkEnv->TTIcounter - MIN_REPLAY_MEM));

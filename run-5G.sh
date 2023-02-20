@@ -14,7 +14,7 @@ do
 	NUM_BE=0
 	NUM_VOIP=0
 
-	for loop in 1 2 3 4 5;
+	for loop in 1;
 	do
 		#for NUM_VID in 12;
 		#do      

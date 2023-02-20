@@ -22,7 +22,7 @@ do
 		sleep 5
 	#done
 
-	
+	'
 	for loop in 1 2 3 4;
 	do
 		for NUM_VID in 12;
@@ -34,7 +34,7 @@ do
 		done
 
 	done
-
+'
 done
 cd ../../
 echo "test end"
