@@ -55,7 +55,7 @@ const float EPS_END         = 0.01;
 const float EPS_DECAY       = 0.0001; // exploration rate, small->slower
 
 const int NET_UPDATE        = 10;     // how many episodes until we update the target DQN 
-const int MEM_SIZE          = 200000; // replay memory size
+const int MEM_SIZE          = 20000; // replay memory size
 const float LR_START        = 0.01;
 const float LR_END          = 0.00001;
 const float LR_DECAY        = 0.001; //0.001
@@ -232,6 +232,10 @@ int main(int argc, char** argv) {
   log_file_name      = base + "_training.txt";
   model_name         = base + "_" + model_number + "_model.pt";
   h_log("File name ready\n");
+  #ifdef HLOG
+  std::cout << "base_name(" << base << ")"<<std::endl;
+  std::cout << "model_name(" << model_name << ")" <<std::endl;
+  #endif
 
   // by HH LOAD MODEL
   if(is_load)

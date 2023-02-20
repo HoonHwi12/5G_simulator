@@ -14,8 +14,8 @@ do
 	NUM_BE=0
 	NUM_VOIP=0
 
-	#for loop in 1;
-	#do
+	for loop in 1 2 3 4 5;
+	do
 		#for NUM_VID in 12;
 		#do      
 			CAL_VID=$(($NUM_VID/$NUM_CELL))
@@ -28,7 +28,7 @@ do
 			./5G-air-simulator MultiCellWithIMixedApps $NUM_CELL 1 600 $CAL_VID $CAL_CBR $CAL_BE $CAL_VOIP 0 1 30 0.1 242 $SEED
 			sleep 7
 		#done
-	#done
+	done
 done
 
 echo "test end"

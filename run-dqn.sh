@@ -2,6 +2,11 @@
 cd dqn/build
 NUM_CELL=3
 
+NUM_VID=0
+NUM_CBR=0
+NUM_BE=0
+NUM_VOIP=0
+
 for SC_TYPE in 7;
 do
 	NUM_VID=12
@@ -17,8 +22,8 @@ do
 		sleep 5
 	#done
 
-	'
-	for loop in 1;
+	
+	for loop in 1 2 3 4;
 	do
 		for NUM_VID in 12;
 		do
@@ -29,7 +34,7 @@ do
 		done
 
 	done
-	'
+
 done
 cd ../../
 echo "test end"
