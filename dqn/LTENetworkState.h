@@ -18,6 +18,8 @@ extern int TRAIN_START;
 bool use_lstm=false;
 bool pipe_bug;
 
+const int UPDATE_FREQUENCY  = 5;
+
 float sum_delay = 0;
 float sum_gbr = 0;
 float sum_goodput = 0;
@@ -231,10 +233,11 @@ class LTENetworkState{
 		    	
 		    }
 		    // gather number of apps
-		    for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
+			for (std::vector<UESummary*>::iterator it = GetUESummaryContainer()->begin(); it != GetUESummaryContainer()->end(); ++it){
 				this_UE = (*it);
 				noAPPs += (int)(this_UE->applications->size());
 			}
+
 			// form the state size
 			// 1(#ues) + Each UE's(App QoS + cqi)
 		    //state_size = 1+noUEs*{(3+LSTMpacket)*noAPPs + cqi_size + fairness};
@@ -242,10 +245,10 @@ class LTENetworkState{
 			// else state_size = 1+noUEs*(3*noAPPs + cqi_size + 1);
 
 			//state_size = LSTMpacket + cqi_size
-			 if(use_lstm) state_size = 1 + cqi_size; //HH
-			 else state_size = cqi_size;
+			if(use_lstm) state_size = 1 + cqi_size; //HH
+			else state_size = cqi_size;
 
-		    reset_state = torch::ones({noUEs, state_size});
+		    reset_state = torch::ones({noUEs, state_size, UPDATE_FREQUENCY});
 		}
 
 		bool CheckIfUERegistered(float test_id){
@@ -368,10 +371,10 @@ class LTENetworkState{
 				sum_delay += delay_sum/sum_counter;
 				sum_plr += plr_sum/sum_counter;
 
-				//printf("TTI:%f/ AVgbr/AVdelay/AVplr:%f %f %f\n", TTIcounter, gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter);
 				// * hperf performance log
+				#ifdef PERF_LOG
 				printf("%f %f %f %f %f ", gbr_sum/sum_counter,goodput_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter, jfi);
-				//inf_log("%f %f %f %f ", gbr_sum/sum_counter,delay_sum/sum_counter, plr_sum/sum_counter, jfi);
+				#endif
 			}
 
 			return state;
@@ -568,9 +571,13 @@ h_log("debug3003\n");
 				}
 				// UE CQIs
 				this_UE_cqis = this_UE->GetCQIContainer();
-				for (std::vector<int>::iterator ittt = this_UE_cqis->begin(); ittt != this_UE_cqis->end(); ++ittt){
-					reset_state.index_put_({ue_index, index}, (*ittt));
-					index++;
+
+				for (int i=0; i < UPDATE_FREQUENCY; i++)
+				{
+					for (std::vector<int>::iterator ittt = this_UE_cqis->begin(); ittt != this_UE_cqis->end(); ++ittt){
+						reset_state.index_put_({ue_index, index, i}, (*ittt));
+						index++;
+					}
 				}
 			}
 			return reset_state;
@@ -719,7 +726,7 @@ h_log("debug3003\n");
 			calculate_delay = calculate_delay / sum_count;
 			calculate_plr =  calculate_plr / sum_count;
 			// * gbr
-			if (calculate_gbr > 2400 ) gbrReward = 3;
+			if (calculate_gbr > 2350 ) gbrReward = 3;
 			else if (calculate_gbr > 2200 ) gbrReward = 1;					
 			else if ( TTIcounter>15000 && calculate_gbr > before_tti_gbr + 2 ) gbrReward = 0.5;
 			else if (calculate_gbr > 2100 ) gbrReward = 0.5;
@@ -730,26 +737,26 @@ h_log("debug3003\n");
 			before_tti_gbr = calculate_gbr;
 
 			// * DELAY
-			if (calculate_delay < 0.080 ) delayReward = 3;
-			else if (calculate_delay < 0.090 ) delayReward = 1;
+			if (calculate_delay < 0.070 ) delayReward = 3;
+			else if (calculate_delay < 0.080 ) delayReward = 1;
 			else if (TTIcounter>15000 && calculate_delay < before_tti_delay - 0.0003 ) delayReward = 0.5;
-			else if (calculate_delay < 0.100 ) delayReward = 0.5;
-			else if (calculate_delay < 0.105 ) delayReward = 0;
-			else if (calculate_delay < 0.110 ) delayReward = -0.5;
-			else if (calculate_delay < 0.115 ) delayReward = -1;
+			else if (calculate_delay < 0.090 ) delayReward = 0.5;
+			else if (calculate_delay < 0.100 ) delayReward = 0;
+			else if (calculate_delay < 0.105 ) delayReward = -0.5;
+			else if (calculate_delay < 0.110 ) delayReward = -1;
 			else delayReward = -3;
 			before_tti_delay = calculate_delay;
 
 			// * PLR
-			if (calculate_plr < 0.66 ) plrReward = 3;
-			else if (calculate_plr < 0.68 ) plrReward = 1;
+			if (calculate_plr < 0.675 ) plrReward = 3;
+			else if (calculate_plr < 0.685 ) plrReward = 1;
 			else if (TTIcounter>15000 && calculate_plr < before_tti_plr - 0.00002) plrReward = 0.5;
-			else if (calculate_plr < 0.69 ) plrReward = 0.5;
+			else if (calculate_plr < 0.695 ) plrReward = 0.5;
 			//else if ((*(*itt)).realplr < 0.70 ) plrReward = 0.3;
-			else if (calculate_plr < 0.70 ) plrReward = 0;
+			else if (calculate_plr < 0.705 ) plrReward = 0;
 			//else if ((*(*itt)).realplr < 0.72 ) plrReward = -0.3;
-			else if (calculate_plr < 0.705 ) plrReward = -0.5;
-			else if (calculate_plr < 0.710 ) plrReward = -1;
+			else if (calculate_plr < 0.715 ) plrReward = -0.5;
+			else if (calculate_plr < 0.725 ) plrReward = -1;
 			else plrReward = -3;
 			before_tti_plr = calculate_plr;
 
@@ -768,13 +775,13 @@ h_log("debug3003\n");
 			
 			// * FAIRNESS
 			//if (jfi >= before_fairness ) fairness_reward = 1;
-			if (jfi >= 0.64 ) fairness_reward = 3;
-			else if (jfi >= 0.62 ) fairness_reward = 1;
+			if (jfi >= 0.63 ) fairness_reward = 3;
+			else if (jfi >= 0.61 ) fairness_reward = 1;
 			else if (jfi >= before_tti_fairness + 0.000005) fairness_reward = 0.5;
-			else if (jfi >= 0.61 ) fairness_reward = 0.5;
-			else if (jfi >= 0.60 ) fairness_reward = 0;
+			else if (jfi >= 0.60 ) fairness_reward = 0.5;
+			else if (jfi >= 0.59 ) fairness_reward = 0;
 			else if (jfi >= 0.58 ) fairness_reward = -0.5;
-			else if (jfi >= 0.57 ) fairness_reward = -1;
+			else if (jfi >= 0.56 ) fairness_reward = -1;
 			else fairness_reward = -3;
 			before_tti_fairness = jfi;
 
@@ -894,7 +901,6 @@ h_log("debug3003\n");
 		torch::Tensor reset_state;
 		torch::Tensor RealReward;
 		torch::Tensor state;
-		int state_size;
 		int cqi_size;
 		
 		float Accum_Reward;
@@ -902,8 +908,9 @@ h_log("debug3003\n");
 
 		std::vector<UESummary*> *UESummaries;
 	public:
-		float TTIcounter;
+		int TTIcounter;
 		int noAPPs;
+		int state_size;
 		int noUEs;
 };
 #endif

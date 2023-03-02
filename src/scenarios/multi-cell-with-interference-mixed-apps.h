@@ -236,7 +236,8 @@ static void MultiCellWithInterferenceMixedApps (int nbCells, double radius,
   	nm->GetGatewayContainer ()->push_back (gw);
 
   	//Create UEs
-  	int idUE = nbCells;
+  	//int idUE = nbCells;
+	int idUE = 0;
 	for (int j = 0; j < nbCells; j++)
 	{	  
 		for (int i = 0; i < nbVideo; i++){
