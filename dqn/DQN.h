@@ -53,10 +53,10 @@ struct DQNImpl : torch::nn::Module {
 
 	 DQNImpl(int64_t state_size, int64_t action_size, int64_t batch_size) 
 	 	//:conv1(torch::nn::Conv2dOptions(1, batch_size, 3).stride(1).padding(1)), // Conv2dOptions(in channels, out channels, kernel size)
-		:conv1(torch::nn::Conv3dOptions(batch_size, batch_size*2, 5).stride(1)), // Conv2dOptions(in channels, out channels, kernel size)
+		:conv1(torch::nn::Conv3dOptions(batch_size, batch_size*2, 3).stride(1)), // Conv2dOptions(in channels, out channels, kernel size)
 		conv2(torch::nn::Conv3dOptions(batch_size*2, batch_size*4, 3).stride(1)),
 		conv3(torch::nn::Conv3dOptions(64, 64, 3).stride(1)),
-		linear1(torch::nn::Linear(38*NUMUE, 512) ), //200*numue
+		linear1(torch::nn::Linear(14*NUMUE, 512) ), //200*numue
 	 	linear2(torch::nn::Linear(512, action_size) ),
 		state_conv1(torch::nn::Conv3dOptions(1, 3, 3).stride(1)),
 		state_conv2(torch::nn::Conv3dOptions(3, 6, 3).stride(1)),

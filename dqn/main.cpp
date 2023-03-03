@@ -259,7 +259,7 @@ int main(int argc, char** argv) {
   targetNet->to(device);
   // setting up training variables
   //std::vector<experience> samples;
-  tuple_list experience_memory[BATCH_SIZE];
+  tuple_list experience_memory[MEM_SIZE];
   sample_list samples;
 
 
@@ -293,10 +293,10 @@ int main(int argc, char** argv) {
   torch::Tensor before_state = torch::ones({networkEnv->noUEs, networkEnv->state_size, UPDATE_FREQUENCY});
   torch::Tensor next_state = torch::ones({networkEnv->noUEs, networkEnv->state_size, UPDATE_FREQUENCY});
 
-  torch::Tensor exp_current_state[BATCH_SIZE];
-  torch::Tensor exp_next_state[BATCH_SIZE];
-  torch::Tensor exp_reward[BATCH_SIZE];
-  torch::Tensor exp_action_input[BATCH_SIZE];
+  torch::Tensor exp_current_state[MEM_SIZE];
+  torch::Tensor exp_next_state[MEM_SIZE];
+  torch::Tensor exp_reward[MEM_SIZE];
+  torch::Tensor exp_action_input[MEM_SIZE];
 
   h_log("2222\n");
   // selecting an action
@@ -467,8 +467,10 @@ int main(int argc, char** argv) {
 
           //printf("%d %d %d %d\n", action[0][0].item<int>(), action[0][1].item<int>(), action[0][2].item<int>(), action[0][3].item<int>());
 
+          n_log("allocate exp memory\n");
+          n_log("mem_iter(%d) UPDATE_FREQUENCY(%d) mem_capacity(%d)\n", mem_iter, UPDATE_FREQUENCY, mem_capacity);
           // store experiece in replay memory
-          if( (mem_iter-1) >= MEM_SIZE) mem_iter = 0;
+          if( mem_iter >= MEM_SIZE) mem_iter = 0;
 
           //experience_memory[mem_iter].push_front(std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>(state, action_input.to(torch::kCPU), next_state, reward));
           //exp_current_state[mem_iter] = state.clone();
@@ -480,6 +482,8 @@ int main(int argc, char** argv) {
 
           if(mem_capacity < MEM_SIZE) mem_capacity++;
           mem_iter++;
+
+          n_log("allocate exp memory finished\n");
 
           #ifdef NET_LOG
           std::cout << "tl0" << std::get<1>(experience_memory[0]);
@@ -754,6 +758,7 @@ experience processSamples(std::vector<experience> _samples){
     rewards.push_back(std::get<3>(i));
   }
 
+  #ifdef NET_LOG
   int index=0;
   printf("samples:\n");            
   for (auto i : _samples){
@@ -767,6 +772,7 @@ experience processSamples(std::vector<experience> _samples){
     printf("get3: ");
     std::get<3>(i).print();
   }  
+  #endif
 
   torch::Tensor states_tensor;
   torch::Tensor actions_tensor;
