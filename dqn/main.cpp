@@ -57,7 +57,7 @@ const float EPS_END         = 0.01;
 const float EPS_DECAY       = 0.0001; // exploration rate, small->slower
 
 const int NET_UPDATE        = 1000;     // how many episodes until we update the target DQN, ACTUALLY=>NET_UPDATExUPDATE_FREQUENCY
-const int MEM_SIZE          = 10000; // replay memory size
+const int MEM_SIZE          = 50000; // replay memory size
 const float LR_START        = 0.01;
 const float LR_END          = 0.00001;
 const float LR_DECAY        = 0.00001; //0.001
@@ -266,7 +266,9 @@ int main(int argc, char** argv) {
 
 
   h_log("samples ready\n");
-  torch::Tensor current_q_values, next_q_values, target_q_values;
+  torch::Tensor current_q_values, next_q_values;
+  torch::Tensor target_q_values = torch::zeros({BATCH_SIZE, NUM_OUTPUT, 1}).to(device);
+  torch::Tensor target_value;
   torch::optim::Adam optimizer(policyNet->parameters(), torch::optim::AdamOptions(LR_START));
   h_log("optimizer ready\n");
 
@@ -282,7 +284,6 @@ int main(int argc, char** argv) {
   int valid_TTI_explore = 0;
   int valid_TTI_exploit = 0;
   float reward_copy = 0;
-  int update_counter = 0;
   int training_freq = 0;
   bool explore = true;
 
@@ -507,7 +508,6 @@ int main(int argc, char** argv) {
           // if enough samples
           if(canProvideSamples() )
           { 
-            update_counter++;
             // access learning rate
             auto options = static_cast<torch::optim::AdamOptions&> (optimizer.defaults());
             options.lr(lr_rate->explorationRate(networkEnv->TTIcounter - MIN_REPLAY_MEM));
@@ -567,9 +567,9 @@ int main(int argc, char** argv) {
             current_q_index.print();
             #endif
 
-            current_q_values = current_q_values.gather(2, current_q_index); // size: 4x11
-            torch::Tensor currentQ = current_q_values.sum().to(device);
-            q_log("currentQ(%f) ", currentQ.item<float>());
+            current_q_values = current_q_values.gather(2, current_q_index).to(device); // size: 4x11
+            //torch::Tensor currentQ = current_q_values.sum().to(device);
+            //q_log("currentQ(%f) ", currentQ.item<float>());
             #ifdef NET_LOG
             printf("current_q_values: ");
             current_q_values.print();
@@ -587,13 +587,18 @@ int main(int argc, char** argv) {
 
             
             h_log("next Q index\n");
-            torch::Tensor next_q_index = at::argmax(next_q_values,2);
-            next_q_index = next_q_index.unsqueeze(2);
+            //torch::Tensor next_q_index = at::argmax(next_q_values,2);
+            //next_q_index = next_q_index.unsqueeze(2);
             
             h_log("next q print\n");
-            next_q_values = next_q_values.gather(2, next_q_index);
-            torch::Tensor nextQ = next_q_values.sum().to(device);
-            q_log("nextQ(%f) ", nextQ.item<float>());
+            
+            //next_q_values = next_q_values.gather(2, next_q_index);
+            next_q_values = at::argmax(next_q_values,2);
+            next_q_values = next_q_values.unsqueeze(2);
+            next_q_values.print();
+            
+            //torch::Tensor nextQ = next_q_values.sum().to(device);
+            //q_log("nextQ(%f) ", nextQ.item<float>());
             #ifdef NET_LOG
             printf("next_q_values: ");
             next_q_values.print();
@@ -604,8 +609,11 @@ int main(int argc, char** argv) {
             // bellman equation
             h_log("debug 06\n");
             //next_q_values = next_q_values.reshape({NUM_OUTPUT, -1});
-            torch::Tensor batch_reward = std::get<3>(batch).sum().to(device);
-            q_log("reward(%f) ", batch_reward.item<float>());
+            //torch::Tensor batch_reward = std::get<3>(batch).sum().to(device);
+            
+            //torch::Tensor batch_reward = std::get<3>(batch).to(device);
+
+            //q_log("reward(%f) ", batch_reward.item<float>());
             h_log("debug 066\n");
 
             #ifdef NET_LOG
@@ -616,18 +624,33 @@ int main(int argc, char** argv) {
             //batch_reward = batch_reward.unsqueeze(1);
             //batch_reward = batch_reward.unsqueeze(2);
             //batch_reward = torch::nan_to_num(batch_reward);
+            torch::Tensor batch_reward = std::get<3>(batch).to(device);
 
-            target_q_values = ((nextQ.multiply(GAMMA)) + batch_reward).to(device);
-            q_log("targetQ(%f)\n", target_q_values.item<float>());
+            for (int batchiter=0; batchiter<BATCH_SIZE; batchiter++)
+            {
+              //target_q_values = ((nextQ.multiply(GAMMA)) + batch_reward).to(device);
+              //h_log("batch iter(%d)\n", batchiter);
+              //h_log("item float(%f)\n", std::get<3>(batch)[batchiter].item<float>() );
+              //target_value = (next_q_values[batchiter].multiply(GAMMA) + batch_reward[batchiter].item<float>()).to(device);
+              target_value = next_q_values[batchiter];
+              //h_log("batch reward finish\n");
+              target_q_values.index_put_({batchiter}, target_value ).to(device);
+            }
+
+            //q_log("targetQ(%f)\n", target_q_values.item<float>());
             //target_q_values = torch::nan_to_num(target_q_values);
 
             h_log("debug 07\n");
+
             //target_q_values = target_q_values.reshape({-1, NUM_OUTPUT});
             //target_q_values.print();
 
-            h_log("debug 0605\n");
             // loss and backprop
-            torch::Tensor loss = (torch::mse_loss(currentQ, target_q_values)).to(device);
+            //torch::Tensor loss = (torch::mse_loss(currentQ, target_q_values)).to(device);
+
+            torch::Tensor loss = (torch::mse_loss(target_q_values, target_q_values)).to(device);
+
+            h_log("debug 0607\n");
 
             //* hperf loss log
             #ifdef LOSS_LOG
@@ -645,15 +668,15 @@ int main(int argc, char** argv) {
             printf("backward(%0.4f ms) ", (float)(t_backward-t_forward_next)/CLOCKS_PER_SEC*1000);
             #endif
 
-            h_log("debug 0607\n");
+            h_log("debug 0609\n");
             optimizer.step();
+
             h_log("optimizer step complete\n");
 
             // update targetNet with policyNey parameters
-            if(update_counter > NET_UPDATE){
+            if(networkEnv->TTIcounter % NET_UPDATE == 0){
               // copy weights to targetnet
               loadStateDict(policyNet, targetNet);
-              update_counter = 0;
             }
           } // enough samples
         } // every UPDATE_FREQUENCY

@@ -18,7 +18,7 @@ extern int TRAIN_START;
 bool use_lstm=false;
 bool pipe_bug;
 
-const int UPDATE_FREQUENCY  = 1;
+const int UPDATE_FREQUENCY  = 5;
 
 float sum_delay = 0;
 float sum_gbr = 0;
@@ -726,14 +726,19 @@ h_log("debug3003\n");
 			calculate_delay = calculate_delay / sum_count;
 			calculate_plr =  calculate_plr / sum_count;
 			// * gbr
-			if (calculate_gbr > 2200 ) gbrReward = 3;
+			if (calculate_gbr > 2300 ) gbrReward = 3;
+			else if (calculate_gbr > 2200 ) gbrReward = 2;
 			else if (calculate_gbr > 2100 ) gbrReward = 1;					
-			else if ( TTIcounter>10000 && calculate_gbr > before_tti_gbr + 0.6 ) gbrReward = 0.5;
+			//else if ( TTIcounter>10000 && calculate_gbr > before_tti_gbr + 0.6 ) gbrReward = 0.5;
 			else if (calculate_gbr > 2000 ) gbrReward = 0.5;
 			else if (calculate_gbr > 1900 ) gbrReward = 0;
 			else if (calculate_gbr > 1800 ) gbrReward = -0.5;
 			else if (calculate_gbr > 1700 ) gbrReward = -1;
-			else gbrReward = -1;
+			else if (calculate_gbr > 1600 ) gbrReward = -2;
+			else if (calculate_gbr > 1500 ) gbrReward = -3;
+			else if (calculate_gbr > 1400 ) gbrReward = -4;
+			else if (calculate_gbr > 1300 ) gbrReward = -5;
+			else gbrReward = -6;
 			before_tti_gbr = calculate_gbr;
 
 			// * DELAY
