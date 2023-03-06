@@ -94,7 +94,7 @@ class Agent{
 			//printf("exploration_rate(%f)\n", exploration_rate);
 			// printf("eps: %f\n", exploration_rate);
 			current_step++;
-			std::uniform_int_distribution<int> dist_actions(0, num_actions);
+			//std::uniform_int_distribution<int> dist_actions(0, num_actions);
 	        std::uniform_real_distribution<double> dist_rate(0.0, 1.0);
 	        mt.seed(rd());
 			float random_rate = dist_rate(mt);

@@ -7,7 +7,7 @@ NUM_CBR=0
 NUM_BE=0
 NUM_VOIP=0
 
-for SC_TYPE in 0 1 2 4 5 7;
+for SC_TYPE in 7;
 do
 	NUM_VID=12
 	NUM_CBR=0

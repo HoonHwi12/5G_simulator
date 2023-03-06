@@ -49,18 +49,18 @@ int BATCH_SIZE              = 32;
 int TRAIN_START             = 6000;
 int TRAIN_TTI               = 50000;
 const int TEST_TTI          = 0;
-const int MIN_REPLAY_MEM    = 3000; //3000
+const int MIN_REPLAY_MEM    = 6000; //3000
 //const int UPDATE_FREQUENCY  = 1;
-const float GAMMA           = 0.999;  // discount factor for bellman equation
+const float GAMMA           = 0.99;  // discount factor for bellman equation
 const float EPS_START       = 1.0;    // greedy stuff
 const float EPS_END         = 0.01;
 const float EPS_DECAY       = 0.0001; // exploration rate, small->slower
 
-const int NET_UPDATE        = 5;     // how many episodes until we update the target DQN, ACTUALLY=>NET_UPDATExUPDATE_FREQUENCY
-const int MEM_SIZE          = 6000; // replay memory size
+const int NET_UPDATE        = 1000;     // how many episodes until we update the target DQN, ACTUALLY=>NET_UPDATExUPDATE_FREQUENCY
+const int MEM_SIZE          = 10000; // replay memory size
 const float LR_START        = 0.01;
 const float LR_END          = 0.00001;
-const float LR_DECAY        = 0.001; //0.001
+const float LR_DECAY        = 0.00001; //0.001
 const float MOMENTUM        = 0.05;  // SGD MOMENTUM
  // environment concerns
 const int NUM_ACTIONS       = 11;    // number of actions (0~10 = 11)
@@ -254,9 +254,11 @@ int main(int argc, char** argv) {
 
   // copy weights to targetnet
   loadStateDict(policyNet, targetNet);
+  
 
   policyNet->to(device);
   targetNet->to(device);
+
   // setting up training variables
   //std::vector<experience> samples;
   tuple_list experience_memory[MEM_SIZE];
@@ -357,10 +359,10 @@ int main(int argc, char** argv) {
 
       if((networkEnv->TTIcounter) % UPDATE_FREQUENCY== 0) //* hh: update_state is full, update state to next state
       {
+        before_state = next_state.clone(); //* hh: next state to before state
         next_state = update_state.clone();
         next_state = next_state.transpose(2,0);
       }
-      before_state = next_state.clone(); //* hh: training skipped, next state to before state
     }
     else
     {
@@ -369,7 +371,6 @@ int main(int argc, char** argv) {
         if(networkEnv->TTIcounter > TRAIN_TTI && (networkEnv->TTIcounter) % UPDATE_FREQUENCY==0)
         {
           action = agent->exploit(before_state.to(device), policyNet, true);
-          sleep(1000);
         }
         else if((networkEnv->TTIcounter) % UPDATE_FREQUENCY==0)
         {
@@ -447,6 +448,7 @@ int main(int argc, char** argv) {
         
         if((networkEnv->TTIcounter) % UPDATE_FREQUENCY== 0) //* hh: update_state is full, training start
         {
+          before_state = next_state.clone();
           next_state = update_state.clone();
           next_state = next_state.transpose(2,0);
 
@@ -530,8 +532,7 @@ int main(int argc, char** argv) {
             h_log("sample memory\n");
             experience batch = processSamples(samples);
             h_log("process samples\n");
-            torch::Tensor current_q_index = torch::zeros(0);
-            current_q_index = std::get<1>(batch); // size: 40 32x4
+            torch::Tensor current_q_index = std::get<1>(batch).to(device); // size: 40 32x4
 
             // #ifdef NET_LOG
             // n_log("current_q_index: ");
@@ -545,21 +546,21 @@ int main(int argc, char** argv) {
             //std::cout <<"current_q_index ***********************\n" << current_q_index<<std::endl;
 
             h_log("get current q start\n");
-            current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch)); // size: 32x4x11
+            current_q_values = agent->CurrentQ(policyNet, std::get<0>(batch)).to(device); // size: 32x4x11
 
             #ifdef TIME_LOG
             clock_t t_forward_current=clock();
             printf("forward_currentQ(%0.4f ms) ", (float)(t_forward_current-t_save_exp)/CLOCKS_PER_SEC*1000);
             #endif
 
-            current_q_values = torch::nan_to_num(current_q_values);
+            //current_q_values = torch::nan_to_num(current_q_values);
             h_log("get current q end\n");
             //current_q_values = current_q_values.reshape({-1,4,11}); // size: 32x4x11
             //current_q_values.print();
             //std::cout <<"current Q before gather***********************\n" << current_q_values <<std::endl;
 
-            current_q_index = current_q_index.cuda();
-            current_q_values = current_q_values.cuda();
+            //current_q_index = current_q_index.cuda();
+            //current_q_values = current_q_values.cuda();
 
             #ifdef NET_LOG
             printf("current_q_index: ");
@@ -568,6 +569,7 @@ int main(int argc, char** argv) {
 
             current_q_values = current_q_values.gather(2, current_q_index); // size: 4x11
             torch::Tensor currentQ = current_q_values.sum().to(device);
+            q_log("currentQ(%f) ", currentQ.item<float>());
             #ifdef NET_LOG
             printf("current_q_values: ");
             current_q_values.print();
@@ -576,8 +578,6 @@ int main(int argc, char** argv) {
             //current_q_values = current_q_values.reshape({-1, NUM_OUTPUT});
 
             h_log("currenQ ready\n");
-            torch::Tensor next_q_index = torch::zeros(0);
-
             next_q_values = (agent->NextQ(targetNet, std::get<2>(batch))).to(device);
 
             #ifdef TIME_LOG
@@ -585,17 +585,15 @@ int main(int argc, char** argv) {
             printf("forward_nextQ(%0.4f ms) ", (float)(t_forward_next-t_forward_current)/CLOCKS_PER_SEC*1000);
             #endif
 
-            next_q_values = torch::nan_to_num(next_q_values);
-            //next_q_values = next_q_values.reshape({-1, 4,11}); // size: 32x4x11
-
-            next_q_index = at::argmax(next_q_values,2);
-            next_q_index = next_q_index.unsqueeze(2);
+            
             h_log("next Q index\n");
-            //next_q_index.print();
-
+            torch::Tensor next_q_index = at::argmax(next_q_values,2);
+            next_q_index = next_q_index.unsqueeze(2);
+            
             h_log("next q print\n");
             next_q_values = next_q_values.gather(2, next_q_index);
             torch::Tensor nextQ = next_q_values.sum().to(device);
+            q_log("nextQ(%f) ", nextQ.item<float>());
             #ifdef NET_LOG
             printf("next_q_values: ");
             next_q_values.print();
@@ -606,8 +604,8 @@ int main(int argc, char** argv) {
             // bellman equation
             h_log("debug 06\n");
             //next_q_values = next_q_values.reshape({NUM_OUTPUT, -1});
-            next_q_values.cuda();
             torch::Tensor batch_reward = std::get<3>(batch).sum().to(device);
+            q_log("reward(%f) ", batch_reward.item<float>());
             h_log("debug 066\n");
 
             #ifdef NET_LOG
@@ -617,10 +615,11 @@ int main(int argc, char** argv) {
 
             //batch_reward = batch_reward.unsqueeze(1);
             //batch_reward = batch_reward.unsqueeze(2);
-            batch_reward = torch::nan_to_num(batch_reward);
+            //batch_reward = torch::nan_to_num(batch_reward);
 
             target_q_values = ((nextQ.multiply(GAMMA)) + batch_reward).to(device);
-            target_q_values = torch::nan_to_num(target_q_values);
+            q_log("targetQ(%f)\n", target_q_values.item<float>());
+            //target_q_values = torch::nan_to_num(target_q_values);
 
             h_log("debug 07\n");
             //target_q_values = target_q_values.reshape({-1, NUM_OUTPUT});
@@ -657,7 +656,6 @@ int main(int argc, char** argv) {
               update_counter = 0;
             }
           } // enough samples
-          before_state = next_state.clone();
         } // every UPDATE_FREQUENCY
 
         // training time logging
@@ -668,6 +666,7 @@ int main(int argc, char** argv) {
         if (action[1][0].item<int>() == 0) valid_TTI_exploit++;
         else if(action[1][0].item<int>() > 0) valid_TTI_explore++;
         //printf("\tInferenceTime %0.7f ms\tExploit %d,\tExplore %d\n", (float)(clock()-infstart)/CLOCKS_PER_SEC, valid_TTI_exploit, valid_TTI_explore);
+        q_log("Exploit(%d)Explore(%d) ", valid_TTI_exploit, valid_TTI_explore);
 
       } // training loop
     }
